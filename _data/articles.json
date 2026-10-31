@@ -1,5 +1,19 @@
 [
   {
+    "title": "إزاي تشحن موديل Gemma حجمه ٥٨٤ ميجا عن طريق Google Play",
+    "date": "2026-10-31",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "KMP",
+      "Gemma",
+      "On-Device AI"
+    ],
+    "summary": "تجربة PokeCollect في توصيل موديل Gemma كبير للمستخدمين من غير ما الـ APK يبقى ٦٠٠ ميجا.",
+    "content": "عندك موديل AI حجمه ٥٨٤ ميجا، هتحطه جوه الـ APK وتخلّي المستخدم ينزّل app بـ ٦٠٠ ميجا؟ 😬\n\nده اللي قابل Kevin Desai في PokeCollect، وهو app بـ Kotlin Multiplatform فيه feature بتجاوب على أسئلة باستخدام Gemma على الجهاز مع LiteRT-LM.\n\nالحل اسمه Play for On-Device AI\nدي library من Google لسه في beta، مبنية على Play Asset Delivery. الموديل بيتفصل عن الـ APK، وجوجل بلاي هو اللي بيستضيفه ويوصّله.\n\nالخطوات باختصار\nأولًا، لازم تشحن AAB مش APK، ومحتاج AGP 8.8 أو أحدث.\nثانيًا، اختار الـ delivery mode، يا إما fast-follow بعد التثبيت على طول، أو install-time مع الـ app، أو on-demand وقت الطلب.\nثالثًا، اعمل module فيه الموديل بس بالـ plugin اللي اسمه com.android.ai-pack، ومتحطش ملف الموديل في git.\nرابعًا، اربطه بـ assetPacks وضيف dependency الـ ai-delivery.\nخامسًا، من AiPackManager لو getPackLocation رجّع null نادي fetch، وتابع الحالات زي DOWNLOADING و WAITING_FOR_WIFI و COMPLETED في الـ UI.\n\nملاحظات\nمش محتاج Internet permission، بس فيه foreground service لازم تصرّح بيها في Play Console. والحد ١.٥ جيجا لكل AI pack، وتقدر تعمل device targeting حسب الـ RAM أو الـ chip.\n\nالخلاصة 🎯\nموديل كبير على Google Play، من غير app تقيل ومن غير hosting، وبيشتغل offline بالكامل.\n\nإنت بتوزّع موديلات الـ AI في الـ app بتاعك إزاي؟ 👇\n\n(المصدر في أول كومنت)",
+    "url": "https://androidadventures.dev/shipping-a-584-mb-gemma-model-through-google-play-b4df1825c6b8"
+  },
+  {
     "title": "ميزانية الـ prompt في Gemini Nano: حد الـ ٤٠٠٠ token",
     "date": "2026-10-31",
     "source": "نشرة التكنولوجيا",
