@@ -46,7 +46,7 @@ title: المقالات
     {% if article.category %}<button class="category" data-cat="{{ article.category }}">{{ article.category }}</button>{% endif %}
     <span class="source">{{ article.source }}</span>
     <span class="dot">•</span>
-    <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}</time>
+    <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}{% if article.date contains "T" %} · {{ article.date | date: "%H:%M" }}{% endif %}</time>
   </header>
   <h2>{% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h2>
   {% assign sum_ar = article.summary_ar | default: article.summary %}
