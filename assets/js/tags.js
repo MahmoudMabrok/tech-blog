@@ -27,6 +27,13 @@
   }
 
   document.addEventListener('click', function (e) {
+    var v = e.target.closest('.view-btn');
+    if (v) {
+      var card = v.closest('.card');
+      card.querySelectorAll('.view-btn').forEach(function (b) { b.classList.toggle('active', b === v); });
+      card.querySelectorAll('.view').forEach(function (el) { el.hidden = !el.classList.contains('view-' + v.dataset.view); });
+      return;
+    }
     var b = e.target.closest('button[data-cat], button[data-tag]');
     if (b) {
       e.preventDefault(); e.stopPropagation();

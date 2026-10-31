@@ -49,8 +49,18 @@ title: المقالات
     <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}</time>
   </header>
   <h2>{% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h2>
-  {% if article.summary %}<p class="summary">{{ article.summary }}</p>{% endif %}
-  {% if article.content %}<div class="content">{{ article.content | markdownify }}</div>{% endif %}
+  {% assign sum_ar = article.summary_ar | default: article.summary %}
+  {% assign sum_en = article.summary_en %}
+  {% if sum_ar or sum_en %}
+  <div class="view-switch" role="tablist">
+    <button class="view-btn active" data-view="full">البوست كامل</button>
+    {% if sum_ar %}<button class="view-btn" data-view="ar">الملخص العربي</button>{% endif %}
+    {% if sum_en %}<button class="view-btn" data-view="en">English Summary</button>{% endif %}
+  </div>
+  {% endif %}
+  <div class="view view-full content">{{ article.content | markdownify }}</div>
+  {% if sum_ar %}<div class="view view-ar summary-box" hidden><p>{{ sum_ar }}</p></div>{% endif %}
+  {% if sum_en %}<div class="view view-en summary-box" dir="ltr" lang="en" hidden><p>{{ sum_en }}</p></div>{% endif %}
   <footer class="card-footer">
     {% if article.tags %}
     <div class="tags">{% for tag in article.tags %}<button class="tag" data-tag="{{ tag }}">#{{ tag }}</button>{% endfor %}</div>

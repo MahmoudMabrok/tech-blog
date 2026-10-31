@@ -9,7 +9,7 @@
       "Performance",
       "Android"
     ],
-    "summary": "فريق Sentry قلّل وقت الـ init في الـ Android SDK، وقلّل الـ memory والـ CPU، يعني cold start أسرع بمجرد تحديث النسخة.",
+    "summary_ar": "فريق Sentry قلّل وقت الـ init في الـ Android SDK، وقلّل الـ memory والـ CPU، يعني cold start أسرع بمجرد تحديث النسخة.",
     "content": "عايز cold start أسرع ببلاش؟ ساعات الحل إنك تعمل bump لنسخة library 😄\n\nفريق Sentry بيقول إن وقت الـ init في الـ Android SDK بتاعهم قلّ من ٢٠٪ لـ ٣٠٪، وكمان قللوا الـ memory allocation وصلّحوا leaks وقللوا الـ background CPU.\n\nوصلوا لكده إزاي؟\nاستخدموا Perfetto traces، وعملوا أكتر من ٤٠ تغيير، وكل تغيير اتقاس بـ Macrobenchmark.\n\nأهم ٣ دروس\nأولًا، نقلوا قراية الـ options من الـ AndroidManifest لوقت الـ build، والـ Gradle Plugin بيكتبها في الـ bytecode، وده لوحده جاب حوالي ٦.٥٪. ونفس الفكرة بدل الـ reflection.\nثانيًا، استبدلوا java.net.URI في الـ DSN parsing بـ parser خفيف، من حوالي ٦ ملّي ثانية لحوالي ١ ميكرو ثانية.\nثالثًا، بدل threads لمرة واحدة، وكل واحدة بـ stack حجمها ١ ميجا في ART، استخدموا shared executor pools ووفّروا حوالي ٣ ميجا heap.\n\nتعمل إيه؟\nحدّث الـ SDK لنسخة 8.54.0 أو أحدث، والـ Gradle Plugin لنسخة 6.20.0 أو أحدث، وبعدها قيس الـ cold start عندك.\n\nالخلاصة 🎯\nانقل الشغل لوقت الـ build، وابعد عن الـ reflection، واستبدل الـ APIs التقيلة، وأعد استخدام الـ threads، وقيس كل تغيير.\n\nآخر مرة قِست الـ startup time بتاع تطبيقك إمتى؟ 👇\n\n(المصدر في أول كومنت)",
     "url": "https://blog.sentry.io/android-sdk-faster-startup/"
   },
@@ -23,7 +23,7 @@
       "Gemma",
       "On-Device AI"
     ],
-    "summary": "تجربة PokeCollect في توصيل موديل Gemma كبير للمستخدمين من غير ما الـ APK يبقى ٦٠٠ ميجا.",
+    "summary_ar": "تجربة PokeCollect في توصيل موديل Gemma كبير للمستخدمين من غير ما الـ APK يبقى ٦٠٠ ميجا.",
     "content": "عندك موديل AI حجمه ٥٨٤ ميجا، هتحطه جوه الـ APK وتخلّي المستخدم ينزّل app بـ ٦٠٠ ميجا؟ 😬\n\nده اللي قابل Kevin Desai في PokeCollect، وهو app بـ Kotlin Multiplatform فيه feature بتجاوب على أسئلة باستخدام Gemma على الجهاز مع LiteRT-LM.\n\nالحل اسمه Play for On-Device AI\nدي library من Google لسه في beta، مبنية على Play Asset Delivery. الموديل بيتفصل عن الـ APK، وجوجل بلاي هو اللي بيستضيفه ويوصّله.\n\nالخطوات باختصار\nأولًا، لازم تشحن AAB مش APK، ومحتاج AGP 8.8 أو أحدث.\nثانيًا، اختار الـ delivery mode، يا إما fast-follow بعد التثبيت على طول، أو install-time مع الـ app، أو on-demand وقت الطلب.\nثالثًا، اعمل module فيه الموديل بس بالـ plugin اللي اسمه com.android.ai-pack، ومتحطش ملف الموديل في git.\nرابعًا، اربطه بـ assetPacks وضيف dependency الـ ai-delivery.\nخامسًا، من AiPackManager لو getPackLocation رجّع null نادي fetch، وتابع الحالات زي DOWNLOADING و WAITING_FOR_WIFI و COMPLETED في الـ UI.\n\nملاحظات\nمش محتاج Internet permission، بس فيه foreground service لازم تصرّح بيها في Play Console. والحد ١.٥ جيجا لكل AI pack، وتقدر تعمل device targeting حسب الـ RAM أو الـ chip.\n\nالخلاصة 🎯\nموديل كبير على Google Play، من غير app تقيل ومن غير hosting، وبيشتغل offline بالكامل.\n\nإنت بتوزّع موديلات الـ AI في الـ app بتاعك إزاي؟ 👇\n\n(المصدر في أول كومنت)",
     "url": "https://androidadventures.dev/shipping-a-584-mb-gemma-model-through-google-play-b4df1825c6b8"
   },
@@ -37,7 +37,7 @@
       "On-Device AI",
       "Android"
     ],
-    "summary": "حدود الـ Prompt API في Gemini Nano على Android، وإزاي تحسب ميزانية الـ prompt قبل ما تنادي الموديل.",
+    "summary_ar": "حدود الـ Prompt API في Gemini Nano على Android، وإزاي تحسب ميزانية الـ prompt قبل ما تنادي الموديل.",
     "content": "الـ Gemini Nano على Android ببلاش وشغال على الجهاز… لحد ما الـ prompt يعدّي حوالي ٤٠٠٠ token 😅\n\nمقال Sai Ram Kotha بيلخّص حدود الـ Prompt API من الـ docs، وإزاي تعمل budget للـ prompt قبل ما تنادي الموديل.\n\nالأرقام\nالـ input لازم يكون أقل من ٤٠٠٠ token، يعني حوالي ٣٠٠٠ كلمة إنجليزي. والـ output مفيش له رقم ثابت، بس Google بتنصح تبعد عن أي رد أطول من حوالي ٤٠٠٠ token. وبتحدد طول الرد بـ maxOutputTokens، وبتعدّ بـ countTokens.\n\nالجهاز\nمحتاج API level ٢٦ أو أعلى، ومن غير bootloader مفتوح. والموديل جوه AICore، فلازم تتعامل مع حالات زي DOWNLOADABLE و DOWNLOADING كوضع طبيعي مش crash. وفيه quota لكل app من غير أرقام معلنة.\n\nالجديد من I/O\nالـ Nano 4 في developer preview ومش بيشيل الحدود دي. والـ prefix caching لسه Experimental، والـ Structured Output لسه Alpha.\n\nمثال للـ budget\nلو الـ system instructions حوالي ٣٠٠ token، ورسالة فيها مقال حوالي ٢٤٠٠، ومساحة الرد حوالي ٨٠٠، يبقى فاضل هامش حوالي ٥٠٠ بس. وأي history طويل هيعدّي الحد.\n\nالخلاصة 🎯\nاعدّ قبل ما تنادي، ولخّص الرسايل القديمة، وحط maxOutputTokens، وجهّز fallback، سواء حالة واضحة في الـ UI أو cloud عن طريق Firebase AI Logic أو تقفل الـ feature.\n\nالـ feature بتاعتك هتعمل إيه على جهاز لسه بينزّل Gemini Nano؟ 👇\n\n(المصدر في أول كومنت)",
     "url": "https://sairamkotha.hashnode.dev/gemini-nano-4-is-in-preview-your-prompt-budget-still-has-to-fit"
   },
@@ -51,7 +51,7 @@
       "AI Agents",
       "Compose"
     ],
-    "summary": "Kryzz AI، app مفتوح المصدر على Android بيخلّي الـ agent يعرض خطته وخطواته قدامك بدل ما يشتغل في الضلمة.",
+    "summary_ar": "Kryzz AI، app مفتوح المصدر على Android بيخلّي الـ agent يعرض خطته وخطواته قدامك بدل ما يشتغل في الضلمة.",
     "content": "طلبت من AI agent على موبايلك مهمة ورجعلك بإجابة حلوة، بس إنت مش عارف هو عمل إيه بالظبط 🤔 فتح الصفحة فعلًا؟ ولا اخترع المصدر؟ ولا صرف رصيد الـ API في loop؟\n\nده اللي خلّى Grokkris يبني Kryzz AI بفكرة واحدة، وهو app مفتوح المصدر على Android برخصة MIT، والفكرة إن الـ agent لازم يوريك هو بيعمل إيه وهو بيعمله.\n\nيعني إيه ده عمليًا؟\nفيه live plan card، الـ agent بيكتب خطة قصيرة الأول ويعلّم على الخطوات، وتقدر توقّفه بدري لو الخطة غلط.\nوفيه work log، كل search وكل صفحة وكل ملف بيظهر كـ chip، فتعرف الإجابة جاية منين.\nوالصفحات بتعدّي على filter للينكات المسموحة بدل أي URL يخترعه الموديل.\nوفيه cost cap افتراضي ربع دولار للمهمة، ويوصل لحد ٢ دولار، عشان أي loop هربان ميصفّيش الـ key بتاعك.\nوفي الآخر ممكن يسلّمك DOCX أو XLSX أو PDF بدل حيطة نص.\n\nالخصوصية والـ stack\nالتطبيق local-first ومن غير telemetry، وإنت بتجيب الـ API key بتاعك. ومكتوب بـ Kotlin و Jetpack Compose، وكل ملفات الـ output طالعة من Markdown model واحد.\n\nالخلاصة 🎯\nافصل مرحلة الخطة عن مرحلة التنفيذ، واعرض الخطة في الـ UI، وحط سقف للتكلفة. كده الغلطات بتبان قبل أي side effect.\n\nإنت بتتعامل إزاي مع سؤال \"الـ agent بيعمل إيه دلوقتي\"؟ 👇\n\n(المصدر في أول كومنت)",
     "url": "https://dev.to/grokkris_267433fde5540f5b/why-my-android-ai-app-shows-its-plan-before-it-does-anything-4kmo"
   },
@@ -64,9 +64,10 @@
       "Kotlin",
       "Android"
     ],
-    "summary": "جولة سريعة على أهم مميزات Kotlin 2.1 وإزاي تأثر على شغلك اليومي.",
+    "summary_ar": "جولة سريعة على أهم مميزات Kotlin 2.1 وإزاي تأثر على شغلك اليومي.",
     "content": "الإصدار الجديد بيركز على **K2 compiler** وأداء أسرع في الـ build.\n\n- `when` guards بقت أوضح\n- تحسينات في الـ multiplatform\n- رسايل errors أوضح",
-    "url": "https://kotlinlang.org/docs/whatsnew21.html"
+    "url": "https://kotlinlang.org/docs/whatsnew21.html",
+    "summary_en": "A quick tour of the most important Kotlin 2.1 features and how they affect your daily work."
   },
   {
     "title": "يعني إيه Coroutines؟ شرح لطفل عنده ٦ سنين",
@@ -77,9 +78,10 @@
       "Kotlin",
       "شرح مبسط"
     ],
-    "summary": "تخيل إنك بتطبخ وبتستنى المية تغلي، وفي نفس الوقت بتقطع الخضار. ده بالظبط اللي بتعمله الـ Coroutines.",
+    "summary_ar": "تخيل إنك بتطبخ وبتستنى المية تغلي، وفي نفس الوقت بتقطع الخضار. ده بالظبط اللي بتعمله الـ Coroutines.",
     "content": "الـ **Coroutine** هي مهمة تقدر توقف شوية وتسيب غيرها يشتغل، من غير ما توقف البرنامج كله.\n\n```kotlin\nlifecycleScope.launch {\n    val data = repository.load()\n    show(data)\n}\n```",
-    "url": "https://kotlinlang.org/docs/coroutines-overview.html"
+    "url": "https://kotlinlang.org/docs/coroutines-overview.html",
+    "summary_en": "Coroutines explained like you're six: cooking while waiting for water to boil."
   },
   {
     "title": "Jetpack Compose: نصايح للأداء",
@@ -90,9 +92,10 @@
       "Compose",
       "Performance"
     ],
-    "summary": "أهم ٣ أخطاء بتسبب recomposition زيادة، وإزاي تتجنبها.",
+    "summary_ar": "أهم ٣ أخطاء بتسبب recomposition زيادة، وإزاي تتجنبها.",
     "content": "1. استخدم `remember` للقيم اللي بتتحسب كتير.\n2. خلي الـ state بتاعك **stable**.\n3. استخدم `derivedStateOf` لما الـ state بيتغير أسرع من الـ UI.",
-    "url": "https://developer.android.com/develop/ui/compose/performance"
+    "url": "https://developer.android.com/develop/ui/compose/performance",
+    "summary_en": "Three common mistakes that cause extra recompositions in Compose, and how to avoid them."
   },
   {
     "title": "Android Weekly: أهم مقالات الأسبوع",
@@ -102,9 +105,10 @@
     "tags": [
       "Android Weekly"
     ],
-    "summary": "ملخص لأهم المقالات اللي اتنشرت الأسبوع ده في Android Weekly.",
+    "summary_ar": "ملخص لأهم المقالات اللي اتنشرت الأسبوع ده في Android Weekly.",
     "content": "الأسبوع ده كان مليان مقالات عن **Gradle** و **Baseline Profiles** و **Material 3**.",
-    "url": "https://androidweekly.net/"
+    "url": "https://androidweekly.net/",
+    "summary_en": "A roundup of this week's top Android Weekly articles."
   },
   {
     "title": "ليه كل مطور محتاج يفهم Git كويس",
@@ -115,8 +119,9 @@
       "Git",
       "أساسيات"
     ],
-    "summary": "مش بس commit و push. فهم الـ branches والـ rebase هيوفرلك ساعات.",
+    "summary_ar": "مش بس commit و push. فهم الـ branches والـ rebase هيوفرلك ساعات.",
     "content": "أهم الأوامر اللي لازم تعرفها:\n\n- `git rebase -i` لترتيب الـ commits\n- `git stash` لما تحتاج تغير branch بسرعة\n- `git bisect` لما تدور على الـ commit اللي كسر حاجة",
-    "url": "https://git-scm.com/book/ar/v2"
+    "url": "https://git-scm.com/book/ar/v2",
+    "summary_en": "Beyond commit and push: why understanding branches and rebase saves you hours."
   }
 ]
