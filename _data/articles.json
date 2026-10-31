@@ -1,5 +1,19 @@
 [
   {
+    "title": "ميزانية الـ prompt في Gemini Nano: حد الـ ٤٠٠٠ token",
+    "date": "2026-10-31",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Gemini Nano",
+      "On-Device AI",
+      "Android"
+    ],
+    "summary": "حدود الـ Prompt API في Gemini Nano على Android، وإزاي تحسب ميزانية الـ prompt قبل ما تنادي الموديل.",
+    "content": "الـ Gemini Nano على Android ببلاش وشغال على الجهاز… لحد ما الـ prompt يعدّي حوالي ٤٠٠٠ token 😅\n\nمقال Sai Ram Kotha بيلخّص حدود الـ Prompt API من الـ docs، وإزاي تعمل budget للـ prompt قبل ما تنادي الموديل.\n\nالأرقام\nالـ input لازم يكون أقل من ٤٠٠٠ token، يعني حوالي ٣٠٠٠ كلمة إنجليزي. والـ output مفيش له رقم ثابت، بس Google بتنصح تبعد عن أي رد أطول من حوالي ٤٠٠٠ token. وبتحدد طول الرد بـ maxOutputTokens، وبتعدّ بـ countTokens.\n\nالجهاز\nمحتاج API level ٢٦ أو أعلى، ومن غير bootloader مفتوح. والموديل جوه AICore، فلازم تتعامل مع حالات زي DOWNLOADABLE و DOWNLOADING كوضع طبيعي مش crash. وفيه quota لكل app من غير أرقام معلنة.\n\nالجديد من I/O\nالـ Nano 4 في developer preview ومش بيشيل الحدود دي. والـ prefix caching لسه Experimental، والـ Structured Output لسه Alpha.\n\nمثال للـ budget\nلو الـ system instructions حوالي ٣٠٠ token، ورسالة فيها مقال حوالي ٢٤٠٠، ومساحة الرد حوالي ٨٠٠، يبقى فاضل هامش حوالي ٥٠٠ بس. وأي history طويل هيعدّي الحد.\n\nالخلاصة 🎯\nاعدّ قبل ما تنادي، ولخّص الرسايل القديمة، وحط maxOutputTokens، وجهّز fallback، سواء حالة واضحة في الـ UI أو cloud عن طريق Firebase AI Logic أو تقفل الـ feature.\n\nالـ feature بتاعتك هتعمل إيه على جهاز لسه بينزّل Gemini Nano؟ 👇\n\n(المصدر في أول كومنت)",
+    "url": "https://sairamkotha.hashnode.dev/gemini-nano-4-is-in-preview-your-prompt-budget-still-has-to-fit"
+  },
+  {
     "title": "ليه app الـ AI بتاعي على Android بيوريك خطته قبل ما يعمل أي حاجة",
     "date": "2026-10-31",
     "source": "نشرة التكنولوجيا",
