@@ -1,29 +1,48 @@
 (function () {
-  var chips = document.querySelectorAll('.tag-chip');
+  var state = { cat: 'all', tag: 'all' };
   var cards = document.querySelectorAll('.card');
   var dividers = document.querySelectorAll('.divider');
+  var list = document.querySelector('.articles');
   var empty = document.querySelector('.no-results');
-  function apply(tag) {
+
+  function render() {
     var shown = 0;
     cards.forEach(function (c) {
       var tags = (c.dataset.tags || '').split('|');
-      var ok = tag === 'all' || tags.indexOf(tag) !== -1;
+      var ok = (state.cat === 'all' || c.dataset.cat === state.cat) &&
+               (state.tag === 'all' || tags.indexOf(state.tag) !== -1);
       c.hidden = !ok;
       if (ok) shown++;
     });
-    dividers.forEach(function (d) { d.hidden = tag !== 'all'; });
-    document.querySelector('.articles').classList.toggle('filtered', tag !== 'all');
-    chips.forEach(function (ch) { ch.classList.toggle('active', ch.dataset.tag === tag); });
+    var filtering = state.cat !== 'all' || state.tag !== 'all';
+    dividers.forEach(function (d) { d.hidden = filtering; });
+    if (list) list.classList.toggle('filtered', filtering);
+    document.querySelectorAll('.cat-tab').forEach(function (b) { b.classList.toggle('active', b.dataset.cat === state.cat); });
+    document.querySelectorAll('.tag-chip').forEach(function (b) { b.classList.toggle('active', b.dataset.tag === state.tag); });
     if (empty) empty.hidden = shown !== 0;
-    if (tag === 'all') history.replaceState(null, '', location.pathname);
-    else history.replaceState(null, '', '#tag=' + encodeURIComponent(tag));
+    var h = [];
+    if (state.cat !== 'all') h.push('cat=' + encodeURIComponent(state.cat));
+    if (state.tag !== 'all') h.push('tag=' + encodeURIComponent(state.tag));
+    history.replaceState(null, '', h.length ? '#' + h.join('&') : location.pathname);
   }
+
   document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-tag]');
-    if (!b || b.tagName !== 'BUTTON') return;
-    apply(b.dataset.tag);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    var b = e.target.closest('button[data-cat], button[data-tag]');
+    if (b) {
+      e.preventDefault(); e.stopPropagation();
+      if (b.dataset.cat !== undefined) { state.cat = b.dataset.cat; }
+      if (b.dataset.tag !== undefined) { state.tag = b.dataset.tag; }
+      render();
+      var f = document.querySelector('.filters');
+      if (f && b.closest('.card')) f.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
   });
-  var m = location.hash.match(/tag=([^&]+)/);
-  if (m) apply(decodeURIComponent(m[1]));
+
+  var hash = location.hash.slice(1).split('&');
+  hash.forEach(function (p) {
+    var kv = p.split('=');
+    if (kv[0] === 'cat' || kv[0] === 'tag') state[kv[0]] = decodeURIComponent(kv[1] || 'all');
+  });
+  render();
 })();

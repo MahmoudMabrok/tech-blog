@@ -15,21 +15,35 @@ title: المقالات
 {% else %}
 
 {% assign all_tags = "" | split: "" %}
-{% for article in articles %}{% for tag in article.tags %}{% assign all_tags = all_tags | push: tag %}{% endfor %}{% endfor %}
+{% assign all_cats = "" | split: "" %}
+{% for article in articles %}
+  {% if article.category %}{% assign all_cats = all_cats | push: article.category %}{% endif %}
+  {% for tag in article.tags %}{% assign all_tags = all_tags | push: tag %}{% endfor %}
+{% endfor %}
 {% assign all_tags = all_tags | uniq | sort %}
+{% assign all_cats = all_cats | uniq | sort %}
 
-<nav class="tag-bar" aria-label="الوسوم">
-  <button class="tag-chip active" data-tag="all">الكل <span class="count">{{ articles.size }}</span></button>
-  {% for tag in all_tags %}
-    {% assign n = 0 %}{% for a in articles %}{% if a.tags contains tag %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
-    <button class="tag-chip" data-tag="{{ tag }}">#{{ tag }} <span class="count">{{ n }}</span></button>
-  {% endfor %}
-</nav>
+<div class="filters">
+  <nav class="cat-bar" aria-label="التصنيفات">
+    <button class="cat-tab active" data-cat="all">كل التصنيفات <span class="count">{{ articles.size }}</span></button>
+    {% for cat in all_cats %}
+      {% assign n = articles | where: "category", cat | size %}
+      <button class="cat-tab" data-cat="{{ cat }}">{{ cat }} <span class="count">{{ n }}</span></button>
+    {% endfor %}
+  </nav>
+  <nav class="tag-bar" aria-label="الوسوم">
+    <button class="tag-chip active" data-tag="all">كل الوسوم</button>
+    {% for tag in all_tags %}
+      <button class="tag-chip" data-tag="{{ tag }}">#{{ tag }}</button>
+    {% endfor %}
+  </nav>
+</div>
 
 <div class="articles">
 {% for article in articles %}
-<article class="card" data-tags="{{ article.tags | join: '|' }}">
+<article class="card" data-tags="{{ article.tags | join: '|' }}" data-cat="{{ article.category }}">
   <header class="meta">
+    {% if article.category %}<button class="category" data-cat="{{ article.category }}">{{ article.category }}</button>{% endif %}
     <span class="source">{{ article.source }}</span>
     <span class="dot">•</span>
     <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}</time>
@@ -41,13 +55,18 @@ title: المقالات
     {% if article.tags %}
     <div class="tags">{% for tag in article.tags %}<button class="tag" data-tag="{{ tag }}">#{{ tag }}</button>{% endfor %}</div>
     {% endif %}
-    {% if article.url %}<a class="read-more" href="{{ article.url }}" target="_blank" rel="noopener">اقرأ المصدر ←</a>{% endif %}
+    {% if article.url %}<a class="read-more" href="{{ article.url }}" target="_blank" rel="noopener">المحتوى الأصلي ↗</a>{% endif %}
   </footer>
 </article>
 {% unless forloop.last %}<div class="divider" role="separator"><span></span></div>{% endunless %}
 {% endfor %}
 </div>
-<p class="no-results" hidden>مفيش مقالات بالوسم ده.</p>
+<p class="no-results" hidden>مفيش مقالات بالفلتر ده.</p>
 {% endif %}
+
+<div class="visitors">
+  <span>عدد الزيارات</span>
+  <img src="https://hits.sh/mahmoudmabrok.github.io/tech-blog.svg?style=flat-square&label=%F0%9F%91%81&color=4f46e5" alt="عدد الزيارات" loading="lazy">
+</div>
 
 <script src="{{ '/assets/js/tags.js' | relative_url }}"></script>

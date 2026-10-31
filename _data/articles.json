@@ -3,7 +3,11 @@
     "title": "إيه الجديد في Kotlin 2.1؟",
     "date": "2026-10-31",
     "source": "نشرة التكنولوجيا",
-    "tags": ["Kotlin", "Android"],
+    "category": "Kotlin",
+    "tags": [
+      "Kotlin",
+      "Android"
+    ],
     "summary": "جولة سريعة على أهم مميزات Kotlin 2.1 وإزاي تأثر على شغلك اليومي.",
     "content": "الإصدار الجديد بيركز على **K2 compiler** وأداء أسرع في الـ build.\n\n- `when` guards بقت أوضح\n- تحسينات في الـ multiplatform\n- رسايل errors أوضح",
     "url": "https://kotlinlang.org/docs/whatsnew21.html"
@@ -12,15 +16,24 @@
     "title": "يعني إيه Coroutines؟ شرح لطفل عنده ٦ سنين",
     "date": "2026-10-30",
     "source": "صانع المحتوى",
-    "tags": ["Kotlin", "شرح مبسط"],
+    "category": "شروحات مبسطة",
+    "tags": [
+      "Kotlin",
+      "شرح مبسط"
+    ],
     "summary": "تخيل إنك بتطبخ وبتستنى المية تغلي، وفي نفس الوقت بتقطع الخضار. ده بالظبط اللي بتعمله الـ Coroutines.",
-    "content": "الـ **Coroutine** هي مهمة تقدر توقف شوية وتسيب غيرها يشتغل، من غير ما توقف البرنامج كله.\n\n```kotlin\nlifecycleScope.launch {\n    val data = repository.load()\n    show(data)\n}\n```"
+    "content": "الـ **Coroutine** هي مهمة تقدر توقف شوية وتسيب غيرها يشتغل، من غير ما توقف البرنامج كله.\n\n```kotlin\nlifecycleScope.launch {\n    val data = repository.load()\n    show(data)\n}\n```",
+    "url": "https://kotlinlang.org/docs/coroutines-overview.html"
   },
   {
     "title": "Jetpack Compose: نصايح للأداء",
     "date": "2026-10-29",
     "source": "نشرة التكنولوجيا",
-    "tags": ["Compose", "Performance"],
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "Performance"
+    ],
     "summary": "أهم ٣ أخطاء بتسبب recomposition زيادة، وإزاي تتجنبها.",
     "content": "1. استخدم `remember` للقيم اللي بتتحسب كتير.\n2. خلي الـ state بتاعك **stable**.\n3. استخدم `derivedStateOf` لما الـ state بيتغير أسرع من الـ UI.",
     "url": "https://developer.android.com/develop/ui/compose/performance"
@@ -29,16 +42,25 @@
     "title": "Android Weekly: أهم مقالات الأسبوع",
     "date": "2026-10-28",
     "source": "نشرة التكنولوجيا",
-    "tags": ["Android Weekly"],
+    "category": "Android",
+    "tags": [
+      "Android Weekly"
+    ],
     "summary": "ملخص لأهم المقالات اللي اتنشرت الأسبوع ده في Android Weekly.",
-    "content": "الأسبوع ده كان مليان مقالات عن **Gradle** و **Baseline Profiles** و **Material 3**."
+    "content": "الأسبوع ده كان مليان مقالات عن **Gradle** و **Baseline Profiles** و **Material 3**.",
+    "url": "https://androidweekly.net/"
   },
   {
     "title": "ليه كل مطور محتاج يفهم Git كويس",
     "date": "2026-10-27",
     "source": "صانع المحتوى",
-    "tags": ["Git", "أساسيات"],
+    "category": "أدوات المطورين",
+    "tags": [
+      "Git",
+      "أساسيات"
+    ],
     "summary": "مش بس commit و push. فهم الـ branches والـ rebase هيوفرلك ساعات.",
-    "content": "أهم الأوامر اللي لازم تعرفها:\n\n- `git rebase -i` لترتيب الـ commits\n- `git stash` لما تحتاج تغير branch بسرعة\n- `git bisect` لما تدور على الـ commit اللي كسر حاجة"
+    "content": "أهم الأوامر اللي لازم تعرفها:\n\n- `git rebase -i` لترتيب الـ commits\n- `git stash` لما تحتاج تغير branch بسرعة\n- `git bisect` لما تدور على الـ commit اللي كسر حاجة",
+    "url": "https://git-scm.com/book/ar/v2"
   }
 ]
