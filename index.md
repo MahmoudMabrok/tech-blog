@@ -59,8 +59,8 @@ title: المقالات
   </div>
   {% endif %}
   <div class="view view-full content">{{ article.content | markdownify }}</div>
-  {% if sum_ar %}<div class="view view-ar summary-box" hidden><p>{{ sum_ar }}</p></div>{% endif %}
-  {% if sum_en %}<div class="view view-en summary-box" dir="ltr" lang="en" hidden><p>{{ sum_en }}</p></div>{% endif %}
+  {% if sum_ar %}<div class="view view-ar summary-box" hidden>{{ sum_ar | newline_to_br | markdownify }}</div>{% endif %}
+  {% if sum_en %}<div class="view view-en summary-box" dir="ltr" lang="en" hidden>{{ sum_en | newline_to_br | markdownify }}</div>{% endif %}
   <footer class="card-footer">
     {% if article.tags %}
     <div class="tags">{% for tag in article.tags %}<button class="tag" data-tag="{{ tag }}">#{{ tag }}</button>{% endfor %}</div>
