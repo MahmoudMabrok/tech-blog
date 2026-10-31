@@ -112,7 +112,8 @@ body {
 .read-more {
   font-size: .9rem; font-weight: 600; color: #fff; background: $accent;
   padding: 4px 14px; border-radius: 8px;
-  &:hover { color: #fff; text-decoration: none; filter: brightness(1.1); }
+  &:visited, &:hover { color: #fff; text-decoration: none; }
+  &:hover { filter: brightness(1.1); }
 }
 
 /* Divider between articles */
