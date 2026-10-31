@@ -27,12 +27,13 @@
   }
 
   var LIMIT = 500;
-  document.querySelectorAll('.view-full').forEach(function (el) {
+  document.querySelectorAll('.view').forEach(function (el) {
     if ((el.textContent || '').trim().length <= LIMIT) return;
     el.classList.add('collapsed');
     var btn = document.createElement('button');
     btn.className = 'more-btn';
     btn.textContent = 'قراءة المزيد ▾';
+    btn.hidden = el.hidden;
     el.insertAdjacentElement('afterend', btn);
   });
 
@@ -50,7 +51,7 @@
       var card = v.closest('.card');
       card.querySelectorAll('.view-btn').forEach(function (b) { b.classList.toggle('active', b === v); });
       card.querySelectorAll('.view').forEach(function (el) { el.hidden = !el.classList.contains('view-' + v.dataset.view); });
-      var mb = card.querySelector('.more-btn'); if (mb) mb.hidden = v.dataset.view !== 'full';
+      card.querySelectorAll('.more-btn').forEach(function (mb) { mb.hidden = mb.previousElementSibling.hidden; });
       return;
     }
     var b = e.target.closest('button[data-cat], button[data-tag]');
