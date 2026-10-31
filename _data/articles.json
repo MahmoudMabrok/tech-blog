@@ -1,5 +1,19 @@
 [
   {
+    "title": "الـ Sentry Android SDK بقى أسرع من ٢٠٪ لـ ٣٠٪",
+    "date": "2026-10-31",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Sentry",
+      "Performance",
+      "Android"
+    ],
+    "summary": "فريق Sentry قلّل وقت الـ init في الـ Android SDK، وقلّل الـ memory والـ CPU، يعني cold start أسرع بمجرد تحديث النسخة.",
+    "content": "عايز cold start أسرع ببلاش؟ ساعات الحل إنك تعمل bump لنسخة library 😄\n\nفريق Sentry بيقول إن وقت الـ init في الـ Android SDK بتاعهم قلّ من ٢٠٪ لـ ٣٠٪، وكمان قللوا الـ memory allocation وصلّحوا leaks وقللوا الـ background CPU.\n\nوصلوا لكده إزاي؟\nاستخدموا Perfetto traces، وعملوا أكتر من ٤٠ تغيير، وكل تغيير اتقاس بـ Macrobenchmark.\n\nأهم ٣ دروس\nأولًا، نقلوا قراية الـ options من الـ AndroidManifest لوقت الـ build، والـ Gradle Plugin بيكتبها في الـ bytecode، وده لوحده جاب حوالي ٦.٥٪. ونفس الفكرة بدل الـ reflection.\nثانيًا، استبدلوا java.net.URI في الـ DSN parsing بـ parser خفيف، من حوالي ٦ ملّي ثانية لحوالي ١ ميكرو ثانية.\nثالثًا، بدل threads لمرة واحدة، وكل واحدة بـ stack حجمها ١ ميجا في ART، استخدموا shared executor pools ووفّروا حوالي ٣ ميجا heap.\n\nتعمل إيه؟\nحدّث الـ SDK لنسخة 8.54.0 أو أحدث، والـ Gradle Plugin لنسخة 6.20.0 أو أحدث، وبعدها قيس الـ cold start عندك.\n\nالخلاصة 🎯\nانقل الشغل لوقت الـ build، وابعد عن الـ reflection، واستبدل الـ APIs التقيلة، وأعد استخدام الـ threads، وقيس كل تغيير.\n\nآخر مرة قِست الـ startup time بتاع تطبيقك إمتى؟ 👇\n\n(المصدر في أول كومنت)",
+    "url": "https://blog.sentry.io/android-sdk-faster-startup/"
+  },
+  {
     "title": "إزاي تشحن موديل Gemma حجمه ٥٨٤ ميجا عن طريق Google Play",
     "date": "2026-10-31",
     "source": "نشرة التكنولوجيا",
