@@ -69,4 +69,4 @@ title: المقالات
   <img src="https://hits.sh/mahmoudmabrok.github.io/tech-blog.svg?style=flat-square&label=%F0%9F%91%81&color=4f46e5" alt="عدد الزيارات" loading="lazy">
 </div>
 
-<script src="{{ '/assets/js/tags.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/tags.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
