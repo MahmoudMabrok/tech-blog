@@ -2,13 +2,25 @@
 ---
 @import "{{ site.theme }}";
 
-body {
-  direction: rtl;
-  text-align: right;
-}
+body { direction: rtl; text-align: right; background: #f6f7f9; }
+.site-header, .site-footer { background: #fff; }
+.page-content { padding-top: 24px; }
+.post-list-heading, .rss-subscribe { display: none; }
 
-.article {
-  margin-bottom: 2em;
-  padding: 1em;
-  border-bottom: 1px solid #eee;
+.articles { display: grid; gap: 18px; }
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  border-right: 4px solid #2a7ae2;
 }
+.card h2 { margin: 6px 0 8px; font-size: 1.35rem; }
+.card h2 a { color: #111; }
+.meta { font-size: .85rem; color: #777; display: flex; gap: 10px; }
+.source { background: #eef4fd; color: #2a7ae2; padding: 0 8px; border-radius: 10px; }
+.summary { color: #444; font-weight: 500; }
+.content pre, .content code { direction: ltr; text-align: left; }
+.tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: .8rem; background: #f0f0f0; padding: 2px 10px; border-radius: 10px; }
+.empty { color: #777; }
