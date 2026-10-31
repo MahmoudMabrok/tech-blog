@@ -1,0 +1,16 @@
+title: نشرة التكنولوجيا
+
+description: محتوى تقني من بوتات صانع المحتوى ونشرة التكنولوجيا
+
+theme: minima
+
+lang: ar
+
+url: "https://mahmoudmabrok.github.io"
+
+baseurl: "/tech-blog"
+
+markdown: kramdown
+
+plugins:
+  - jekyll-feed
