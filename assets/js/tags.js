@@ -26,6 +26,24 @@
     history.replaceState(null, '', h.length ? '#' + h.join('&') : location.pathname);
   }
 
+  var KEY = 'techblog-read';
+  var read = {};
+  try { read = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { read = {}; }
+  function paintRead() {
+    var n = 0;
+    cards.forEach(function (c) { var r = !!read[c.dataset.id]; c.classList.toggle('is-read', r); if (r) n++; });
+    var st = document.querySelector('.read-stat'), rc = document.querySelector('.read-count');
+    if (rc) rc.textContent = n;
+    if (st) st.hidden = n === 0;
+  }
+  function markRead(card) {
+    if (!card || !card.dataset.id || read[card.dataset.id]) return;
+    read[card.dataset.id] = Date.now();
+    try { localStorage.setItem(KEY, JSON.stringify(read)); } catch (e) {}
+    paintRead();
+  }
+  paintRead();
+
   var LIMIT = 500;
   document.querySelectorAll('.view').forEach(function (el) {
     if ((el.textContent || '').trim().length <= LIMIT) return;
@@ -38,11 +56,14 @@
   });
 
   document.addEventListener('click', function (e) {
+    var ln = e.target.closest('.card h2 a, .card .read-more');
+    if (ln) { markRead(ln.closest('.card')); return; }
     var m = e.target.closest('.more-btn');
     if (m) {
       var full = m.previousElementSibling;
       var open = full.classList.toggle('collapsed') === false;
       m.textContent = open ? 'عرض أقل ▴' : 'قراءة المزيد ▾';
+      if (open) markRead(m.closest('.card'));
       if (!open) full.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }

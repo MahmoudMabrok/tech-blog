@@ -182,3 +182,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
   &:hover { text-decoration: underline; }
 }
 .more-btn[hidden] { display: none; }
+
+/* Stats + read state */
+.hero-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.hero-stats .stat { background: rgba(255,255,255,.2); border-radius: 999px; padding: 2px 12px; font-size: .9rem; }
+.hero-stats .stat[hidden] { display: none; }
+.read-badge { display: none; background: #dcfce7; color: #15803d; font-weight: 700; font-size: .75rem; padding: 1px 10px; border-radius: 999px; }
+.card.is-read { background: #fbfcfe; border-color: #d1fae5; }
+.card.is-read .read-badge { display: inline-block; }
+.card.is-read h2 a { color: #6b7280; }
+.meta { flex-wrap: wrap; }

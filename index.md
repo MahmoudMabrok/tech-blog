@@ -8,6 +8,10 @@ title: المقالات
 <section class="hero">
   <h1>{{ site.title }}</h1>
   <p>{{ site.description }}</p>
+  <div class="hero-stats">
+    <span class="stat">📚 <b>{{ articles.size }}</b> مقالة</span>
+    <span class="stat read-stat" hidden>✓ قريت <b class="read-count">0</b> من {{ articles.size }}</span>
+  </div>
 </section>
 
 {% if articles == nil or articles.size == 0 %}
@@ -41,10 +45,11 @@ title: المقالات
 
 <div class="articles">
 {% for article in articles %}
-<article class="card" data-tags="{{ article.tags | join: '|' }}" data-cat="{{ article.category }}">
+<article class="card" data-id="{{ article.url | default: article.title | escape }}" data-tags="{{ article.tags | join: '|' }}" data-cat="{{ article.category }}">
   <header class="meta">
     {% if article.category %}<button class="category" data-cat="{{ article.category }}">{{ article.category }}</button>{% endif %}
     <span class="source">{{ article.source }}</span>
+    <span class="read-badge">✓ اتقرأت</span>
     <span class="dot">•</span>
     <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}{% if article.date contains "T" %} · {{ article.date | date: "%H:%M" }}{% endif %}</time>
   </header>
