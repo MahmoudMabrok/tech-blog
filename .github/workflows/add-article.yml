@@ -1,0 +1,87 @@
+name: Add Article to Blog
+
+on:
+  repository_dispatch:
+    types: [add-article]
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'عنوان المقالة'
+        required: true
+      date:
+        description: 'التاريخ ISO (مثال: 2026-11-01T10:40:00+02:00)'
+        required: true
+        default: ''
+      category:
+        description: 'التصنيف'
+        required: true
+        default: 'أدوات المطورين'
+      tags:
+        description: 'الـ tags مفصولة بفاصلة (مثال: LLMs,Learning,AI)'
+        required: true
+      content:
+        description: 'المحتوى العربي الطويل (Markdown)'
+        required: true
+      summary_ar:
+        description: 'ملخص LinkedIn'
+        required: true
+      summary_en:
+        description: 'English summary'
+        required: true
+      url:
+        description: 'رابط المقالة الأصلية'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  add-article:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare article JSON
+        id: prepare
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo '${{ toJson(github.event.client_payload) }}' > article.json
+          else
+            TAGS=$(echo "${{ github.event.inputs.tags }}" | jq -R 'split(",") | map(gsub("^\\s+|\\s+$";""))')
+            jq -n \
+              --arg title "${{ github.event.inputs.title }}" \
+              --arg date "${{ github.event.inputs.date }}" \
+              --arg category "${{ github.event.inputs.category }}" \
+              --argjson tags "$TAGS" \
+              --arg content "${{ github.event.inputs.content }}" \
+              --arg summary_ar "${{ github.event.inputs.summary_ar }}" \
+              --arg summary_en "${{ github.event.inputs.summary_en }}" \
+              --arg url "${{ github.event.inputs.url }}" \
+              '{
+                title: $title,
+                date: $date,
+                source: "نشرة التكنولوجيا",
+                category: $category,
+                tags: $tags,
+                content: $content,
+                summary_ar: $summary_ar,
+                summary_en: $summary_en,
+                url: $url
+              }' > article.json
+          fi
+
+      - name: Add article to articles.json
+        run: |
+          jq --slurpfile new article.json '[$new[0]] + .' _data/articles.json > /tmp/updated.json
+          mv /tmp/updated.json _data/articles.json
+          jq empty _data/articles.json
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add _data/articles.json
+          TITLE="${{ github.event.client_payload.title || github.event.inputs.title }}"
+          git commit -m "Add article: $TITLE" || echo "No changes"
+          git push
