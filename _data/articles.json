@@ -1,5 +1,21 @@
 [
   {
+    "category": "أدوات المطورين",
+    "content": "تخيل إن في حد عمل prototype لـ Kotlin compiler مكتوب بـ Go، وبيقول إنه أسرع 10× من kotlinc العادي 🤯\n\nالمشروع اسمه kotlin-compiler-go، وهدفه يكون compiler للـ JVM.\n\nالمهم تعرفه:\n- لسه prototype، مش بيدعم كل الـ Kotlin features.\n- الفكرة إن الـ Go أسرع في الـ startup والـ compilation مقارنة بالـ JVM-based compiler.\n- لو نجح، ممكن يبقى بديل خفيف للـ kotlinc في بعض الـ use cases (زي الـ scripting أو الـ small projects).\n- مش جاهز للـ production، لكن فكرة مثيرة للاهتمام في عالم الـ Kotlin tooling.\n\nلو بتحب الـ compilers أو عايز تشوف تجارب خارج الـ JetBrains ecosystem، المشروع ده يستاهل تشوفه.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Compiler #Go #mo3talogy",
+    "date": "2026-11-01T19:51:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "summary_ar": "Prototype لـ Kotlin compiler مكتوب بـ Go، بيقول إنه أسرع 10× من kotlinc.\n\nلسه مش كامل، لكن فكرة مثيرة في الـ tooling.\n\n(المصدر في أول كومنت)\n\n#Kotlin #Compiler #mo3talogy",
+    "summary_en": "🇬🇧 English summary:\nA prototype Kotlin compiler for the JVM written in Go that claims to be 10× faster than kotlinc. Still incomplete, but an interesting experiment in faster Kotlin tooling.",
+    "tags": [
+      "Kotlin",
+      "Compiler",
+      "Go",
+      "Tooling"
+    ],
+    "title": "kotlin-compiler-go: Compiler لـ Kotlin مكتوب بـ Go أسرع 10 مرات؟",
+    "url": "https://github.com/barteo/kotlin-compiler-go"
+  },
+  {
     "category": "Kotlin",
     "content": "لو بتفكر تعمل تطبيق جري (running coach) بـ Kotlin Multiplatform، المقال ده هيوفر عليك تجارب كتير 🏃‍♂️\n\nSteven Rogers شارك تجربته وهو بيعمل app لوحده بـ KMP و Compose، وساب جزء الـ Apple Watch و Wear OS native.\n\nأهم الدروس:\n\n- الـ shared code شغال كويس للـ business logic والـ data، لكن الـ UI على الـ watch محتاج تبقى native عشان الـ performance والـ battery.\n- Compose Multiplatform لسه بيوفر وقت كبير على Android و iOS، بس لازم تخطط من الأول إيه اللي هيبقى shared وإيه اللي هيبقى platform-specific.\n- الـ watchOS و Wear OS ليهم قيود مختلفة، فالأحسن تعمل abstraction واضح من البداية.\n- التجربة كلها بتاعت شخص واحد، فده بيوريك إن KMP بقى usable حتى في المشاريع الصغيرة.\n\nلو بتعمل app فيه wearable، خد بالك إن الـ native code لسه له مكان مهم.\n\nزكاة العلم نشره 💚\n\n#Kotlin #KMP #Compose #Multiplatform #mo3talogy",
     "date": "2026-11-01T19:50:00+02:00",
