@@ -1,5 +1,21 @@
 [
   {
+    "category": "أدوات المطورين",
+    "content": "لو بتحس إن الـ LLMs بتقتل فرحة التعلم، يبقى المقال ده ليك 🧠\n\nزمان كنا بنتعلم frameworks ولغات وpatterns لما نغلط، وبعدين ناخد الدرس. دلوقتي كل حاجة بقت سريعة أوي، والـ AI بيقدر يعمل اللي انت عايزه في ثواني. وده بيخلّي الواحد يتكاسل، لأن المخ بيتعلم أكتر لما يتعب ويحاول.\n\nأنا شخصيًا وقعت في الموضوع ده. كنت بذاكر كتير، وبعدين حسيت إن الموضوع بقى بلا فائدة لأن الـ LLM بيقدر يديك أي حاجة. فوصلت لمرحلة plateau، واحتجت أرجع أتعلم تاني، سواء للشغل أو للمتعة.\n\n#### الحل اللي لقيته\n\nبدأت أقرا paper اسمه Bitcask (لو بتحب الـ databases، اقرأه، خفيف ومفيد). قررت أنفذه من غير مساعدة الـ LLM. وقفت في حتة، واستخدمت الـ AI مش عشان يكتب الكود، لكن عشان يشرحلي المفهوم وأنا أكتبه بنفسي.\n\nمن هنا اكتشفت إني أقدر أستخدم الـ LLM كمعلم (mentor)، مش كحل جاهز.\n\n#### مثال بسيط (Socratic method)\n\nتخيل الكود ده:\n\n```js\nconst nums = [1, 2, 3];\nlet sum = 0;\nfor (let i = 0; i <= nums.length; i++) {\n  sum += nums[i];\n}\nconsole.log(sum); // NaN\n```\n\nبدل ما الـ AI يقولك \"الـ loop بيجري خطوة زيادة\"، يسألك أسئلة:\n\n- كام عنصر في الـ array؟ آخر index كام؟\n- الـ loop بيجري على أنهي قيم؟\n- وبعدين ترسم الصورة بنفسك وتلاقي إن `nums[3]` = `undefined`.\n\nالنتيجة إنك مش هتنسى الغلطة دي، لأنك فكرت فيها بنفسك.\n\nالكتاب الشهير *Make It Stick* بيقول:\n> \"لما تتعب في حل المشكلة قبل ما يشوفوك الحل، الحل ده بيتثبت أكتر في دماغك.\"\n\n#### التخطيط عشان متتكاسلش\n\nلو بتعمل مشروع كبير عشان تتعلم، مش هتخلّصه في ليلة. اطلب من الـ LLM يعمللك plan بمراحل واضحة، كل مرحلة فيها:\n- Goal\n- Steps صغيرة\n- \"Done when\" تقدر تتحقق منه\n- Trap اللي ممكن تقع فيه\n\nمثال من مشروع tinylsm (LSM-tree بسيط):\n\n```md\n## Phase 2 — WAL\n**Goal:** Survive crashes.\n**Done when:** Kill process mid-write, restart, everything is back.\n```\n\nكل ما تفتح session جديد، تقول للـ LLM \"let’s continue\"، وهو يعرف انت واقف فين من الـ checklist.\n\nده بيقلل الـ procrastination، لأنك مش بتضيع وقت تفكر هتعمل إيه النهارده.\n\n#### اعمل التقدم مرئي\n\nالـ visual feedback بيخلّيك تكمل. ممكن REPL بسيط، أو chart، أو أي حاجة تبين إن الشغل بيتحرك. في tinylsm عملت benchmark بسيط بيوريني إن الـ compaction بيحسّن الـ reads بـ 100×. ده لوحده بيدي motivation.\n\n#### نصايح سريعة\n\n- متستخدمش الـ LLM عشان يديك الإجابة، استخدمه كـ mentor.\n- خلّيه يعمل الـ grunt work (tests, tooling, visualization).\n- خطط قبل ما تبدأ عشان تفضل متحمس.\n- اعمل quick wins حتى لو 30 دقيقة في اليوم.\n- متستسلمش للسهل، اطلب منه يشرحلك تاني وثالث لو مش فاهم.\n\nفي الآخر، الاقتباس ده من Shunryu Suzuki بيختصر الموضوع:\n\n> “When you do something, you should burn yourself completely, like a good bonfire, leaving no trace of yourself.”\n\nلو عايز تجرب الـ skill اللي بيتكلم عنها: [socratic-code-mentor](https://gist.github.com/ogzhanolguncu/274e9974dc02942109ad70200f6d7b25)\n\nزكاة العلم نشره 💚\n\n#LLMs #Learning #AI #Programming #mo3talogy",
+    "date": "2026-11-01T10:40:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "summary_ar": "إزاي تفضل تتعلم في عصر الـ LLMs من غير ما تتكاسل؟\n\nالـ AI بيقدر يعمل أي حاجة بسرعة، وده بيقتل فرحة التعلم بالتجربة والغلط.\n\nالحل:\n- استخدم الـ LLM كـ mentor مش كحل جاهز (Socratic method)\n- خطط المراحل قبل ما تبدأ عشان متتكاسلش\n- اعمل التقدم مرئي (REPL, charts...)\n- خلّيه يعمل الـ grunt work، وانت ركز على الفهم\n\nالتعلم الحقيقي بيحصل لما تتعب وتفكر بنفسك.\n\n(المصدر في أول كومنت)\n\n#LLMs #Learning #AI #mo3talogy",
+    "summary_en": "🇬🇧 English summary:\nHow to keep learning when LLMs can one-shot everything. Use them as a Socratic mentor instead of an answer machine, plan your projects in clear phases with goals and checklists, make progress visible with simple REPLs or charts, and let the AI handle the boring parts (tests, tooling) so you stay in the learning zone. Learning sticks when you struggle and figure things out yourself.",
+    "tags": [
+      "LLMs",
+      "Learning",
+      "AI",
+      "Programming"
+    ],
+    "title": "إزاي تفضل تتعلم في عصر الـ LLMs",
+    "url": "https://ogzhanolguncu.com/blog/how-to-keep-learning-in-the-age-of-llms/"
+  },
+  {
     "title": "طريقة أضمن لإضافة وتعديل الـ contacts على Android بدل WRITE_CONTACTS",
     "date": "2026-10-31T18:05:17+02:00",
     "source": "نشرة التكنولوجيا",
@@ -137,4 +153,3 @@
     "url": "https://www.facebook.com/m03ta/posts/pfbid0LKbRoh5okxW54M1LfLRsyBSUfrQ1cdA4qNMzYVBH3immSdnVQSKHMwoB9MA8zxC2l"
   }
 ]
-
