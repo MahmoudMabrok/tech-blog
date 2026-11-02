@@ -5,6 +5,37 @@
   var list = document.querySelector('.articles');
   var empty = document.querySelector('.no-results');
 
+  // Apply default view preference
+  var DEFAULT_KEY = 'techblog-default-view';
+  var defaultView = localStorage.getItem(DEFAULT_KEY) || 'full';
+
+  function applyDefaultView() {
+    cards.forEach(function (card) {
+      var buttons = card.querySelectorAll('.view-btn');
+      var views = card.querySelectorAll('.view');
+      if (!buttons.length) return;
+
+      // Reset
+      buttons.forEach(function (b) { b.classList.remove('active'); });
+      views.forEach(function (v) { v.hidden = true; });
+
+      // Activate preferred
+      var preferredBtn = card.querySelector('.view-btn[data-view="' + defaultView + '"]');
+      var preferredView = card.querySelector('.view-' + defaultView);
+      if (preferredBtn && preferredView) {
+        preferredBtn.classList.add('active');
+        preferredView.hidden = false;
+      } else {
+        // fallback to full
+        var fullBtn = card.querySelector('.view-btn[data-view="full"]');
+        var fullView = card.querySelector('.view-full');
+        if (fullBtn) fullBtn.classList.add('active');
+        if (fullView) fullView.hidden = false;
+      }
+    });
+  }
+  applyDefaultView();
+
   function render() {
     var shown = 0;
     cards.forEach(function (c) {
