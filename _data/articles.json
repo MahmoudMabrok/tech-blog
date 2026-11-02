@@ -1,50 +1,79 @@
 [
   {
-    "title": "إزاي تخلي الـ CI بتاعك أسرع 20 مرة عشان الـ Agents",
-    "date": "2026-11-02T09:00:00+02:00",
+    "title": "Parse reminder dates في Kotlin Multiplatform (offline)",
+    "date": "2026-11-02T09:20:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "KMP",
+      "DateParser",
+      "Multiplatform"
+    ],
+    "content": "لو محتاج تعمل parsing لتواريخ زي \"tomorrow from 5PM to 8PM\" في shared code بـ Kotlin Multiplatform، فيه walkthrough جديد بـ DateParser Kotlin 📅\n\nالـ demo بيوريك إزاي تعمل كده offline من غير ما تعتمد على platform-specific APIs.\n\nمفيد لأي تطبيق فيه reminders أو calendar features على Android و iOS مع بعض.\n\nزكاة العلم نشره 💚\n\n#KMP #DateParser #mo3talogy",
+    "summary_ar": "Walkthrough لـ parsing reminder dates زي \"tomorrow from 5PM to 8PM\" offline في shared KMP code بـ DateParser Kotlin.\n\n(المصدر في أول كومنت)\n\n#KMP #mo3talogy",
+    "summary_en": "Offline KMP walkthrough for parsing natural language reminder dates like 'tomorrow from 5PM to 8PM' using DateParser Kotlin in shared code.",
+    "url": "https://alox1d.github.io/dateparser-kotlin/en/kmp-reminder-demo/"
+  },
+  {
+    "title": "proctor: اكتب eval suite مرة واحدة وشغّله على Gemini Nano و Apple Foundation Models",
+    "date": "2026-11-02T09:21:00+02:00",
     "source": "نشرة التكنولوجيا",
     "category": "أدوات المطورين",
     "tags": [
-      "CI",
-      "GitHub Actions",
-      "Agents",
-      "Performance"
+      "KMP",
+      "AI",
+      "Testing",
+      "OnDevice"
     ],
-    "content": "من سنة كان الـ PR في Boardy بيستنى لحد 40 دقيقة عشان الـ CI يخلص. دلوقتي بيستنى دقيقتين بس ⚡\n\nOwen Gretzinger كتب البوست ده وشرح إزاي عملوا كده، وليه الموضوع بقى أهم من أي وقت تاني. لأن كل الـ PRs بقت بتتكتب بـ coding agents، والـ agents مش بتزهق من الـ push. بتكتب، تستنى الـ CI، تصلح الـ red check، وتعمل push تاني. لما كتابة الكود تبقى أسرع 10 مرات والـ CI ميتغيرش، الـ CI هو اللي هتستنى عليه.\n\nالـ 9 خطوات اللي عملوها:\n\n1. **سيبوا GitHub default runners**\nالـ jobs كانت بتستنى لحد 11 دقيقة عشان تجيب machine. دلوقتي بتبدأ في 8 ثواني. استخدموا Blacksmith (وفيه خيارات تانية زي Vercel CI و boat.dev). نقلوا كل الـ jobs، حتى الصغيرة. الـ runners لوحدها نزلتهم من 40 دقيقة لـ 10.\n\n2. **بدلوا ESLint بـ Oxlint**\nالـ lint نزل من دقيقتين لـ 5 ثواني. الـ agents مش بتزعجها الـ strict rules، ففعّل كل حاجة.\n\n3. **غيروا الـ typechecker كل ما يطلع أسرع**\nغيروه 3 مرات في شهر. الـ cold typecheck كان 70 ثانية على tsc، TypeScript 7 نزله لـ 13، و bun check بيعمله في أقل من 5 ثواني. محليًا tsrs بيعمله في 0.6 ثانية.\n\n4. **Shardوا الـ tests على machines أكبر**\nقسموا target كان 8 دقايق لـ 6 shards على machines بـ 8 vCPU، كل واحدة بـ database لوحدها. الـ machines الأكبر أثرت أكتر من عدد الـ shards.\n\n5. **وقفوا إعادة تحميل الـ app لكل test file**\nVitest كان بيدي كل test file worker جديد، فكل file كان بيستورد الـ NestJS app من الأول. عملوا `isolate: false`، والـ shards نزلت من 100 ثانية لـ 35. لازم تعمل hook يعيد الـ state بعد كل file عشان متسربش.\n\n6. **صلحوا الـ setup**\nالـ test job نزل من 168 ثانية لـ 74. معظم التوفير من الـ setup مش من الـ tests. اكتشفوا إن نص الـ test jobs مكنش عندها dependency cache (GitHub بيعمل cache للـ PR على الـ branch بتاعه، ومفيش حد كان بيعمل seed من main). كمان عملوا cache لـ node_modules (بتترجع في 13 ثانية بدل install 33 ثانية)، و blobless clone بدل shallow.\n\n7. **شغلوا كل حاجة parallel**\nالـ lint والـ typecheck والـ build والـ tests كلهم بيشتغلوا مع بعض. الـ PR بتاخد وقت أبطأ واحدة.\n\n8. **شغل بس اللي الـ PR لمسه**\nاستخدموا nx affected عشان الـ PR يختبر المشاريع اللي اتغيرت بس، والـ full suite بيشتغل كل ليلة على main.\n\n9. **شغل الـ checks قبل كل push**\nالـ pre-push hook بيشغل format و lint و typecheck على الـ files المتغيرة في أقل من 9 ثواني. الـ agent اللي يلاقي type error محليًا يصلحه في ثواني بدل ما يستنى الـ CI.\n\n**التكلفة:**\nفاتورة الـ CI طلعت من 230$ في الشهر لـ 4300$، بس ده أرخص فلوس بيصرفوها عشان يخلوا الـ agents أسرع.\n\n**الخطوة الجاية:**\nدلوقتي الـ agents بتكتب الكود والـ CI بياخد دقيقتين، أبطأ حاجة في الـ loop هي إنه يدوس merge. مع عشرات الـ agent sessions في نفس الوقت، ساعات لسه بياخد وقت عشان يخلّص الشغل. فالـ bottleneck الجاي هو هو نفسه.\n\nالبوست الأصلي: https://x.com/owengretzinger/status/2116291924219060319\n\nزكاة العلم نشره 💚\n\n#CI #GitHubActions #Agents #Performance #mo3talogy",
-    "summary_ar": "إزاي خلو الـ CI أسرع 20 مرة (من 40 دقيقة لدقيقتين) عشان الـ coding agents.\n\nالخطوات الأساسية: سيبوا GitHub runners، بدلوا ESLint بـ Oxlint، غيروا typechecker لـ bun check، shardوا الـ tests، صلحوا الـ setup والـ cache، وشغلوا كل حاجة parallel.\n\nالفاتورة طلعت من 230$ لـ 4300$، بس ده أرخص حاجة بيعملوها عشان يسرعوا الـ agents.\n\n(المصدر في أول كومنت)\n\n#CI #Agents #mo3talogy",
-    "summary_en": "🇬🇧 English summary:\nHow Boardy cut CI from 40 minutes to 2 minutes so coding agents can iterate faster. Key moves: leave GitHub hosted runners, switch ESLint to Oxlint, use bun check for typechecking, shard tests on bigger machines, fix setup/caching, run everything in parallel, and only test what the PR touches. CI cost rose from $230 to $4300/month, but it's the cheapest money they spend on agent speed.",
-    "url": "https://x.com/owengretzinger/status/2116291924219060319"
+    "content": "لو بتختبر on-device AI models، فيه مكتبة اسمها proctor بتسمحلك تكتب eval suite مرة واحدة في Kotlin Multiplatform وتشغله على Gemini Nano (Android) و Apple Foundation Models (iOS) 🤖\n\nمفيدة لأي حد بيعمل on-device AI agents أو features ويحتاج يقارن الـ performance بين المنصات.\n\nزكاة العلم نشره 💚\n\n#KMP #AI #OnDevice #mo3talogy",
+    "summary_ar": "proctor بيخلّيك تكتب eval suite مرة واحدة في KMP وتشغله على Gemini Nano و Apple Foundation Models.\n\n(المصدر في أول كومنت)\n\n#KMP #AI #mo3talogy",
+    "summary_en": "proctor lets you write an eval suite once in Kotlin Multiplatform and run it against Gemini Nano on Android and Apple Foundation Models on iOS.",
+    "url": "https://github.com/jantursky/proctor"
   },
   {
-    "title": "ktrs: إعادة كتابة ktfmt و ktlint بـ Rust",
-    "date": "2026-11-02T09:10:00+02:00",
+    "title": "AspectK: AOP لـ Kotlin Multiplatform في وقت الـ compile",
+    "date": "2026-11-02T09:22:00+02:00",
     "source": "نشرة التكنولوجيا",
     "category": "أدوات المطورين",
     "tags": [
-      "Kotlin",
-      "Rust",
-      "Formatting",
-      "Tooling"
+      "KMP",
+      "AOP",
+      "Compiler Plugin"
     ],
-    "content": "لو بتعاني من بطء الـ ktfmt أو ktlint، فيه مشروع جديد اسمه ktrs بيعيد كتابتهم بـ Rust 🚀\n\nالهدف إنه يطلع نفس الـ output بالظبط (byte-identical) من غير ما يحتاج JVM يشتغل.\n\nده بيخلي الـ formatting والـ lint أسرع بكتير، خاصة في الـ CI أو على المشاريع الكبيرة.\n\nلسه جديد، بس فكرة قوية لأي حد عايز يسرّع الـ tooling بتاعه.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Rust #Tooling #mo3talogy",
-    "summary_ar": "ktrs بيعيد كتابة ktfmt و ktlint بـ Rust، بنفس الـ output من غير JVM. أسرع بكتير في الـ CI.\n\n(المصدر في أول كومنت)\n\n#Kotlin #Rust #mo3talogy",
-    "summary_en": "ktrs rewrites ktfmt and ktlint in Rust with byte-identical output and no JVM startup. Faster formatting and linting, especially useful in CI.",
-    "url": "https://github.com/Hexay/ktrs"
+    "content": "AspectK هو Kotlin compiler plugin بيضيف Aspect-Oriented Programming في وقت الـ compile لمشاريع Kotlin Multiplatform 🔧\n\nمفيد لو عايز تعمل cross-cutting concerns (زي logging أو analytics) من غير ما تكرر الكود في كل مكان.\n\nزكاة العلم نشره 💚\n\n#KMP #AOP #CompilerPlugin #mo3talogy",
+    "summary_ar": "AspectK compiler plugin بيضيف AOP لـ Kotlin Multiplatform في وقت الـ compile.\n\n(المصدر في أول كومنت)\n\n#KMP #AOP #mo3talogy",
+    "summary_en": "AspectK is a Kotlin compiler plugin that adds compile-time aspect-oriented programming to Kotlin Multiplatform projects.",
+    "url": "https://github.com/Mole-Labs/aspectk"
   },
   {
-    "title": "Orrery: تقويم لـ Compose Multiplatform",
-    "date": "2026-11-02T09:11:00+02:00",
+    "title": "Stipple: dithered UI لـ Compose Multiplatform",
+    "date": "2026-11-02T09:23:00+02:00",
     "source": "نشرة التكنولوجيا",
     "category": "Kotlin",
     "tags": [
       "Compose",
       "Multiplatform",
-      "Calendar"
+      "UI"
     ],
-    "content": "لو محتاج تقويم (calendar) لـ Compose Multiplatform، فيه مكتبة اسمها Orrery 📅\n\nبتدعم الشهر والأسبوع والسنة، مع Material 3 theming، وفيه optional module للـ Chinese lunisolar calendar.\n\nمفيدة لأي تطبيق فيه تواريخ أو scheduling على Android و iOS مع بعض.\n\nزكاة العلم نشره 💚\n\n#Compose #KMP #Calendar #mo3talogy",
-    "summary_ar": "Orrery تقويم لـ Compose Multiplatform مع Material 3. فيه month/week/year views و optional Chinese calendar.\n\n(المصدر في أول كومنت)\n\n#Compose #KMP #mo3talogy",
-    "summary_en": "Orrery is a month, week and year calendar for Compose Multiplatform with Material 3 theming and an optional Chinese lunisolar module.",
-    "url": "https://github.com/koza4e4ok/Orrery"
+    "content": "Stipple مكتبة لـ Compose Multiplatform بتعمل dithering على عناصر الـ UI 🎨\n\nفيها modifiers و components بتشتغل على Android و iOS و desktop و web.\n\nلو بتعمل تصميم فيه retro أو artistic effects، المكتبة دي ممكن تفيدك.\n\nزكاة العلم نشره 💚\n\n#Compose #KMP #UI #mo3talogy",
+    "summary_ar": "Stipple مكتبة بتضيف dithered UI effects لـ Compose Multiplatform على Android و iOS و desktop و web.\n\n(المصدر في أول كومنت)\n\n#Compose #KMP #mo3talogy",
+    "summary_en": "Stipple is a Compose Multiplatform library that dithers UI elements, with modifiers and components for Android, iOS, desktop and web.",
+    "url": "https://github.com/jantursky/stipple"
+  },
+  {
+    "title": "herald: مكتبة analytics لـ Kotlin بتبعت لأكتر من vendor في نفس الوقت",
+    "date": "2026-11-02T09:24:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Analytics",
+      "Kotlin",
+      "Firebase"
+    ],
+    "content": "herald مكتبة Kotlin analytics بتسمحلك تبعت الأحداث لـ Firebase و Adjust و Mixpanel وغيرهم في نفس الوقت من غير ما تكرر الكود 📊\n\nمفيدة لو بتستخدم أكتر من analytics provider وعايز abstraction نظيف.\n\nزكاة العلم نشره 💚\n\n#Analytics #Kotlin #mo3talogy",
+    "summary_ar": "herald مكتبة analytics بتبعت الأحداث لـ Firebase و Adjust و Mixpanel وغيرهم من كود واحد.\n\n(المصدر في أول كومنت)\n\n#Analytics #Kotlin #mo3talogy",
+    "summary_en": "herald is a Kotlin analytics library that sends app events to Firebase, Adjust, Mixpanel and other vendors at once.",
+    "url": "https://github.com/MkhytarMkhoian/herald"
   },
   {
     "category": "أدوات المطورين",
