@@ -214,8 +214,8 @@
       "AOP",
       "Compiler Plugin"
     ],
-    "content": "AspectK هو Kotlin compiler plugin بيضيف Aspect-Oriented Programming في وقت الـ compile لمشاريع Kotlin Multiplatform 🔧\n\nمفيد لو عايز تعمل cross-cutting concerns (زي logging أو analytics) من غير ما تكرر الكود في كل مكان.\n\nزكاة العلم نشره 💚\n\n#KMP #AOP #CompilerPlugin #mo3talogy",
-    "summary_ar": "AspectK compiler plugin بيضيف AOP لـ Kotlin Multiplatform في وقت الـ compile.\n\n(المصدر في أول كومنت)\n\n#KMP #AOP #mo3talogy",
+    "content": "AspectK هو Kotlin compiler plugin بيضيف Aspect-Oriented Programming في وقت الـ compile لمشاريع Kotlin Multiplatform.\n\nالفكرة إنك تعرّف aspects (زي logging أو analytics أو error handling) مرة واحدة، والـ plugin يحقنها في الأماكن المناسبة أثناء الـ compilation، من غير ما تكتب الكود في كل مكان.\n\nده بيقلل الـ boilerplate، وبيخلّي الـ cross-cutting concerns مركزية. لو عايز تغير طريقة الـ logging مثلاً، تغيرها في مكان واحد.\n\nالمكتبة لسه جديدة، لكنها مفيدة لأي مشروع KMP فيه logging أو analytics أو security checks متكررة.\n\nزكاة العلم نشره 💚\n\n#KMP #AOP #CompilerPlugin #mo3talogy",
+    "summary_ar": "AspectK compiler plugin بيضيف Aspect-Oriented Programming لـ Kotlin Multiplatform في وقت الـ compile. تعرّف الـ aspects مرة واحدة (logging, analytics...) والـ plugin يحقنها في الأماكن المناسبة.\n\n(المصدر في أول كومنت)\n\n#KMP #AOP #mo3talogy",
     "summary_en": "AspectK is a Kotlin compiler plugin that adds compile-time aspect-oriented programming to Kotlin Multiplatform projects.",
     "url": "https://github.com/Mole-Labs/aspectk"
   },
@@ -229,8 +229,8 @@
       "Multiplatform",
       "UI"
     ],
-    "content": "Stipple مكتبة لـ Compose Multiplatform بتعمل dithering على عناصر الـ UI 🎨\n\nفيها modifiers و components بتشتغل على Android و iOS و desktop و web.\n\nلو بتعمل تصميم فيه retro أو artistic effects، المكتبة دي ممكن تفيدك.\n\nزكاة العلم نشره 💚\n\n#Compose #KMP #UI #mo3talogy",
-    "summary_ar": "Stipple مكتبة بتضيف dithered UI effects لـ Compose Multiplatform على Android و iOS و desktop و web.\n\n(المصدر في أول كومنت)\n\n#Compose #KMP #mo3talogy",
+    "content": "Stipple مكتبة لـ Compose Multiplatform بتعمل dithering على عناصر الـ UI.\n\nالـ dithering بيخلّي الألوان تبان أكتر من اللي هي عليه فعليًا، عن طريق توزيع النقاط بطريقة معينة. المكتبة فيها modifiers و components بتشتغل على Android و iOS و desktop و web.\n\nلو بتعمل تصميم فيه retro look أو artistic effects، أو عايز تحسن الـ visual quality على شاشات محدودة الألوان، المكتبة دي ممكن تفيدك.\n\nزكاة العلم نشره 💚\n\n#Compose #KMP #UI #Dithering #mo3talogy",
+    "summary_ar": "Stipple مكتبة بتضيف dithered UI effects لـ Compose Multiplatform على Android و iOS و desktop و web. مفيدة للـ retro looks أو تحسين الـ visual quality.\n\n(المصدر في أول كومنت)\n\n#Compose #KMP #UI #mo3talogy",
     "summary_en": "Stipple is a Compose Multiplatform library that dithers UI elements, with modifiers and components for Android, iOS, desktop and web.",
     "url": "https://github.com/jantursky/stipple"
   },
@@ -244,17 +244,17 @@
       "Kotlin",
       "Firebase"
     ],
-    "content": "herald مكتبة Kotlin analytics بتسمحلك تبعت الأحداث لـ Firebase و Adjust و Mixpanel وغيرهم في نفس الوقت من غير ما تكرر الكود 📊\n\nمفيدة لو بتستخدم أكتر من analytics provider وعايز abstraction نظيف.\n\nزكاة العلم نشره 💚\n\n#Analytics #Kotlin #mo3talogy",
-    "summary_ar": "herald مكتبة analytics بتبعت الأحداث لـ Firebase و Adjust و Mixpanel وغيرهم من كود واحد.\n\n(المصدر في أول كومنت)\n\n#Analytics #Kotlin #mo3talogy",
+    "content": "herald مكتبة Kotlin analytics بتسمحلك تبعت الأحداث لـ Firebase و Adjust و Mixpanel وغيرهم في نفس الوقت من غير ما تكرر الكود.\n\nبدل ما تكتب كود منفصل لكل provider، تعرّف الـ event مرة واحدة، والمكتبة تبعته لكل الـ vendors اللي محتاجهم. ده بيقلل الـ boilerplate وبيخلّي إضافة provider جديد أسهل.\n\nمفيدة لو بتستخدم أكتر من analytics provider وعايز abstraction نظيف من غير ما تربط الـ business logic بـ vendor معين.\n\nزكاة العلم نشره 💚\n\n#Analytics #Kotlin #Firebase #mo3talogy",
+    "summary_ar": "herald مكتبة analytics بتبعت الأحداث لـ Firebase و Adjust و Mixpanel وغيرهم من كود واحد. تقلل الـ boilerplate وتخلّي إضافة provider جديد أسهل.\n\n(المصدر في أول كومنت)\n\n#Analytics #Kotlin #mo3talogy",
     "summary_en": "herald is a Kotlin analytics library that sends app events to Firebase, Adjust, Mixpanel and other vendors at once.",
     "url": "https://github.com/MkhytarMkhoian/herald"
   },
   {
     "category": "أدوات المطورين",
-    "content": "تخيل إن في حد عمل prototype لـ Kotlin compiler مكتوب بـ Go، وبيقول إنه أسرع 10× من kotlinc العادي 🤯\n\nالمشروع اسمه kotlin-compiler-go، وهدفه يكون compiler للـ JVM.\n\nالمهم تعرفه:\n- لسه prototype، مش بيدعم كل الـ Kotlin features.\n- الفكرة إن الـ Go أسرع في الـ startup والـ compilation مقارنة بالـ JVM-based compiler.\n- لو نجح، ممكن يبقى بديل خفيف للـ kotlinc في بعض الـ use cases (زي الـ scripting أو الـ small projects).\n- مش جاهز للـ production، لكن فكرة مثيرة للاهتمام في عالم الـ Kotlin tooling.\n\nلو بتحب الـ compilers أو عايز تشوف تجارب خارج الـ JetBrains ecosystem، المشروع ده يستاهل تشوفه.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Compiler #Go #mo3talogy",
+    "content": "تخيل إن في حد عمل prototype لـ Kotlin compiler مكتوب بـ Go، وبيقول إنه أسرع 10× من kotlinc العادي.\n\nالمشروع اسمه kotlin-compiler-go، وهدفه يكون compiler للـ JVM. لسه prototype، مش بيدعم كل الـ Kotlin features. الفكرة إن الـ Go أسرع في الـ startup والـ compilation مقارنة بالـ JVM-based compiler.\n\nلو نجح، ممكن يبقى بديل خفيف للـ kotlinc في بعض الـ use cases زي الـ scripting أو الـ small projects. مش جاهز للـ production، لكن فكرة مثيرة للاهتمام في عالم الـ Kotlin tooling.\n\nلو بتحب الـ compilers أو عايز تشوف تجارب خارج الـ JetBrains ecosystem، المشروع ده يستاهل تشوفه.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Compiler #Go #Tooling #mo3talogy",
     "date": "2026-11-01T19:51:00+02:00",
     "source": "نشرة التكنولوجيا",
-    "summary_ar": "Prototype لـ Kotlin compiler مكتوب بـ Go، بيقول إنه أسرع 10× من kotlinc.\n\nلسه مش كامل، لكن فكرة مثيرة في الـ tooling.\n\n(المصدر في أول كومنت)\n\n#Kotlin #Compiler #mo3talogy",
+    "summary_ar": "Prototype لـ Kotlin compiler مكتوب بـ Go، بيقول إنه أسرع 10× من kotlinc. لسه مش كامل، لكن فكرة مثيرة في الـ tooling خارج الـ JetBrains ecosystem.\n\n(المصدر في أول كومنت)\n\n#Kotlin #Compiler #mo3talogy",
     "summary_en": "🇬🇧 English summary:\nA prototype Kotlin compiler for the JVM written in Go that claims to be 10× faster than kotlinc. Still incomplete, but an interesting experiment in faster Kotlin tooling.",
     "tags": [
       "Kotlin",
@@ -267,10 +267,10 @@
   },
   {
     "category": "Kotlin",
-    "content": "لو بتفكر تعمل تطبيق جري (running coach) بـ Kotlin Multiplatform، المقال ده هيوفر عليك تجارب كتير 🏃‍♂️\n\nSteven Rogers شارك تجربته وهو بيعمل app لوحده بـ KMP و Compose، وساب جزء الـ Apple Watch و Wear OS native.\n\nأهم الدروس:\n\n- الـ shared code شغال كويس للـ business logic والـ data، لكن الـ UI على الـ watch محتاج تبقى native عشان الـ performance والـ battery.\n- Compose Multiplatform لسه بيوفر وقت كبير على Android و iOS، بس لازم تخطط من الأول إيه اللي هيبقى shared وإيه اللي هيبقى platform-specific.\n- الـ watchOS و Wear OS ليهم قيود مختلفة، فالأحسن تعمل abstraction واضح من البداية.\n- التجربة كلها بتاعت شخص واحد، فده بيوريك إن KMP بقى usable حتى في المشاريع الصغيرة.\n\nلو بتعمل app فيه wearable، خد بالك إن الـ native code لسه له مكان مهم.\n\nزكاة العلم نشره 💚\n\n#Kotlin #KMP #Compose #Multiplatform #mo3talogy",
+    "content": "لو بتفكر تعمل تطبيق جري (running coach) بـ Kotlin Multiplatform، المقال ده هيوفر عليك تجارب كتير.\n\nSteven Rogers شارك تجربته وهو بيعمل app لوحده بـ KMP و Compose، وساب جزء الـ Apple Watch و Wear OS native.\n\nأهم الدروس:\n\n- الـ shared code شغال كويس للـ business logic والـ data، لكن الـ UI على الـ watch محتاج تبقى native عشان الـ performance والـ battery.\n- Compose Multiplatform لسه بيوفر وقت كبير على Android و iOS، بس لازم تخطط من الأول إيه اللي هيبقى shared وإيه اللي هيبقى platform-specific.\n- الـ watchOS و Wear OS ليهم قيود مختلفة، فالأحسن تعمل abstraction واضح من البداية.\n- التجربة كلها بتاعت شخص واحد، فده بيوريك إن KMP بقى usable حتى في المشاريع الصغيرة.\n\nلو بتعمل app فيه wearable، خد بالك إن الـ native code لسه له مكان مهم.\n\nزكاة العلم نشره 💚\n\n#Kotlin #KMP #Compose #Multiplatform #Wearable #mo3talogy",
     "date": "2026-11-01T19:50:00+02:00",
     "source": "نشرة التكنولوجيا",
-    "summary_ar": "تجربة شحن تطبيق جري بـ KMP + Compose مع Apple Watch native.\n\nالـ shared code كويس للـ logic، لكن الـ watch محتاج native. درس مهم لأي حد بيعمل wearable app.\n\n(المصدر في أول كومنت)\n\n#KMP #Compose #mo3talogy",
+    "summary_ar": "تجربة شحن تطبيق جري بـ KMP + Compose مع Apple Watch و Wear OS native. الـ shared code كويس للـ logic، لكن الـ watch محتاج native. درس مهم لأي حد بيعمل wearable app.\n\n(المصدر في أول كومنت)\n\n#KMP #Compose #mo3talogy",
     "summary_en": "🇬🇧 English summary:\nLessons from shipping a running coach app with Kotlin Multiplatform and Compose while keeping the Apple Watch and Wear OS parts native. Shared code works well for logic, but platform-specific UI is still needed for wearables.",
     "tags": [
       "KMP",
