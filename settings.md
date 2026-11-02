@@ -41,7 +41,7 @@ permalink: /settings/
   <p id="save-msg" class="save-msg" hidden>اتحفظت ✅</p>
 </div>
 
-<p style="margin-top: 2rem;"><a href="/">← رجوع للمقالات</a></p>
+<p style="margin-top: 2rem;"><a href="/tech-blog/">← رجوع للمقالات</a></p>
 
 <script>
 (function() {
