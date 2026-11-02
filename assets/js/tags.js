@@ -135,7 +135,7 @@
       if (e.target.closest('.lightbox-nav.prev')) { stepLightbox(-1); return; }
       if (e.target.closest('.lightbox-nav.next')) { stepLightbox(1); return; }
     }
-    var ln = e.target.closest('.card h2 a, .card .read-more');
+    var ln = e.target.closest('.card .read-more');
     if (ln) { markRead(ln.closest('.card')); return; }
     var m = e.target.closest('.more-btn');
     if (m) {

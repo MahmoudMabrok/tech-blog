@@ -64,7 +64,7 @@ title: المقالات
     {% endfor %}
   </div>
   {% endif %}
-  <h2>{% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h2>
+  <h2>{{ article.title }}</h2>
   {% assign sum_ar = article.summary_ar | default: article.summary %}
   {% assign sum_en = article.summary_en %}
   {% if sum_ar or sum_en %}
