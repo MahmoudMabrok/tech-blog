@@ -53,6 +53,11 @@ title: المقالات
     <span class="dot">•</span>
     <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}{% if article.date contains "T" %} · {{ article.date | date: "%H:%M" }}{% endif %}</time>
   </header>
+  {% if article.image %}
+  <figure class="card-cover">
+    {% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{% endif %}<img src="{{ article.image | relative_url }}" alt="{{ article.title | escape }}" loading="lazy" decoding="async">{% if article.url %}</a>{% endif %}
+  </figure>
+  {% endif %}
   <h2>{% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h2>
   {% assign sum_ar = article.summary_ar | default: article.summary %}
   {% assign sum_en = article.summary_en %}

@@ -192,3 +192,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
 .card.is-read .read-badge { display: inline-block; }
 .card.is-read h2 a { color: #6b7280; }
 .meta { flex-wrap: wrap; }
+
+/* Article cover images */
+.card-cover { margin: 12px 0 14px; }
+.card-cover img {
+  display: block; max-width: 100%; width: 100%; height: auto;
+  border-radius: 12px; border: 1px solid #eceef5; background: #f6f7fb;
+}
