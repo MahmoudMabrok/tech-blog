@@ -1,5 +1,21 @@
 [
   {
+    "title": "What's new in Android developer tools and performance at Android Dev Summit",
+    "date": "2026-11-02T10:21:09+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Android CLI",
+      "Performance",
+      "R8",
+      "Compose"
+    ],
+    "content": "## The problem / context\n\nGoogle's Android Dev Summit 2026 round-up of tools and performance news has three themes: any agent and any model inside Android Studio; Android CLI giving agents, terminals and CI first-class access to the toolchain; and going from a production signal to a verified fix. (BYOA and Change Review have their own card.)\n\n## How it works\n\nAndroid CLI is the tool-first interface for agents. New commands provision real devices (android device remote), render Compose Previews without an emulator (android preview — 77% faster UI tasks with up to 3x fewer tokens in Google's testing), profile, and pull Android vitals and Crashlytics data (android signals). Official plugins bring it to Claude Code and Codex. The other performance tools work the same in Studio and the CLI.\n\n## Key ideas\n\n1. LeakCanary in the CLI (android profiler leakcanary) analyses heap dumps on your computer, not the device.\n2. androidx.tracing 2.0: trace sections carry file, line and arguments, and coroutine work appears as connected flows.\n3. R8: android analyze scores shrinking for an APK/AAB or library; AGP 9.3 adds the R8 Configuration Analyzer; Jetpack Keep (alpha) gives type-safe keep annotations.\n4. Compose 1.13 recomposition tracing shows why a function recomposed, back to the state write that caused it.\n5. Migration Assistant (Canary): right-click an XML layout, then AI > Migrate to Compose.\n6. Lightbuild preview: a declarative YAML build for new or experimental projects; 30+ evaluated Android skills, incl. play-policy-insights and security skills.\n\n## Examples\n\n**1. Commands named in the post** _(From the article)_\n\n```bash\n# give an agent Android tooling\nandroid init\nandroid skills list\nandroid skills add <skill>\n\n# real devices, previews, production data\nandroid device remote\nandroid device hub\nandroid preview\nandroid signals\n\n# R8 configuration report (AGP 9.3)\n./gradlew :app:analyzeReleaseR8Config\n\n# Android CLI plugin for Claude Code\nclaude plugin marketplace add android/android-cli-plugin\nclaude plugin install android-cli@android-cli-plugin\n```\n\n## Why it matters\n\nThe Android toolchain is becoming scriptable end to end. Any agent or CI job can now build, preview, profile and audit an app with official knowledge instead of guessing — and recomposition tracing and R8 analysis make the performance work measurable.\n\n> **Note:** Some items are Canary/alpha/preview (Migration Assistant, Fix with AI for leaks, Lightbuild, Jetpack Keep).\n\nSource: https://developer.android.com/blog/posts/android-dev-summit-26-developer-tools-performance",
+    "summary_ar": "ملخص أدوات Android Dev Summit: أوامر Android CLI جديدة للـ agents زي android preview و android device remote.\nوكمان recomposition tracing في Compose 1.13 وتحليل R8 في AGP 9.3.",
+    "summary_en": "A round-up of Android Dev Summit tooling: new Android CLI commands for agents (previews, remote devices, production signals, profiling) and plugins for Claude Code and Codex. It also covers Compose 1.13 recomposition tracing and R8 analysis in AGP 9.3.",
+    "url": "https://developer.android.com/blog/posts/android-dev-summit-26-developer-tools-performance"
+  },
+  {
     "title": "Your favorite agents are now integrated in Android Studio",
     "date": "2026-11-02T10:20:58+02:00",
     "source": "نشرة التكنولوجيا",
