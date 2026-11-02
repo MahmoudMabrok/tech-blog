@@ -86,7 +86,55 @@
     el.insertAdjacentElement('afterend', btn);
   });
 
+  var lb = document.getElementById('lightbox');
+  var lbImg = lb ? lb.querySelector('img') : null;
+  var group = [];
+  var gIndex = 0;
+
+  function showSlide() {
+    if (!lbImg || !group.length) return;
+    lbImg.src = group[gIndex];
+    lbImg.alt = 'صورة ' + (gIndex + 1) + ' من ' + group.length;
+    var multi = group.length > 1;
+    lb.querySelector('.prev').hidden = !multi;
+    lb.querySelector('.next').hidden = !multi;
+  }
+  function openLightbox(items, i) {
+    if (!lb) return;
+    group = items;
+    gIndex = i;
+    showSlide();
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    if (!lb) return;
+    lb.hidden = true;
+    if (lbImg) lbImg.removeAttribute('src');
+    document.body.style.overflow = '';
+    group = [];
+  }
+  function stepLightbox(delta) {
+    if (!group.length) return;
+    gIndex = (gIndex + delta + group.length) % group.length;
+    showSlide();
+  }
+
   document.addEventListener('click', function (e) {
+    var shot = e.target.closest('.gallery-item');
+    if (shot) {
+      e.preventDefault();
+      var strip = shot.closest('.card-gallery');
+      var buttons = strip.querySelectorAll('.gallery-item');
+      var items = Array.prototype.map.call(buttons, function (b) { return b.getAttribute('data-full'); });
+      openLightbox(items, Array.prototype.indexOf.call(buttons, shot));
+      return;
+    }
+    if (lb && !lb.hidden) {
+      if (e.target.closest('.lightbox-close') || e.target === lb) { closeLightbox(); return; }
+      if (e.target.closest('.lightbox-nav.prev')) { stepLightbox(-1); return; }
+      if (e.target.closest('.lightbox-nav.next')) { stepLightbox(1); return; }
+    }
     var ln = e.target.closest('.card h2 a, .card .read-more');
     if (ln) { markRead(ln.closest('.card')); return; }
     var m = e.target.closest('.more-btn');
@@ -124,4 +172,11 @@
     if (kv[0] === 'cat' || kv[0] === 'tag') state[kv[0]] = decodeURIComponent(kv[1] || 'all');
   });
   render();
+
+  document.addEventListener('keydown', function (e) {
+    if (!lb || lb.hidden) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowRight') stepLightbox(-1);
+    else if (e.key === 'ArrowLeft') stepLightbox(1);
+  });
 })();

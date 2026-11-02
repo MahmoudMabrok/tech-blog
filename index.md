@@ -56,14 +56,13 @@ title: المقالات
   {% assign imgs = article.images %}
   {% if imgs == nil or imgs.size == 0 %}{% if article.image %}{% assign imgs = article.image | split: "|" %}{% endif %}{% endif %}
   {% if imgs and imgs.size > 0 %}
-  <figure class="card-cover">
-    {% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{% endif %}<img src="{{ imgs[0] | relative_url }}" alt="{{ article.title | escape }}" loading="lazy" decoding="async">{% if article.url %}</a>{% endif %}
-  </figure>
-  {% if imgs.size > 1 %}
-  <div class="card-gallery" dir="rtl">
-    {% for im in imgs offset:1 %}<a href="{{ im | relative_url }}" target="_blank" rel="noopener" title="كبّر الصورة"><img src="{{ im | relative_url }}" alt="{{ article.title | escape }} ({{ forloop.index | plus: 1 }})" loading="lazy" decoding="async"></a>{% endfor %}
+  <div class="card-gallery" dir="rtl" aria-label="صور المقالة">
+    {% for im in imgs %}
+    <button type="button" class="gallery-item" data-full="{{ im | relative_url }}" aria-label="عرض الصورة {{ forloop.index }} بحجم أكبر">
+      <img src="{{ im | relative_url }}" alt="{{ article.title | escape }}{% if imgs.size > 1 %} ({{ forloop.index }}){% endif %}" loading="lazy" decoding="async">
+    </button>
+    {% endfor %}
   </div>
-  {% endif %}
   {% endif %}
   <h2>{% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h2>
   {% assign sum_ar = article.summary_ar | default: article.summary %}
@@ -94,6 +93,13 @@ title: المقالات
 <div class="visitors">
   <span>عدد الزيارات</span>
   <img src="https://hits.sh/mahmoudmabrok.github.io/tech-blog.svg?style=flat-square&label=%F0%9F%91%81&color=4f46e5" alt="عدد الزيارات" loading="lazy">
+</div>
+
+<div id="lightbox" class="lightbox" hidden>
+  <button type="button" class="lightbox-close" aria-label="إغلاق">×</button>
+  <button type="button" class="lightbox-nav prev" aria-label="الصورة السابقة">‹</button>
+  <img alt="">
+  <button type="button" class="lightbox-nav next" aria-label="الصورة التالية">›</button>
 </div>
 
 <script src="{{ '/assets/js/tags.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
