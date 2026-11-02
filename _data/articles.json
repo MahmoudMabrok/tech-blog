@@ -1,5 +1,179 @@
 [
   {
+    "title": "Jetpack AppState: لما الـ Premium يخلّص والموسيقى لسه شغالة",
+    "date": "2026-11-02T09:30:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Jetpack",
+      "AppState",
+      "Architecture"
+    ],
+    "content": "لو عندك app فيه subscription و music playback، إزاي تشارك حالة الـ premium بين الـ playback والـ UI؟\n\nArda Kazancı شرح إزاي Jetpack AppState (StateStore و Transform) ممكن يحل المشكلة دي بطريقة نظيفة.\n\nمفيد لأي حد بيعمل apps فيها state معقد مشترك بين features مختلفة.\n\nزكاة العلم نشره 💚\n\n#Android #Jetpack #AppState #mo3talogy",
+    "summary_ar": "شرح لـ Jetpack AppState وإزاي StateStore و Transform ممكن يشاركوا حالة الـ subscription مع الـ playback.\n\n(المصدر في أول كومنت)\n\n#Android #Jetpack #mo3talogy",
+    "summary_en": "How Jetpack AppState's StateStore and Transform can share subscription state with media playback.",
+    "url": "https://ardakazanci.com/posts/jetpack-appstate-explained/"
+  },
+  {
+    "title": "Flake-Free Tests - Part 2: Hardening Turbine Tests",
+    "date": "2026-11-02T09:31:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Testing",
+      "Flow",
+      "Turbine"
+    ],
+    "content": "الجزء التاني من سلسلة Flake-Free Tests. Kevin Schildhorn شرح إزاي تصلّب اختبارات Turbine للـ Flows، خاصة مع StateFlow والـ events والـ sync points.\n\nلو اختباراتك بتفشل أحيانًا من غير سبب واضح، المقال ده هيساعدك.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Testing #Flow #mo3talogy",
+    "summary_ar": "إزاي تصلّب اختبارات Turbine للـ Flows عشان متبقاش flaky. يغطي StateFlow و events و sync points.\n\n(المصدر في أول كومنت)\n\n#Testing #Flow #mo3talogy",
+    "summary_en": "How to harden Turbine tests for Flows, covering StateFlow, events, and synchronization points.",
+    "url": "https://touchlab.co/flake-free-flow-tests-pt2-turbine"
+  },
+  {
+    "title": "CI/CD لـ Kotlin Multiplatform بـ GitHub Actions",
+    "date": "2026-11-02T09:32:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "KMP",
+      "CI",
+      "GitHub Actions"
+    ],
+    "content": "KMP Bits شرح setup بسيط لـ CI/CD لـ Kotlin Multiplatform بـ GitHub Actions، بـ 3 jobs.\n\nمفيد لو لسه بتبدأ في مشروع KMP وعايز pipeline شغال بسرعة.\n\nزكاة العلم نشره 💚\n\n#KMP #CI #GitHubActions #mo3talogy",
+    "summary_ar": "Walkthrough لـ CI/CD setup بـ 3 jobs لـ Kotlin Multiplatform باستخدام GitHub Actions.\n\n(المصدر في أول كومنت)\n\n#KMP #CI #mo3talogy",
+    "summary_en": "A three-job GitHub Actions CI setup for Kotlin Multiplatform projects.",
+    "url": "https://medium.com/@kmpbits/every-commit-on-the-clock-ci-cd-for-kotlin-multiplatform-with-github-actions-kmp-bits-2c5549c42789"
+  },
+  {
+    "title": "إزاي تعمل holographic foil effect في Jetpack Compose",
+    "date": "2026-11-02T09:33:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "AGSL",
+      "Shaders"
+    ],
+    "content": "Manuel Mato شرح إزاي تعمل holographic foil effect بـ AGSL shaders في Jetpack Compose ✨\n\nلو بتعمل UI مميز أو عايز تضيف effects بصرية، المقال ده فيه الكود والشرح.\n\nزكاة العلم نشره 💚\n\n#Compose #AGSL #Shaders #mo3talogy",
+    "summary_ar": "شرح بناء holographic foil effect باستخدام AGSL shaders في Jetpack Compose.\n\n(المصدر في أول كومنت)\n\n#Compose #Shaders #mo3talogy",
+    "summary_en": "How to build a holographic foil effect with AGSL shaders in Jetpack Compose.",
+    "url": "https://proandroiddev.com/how-a-holographic-foil-effect-works-in-jetpack-compose-9535d621c055"
+  },
+  {
+    "title": "Enable أو Disable Android AppFunctions في الـ runtime",
+    "date": "2026-11-02T09:34:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "AppFunctions",
+      "AI",
+      "Android"
+    ],
+    "content": "Katie Barnett شرحت إزاي تعمل enable أو disable لـ Android AppFunctions في الـ runtime بناءً على موافقة المستخدم أو feature toggles.\n\nمفيد لو بتستخدم AppFunctions كـ on-device MCP servers وعايز تتحكم فيهم ديناميكيًا.\n\nزكاة العلم نشره 💚\n\n#Android #AppFunctions #AI #mo3talogy",
+    "summary_ar": "إزاي تعمل enable/disable لـ Android AppFunctions في الـ runtime حسب موافقة المستخدم أو feature flags.\n\n(المصدر في أول كومنت)\n\n#Android #AppFunctions #mo3talogy",
+    "summary_en": "How to enable or disable Android AppFunctions at runtime based on user consent or feature toggles.",
+    "url": "https://medium.com/proandroiddev/ai-meet-app-enable-or-disable-android-appfunctions-at-runtime-77e18ca3ec95"
+  },
+  {
+    "title": "Kotlin Coroutines Debugging: StackTraceRecoverable",
+    "date": "2026-11-02T09:35:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Coroutines",
+      "Debugging"
+    ],
+    "content": "Arda Kazancı شرح إزاي StackTraceRecoverable بيخلي بيانات الـ custom exception سليمة أثناء الـ coroutine stack trace recovery.\n\nمفيد لو بتعاني من stack traces مش واضحة في الـ coroutines.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Coroutines #Debugging #mo3talogy",
+    "summary_ar": "إزاي StackTraceRecoverable بيحافظ على بيانات الـ custom exceptions أثناء recovery في الـ coroutines.\n\n(المصدر في أول كومنت)\n\n#Coroutines #Debugging #mo3talogy",
+    "summary_en": "How StackTraceRecoverable keeps custom exception data intact during coroutine stack trace recovery.",
+    "url": "https://ardakazanci.github.io/blog/posts/kotlin-coroutines-debugging-stacktrace-recoverable/"
+  },
+  {
+    "title": "متى تستخدم KSP؟ ومتى لا",
+    "date": "2026-11-02T09:36:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "KSP",
+      "Code Generation"
+    ],
+    "content": "Jaewoong Eum شرح متى يكون KSP الأداة المناسبة للـ code generation، ومتى الـ incremental model بتاعه مش كفاية.\n\nمقال مفيد لأي حد بيفكر يستخدم KSP في مشروعه.\n\nزكاة العلم نشره 💚\n\n#KSP #CodeGeneration #mo3talogy",
+    "summary_ar": "متى KSP يكون الخيار الصح للـ code generation، ومتى الـ incremental model بتاعه يقف.\n\n(المصدر في أول كومنت)\n\n#KSP #mo3talogy",
+    "summary_en": "When KSP is the right tool for code generation, and where its incremental model stops being enough.",
+    "url": "https://www.revenuecat.com/blog/engineering/when-ksp"
+  },
+  {
+    "title": "App Architecture: Analytics بطريقة vendor-agnostic",
+    "date": "2026-11-02T09:37:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Architecture",
+      "Analytics"
+    ],
+    "content": "Mkhytar Mkhoian شرح architecture لـ analytics في الـ modular Android apps، بيفصل الـ events والـ factories والـ trackers عشان يكون vendor-agnostic.\n\nمفيد لو بتستخدم أكتر من analytics provider وعايز كود نظيف.\n\nزكاة العلم نشره 💚\n\n#Android #Analytics #Architecture #mo3talogy",
+    "summary_ar": "Architecture لـ analytics في الـ modular apps بيفصل الـ events والـ trackers عشان يكون مستقل عن الـ vendor.\n\n(المصدر في أول كومنت)\n\n#Analytics #Architecture #mo3talogy",
+    "summary_en": "A vendor-agnostic analytics architecture for modular Android apps, splitting events, factories, and trackers.",
+    "url": "https://proandroiddev.com/app-architecture-analytics-ec3471ca619b"
+  },
+  {
+    "title": "Kotlin Flow: Bugs بتبان صحيحة في الأول",
+    "date": "2026-11-02T09:38:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Flow",
+      "Bugs"
+    ],
+    "content": "Kaustubh Deshmukh شرح 4 bugs شائعة في Kotlin Flow بتبان صحيحة في الأول، متعلقة بالـ collection و placement الـ catch و conflation و stateIn.\n\nلو بتستخدم Flow كتير، المقال ده يستاهل تشوفه.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Flow #Bugs #mo3talogy",
+    "summary_ar": "4 bugs شائعة في Kotlin Flow بتبان صحيحة في الأول: collection و catch و conflation و stateIn.\n\n(المصدر في أول كومنت)\n\n#Flow #Bugs #mo3talogy",
+    "summary_en": "Four easy-to-miss Kotlin Flow bugs around collection, catch placement, conflation, and stateIn.",
+    "url": "https://kt.academy/article/kaustubh_flow_bugs_that_look_correct_at_first"
+  },
+  {
+    "title": "Migrating a Real Android App to Kotlin Multiplatform (1/4)",
+    "date": "2026-11-02T09:39:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "KMP",
+      "Migration"
+    ],
+    "content": "Daniel Voko بيشرح في الجزء الأول إزاي جهّز تطبيق Android حقيقي للـ migration لـ Kotlin Multiplatform، من خلال modular architecture واختيار مكتبات portable.\n\nمفيد لأي حد بيفكر يعمل migration لـ KMP.\n\nزكاة العلم نشره 💚\n\n#KMP #Migration #mo3talogy",
+    "summary_ar": "الجزء الأول: إزاي تجهّز تطبيق Android حقيقي للـ migration لـ Kotlin Multiplatform.\n\n(المصدر في أول كومنت)\n\n#KMP #Migration #mo3talogy",
+    "summary_en": "How a real Android app became KMP-ready through early modular architecture and portable library choices (Part 1 of 4).",
+    "url": "https://proandroiddev.com/migrating-a-real-android-app-to-kotlin-multiplatform-1-4-before-the-migration-8b1d16f68747"
+  },
+  {
+    "title": "Kotlin 2.5: Full value classes و value objects يعني إيه لـ Android",
+    "date": "2026-11-02T09:40:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Kotlin",
+      "Value Classes"
+    ],
+    "content": "Arda Kazancı شرح إيه اللي بيجيبه Kotlin 2.5 من full value classes و value objects (experimental)، وإزاي ده يؤثر على مطوري Android.\n\nمفيد لو بتتابع تطورات اللغة.\n\nزكاة العلم نشره 💚\n\n#Kotlin #ValueClasses #mo3talogy",
+    "summary_ar": "إيه اللي بيجيبه Kotlin 2.5 من full value classes و value objects لمطوري Android.\n\n(المصدر في أول كومنت)\n\n#Kotlin #mo3talogy",
+    "summary_en": "What Kotlin 2.5's experimental full value classes and value objects mean for Android developers.",
+    "url": "https://ardakazanci.com/posts/kotlin-2-5-full-value-classes/"
+  },
+  {
+    "title": "Android Developer Roadmap 2027",
+    "date": "2026-11-02T09:41:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Career",
+      "Roadmap",
+      "AI"
+    ],
+    "content": "Mayank Kumar عمل roadmap لمطوري Android لـ 2027، بيغطي المهارات والمقابلات ودور الـ AI.\n\nمفيد لو بتفكر في مسارك المهني أو بتحضّر لمقابلات.\n\nزكاة العلم نشره 💚\n\n#Android #Career #AI #mo3talogy",
+    "summary_ar": "Roadmap لمطوري Android لـ 2027: المهارات والمقابلات ودور الـ AI.\n\n(المصدر في أول كومنت)\n\n#Android #Career #mo3talogy",
+    "summary_en": "Android developer roadmap for 2027 covering skills, interview topics, and the role of AI.",
+    "url": "https://imayankkumar.com/blog/android-developer-roadmap-2027/"
+  },
+  {
     "title": "Parse reminder dates في Kotlin Multiplatform (offline)",
     "date": "2026-11-02T09:20:00+02:00",
     "source": "نشرة التكنولوجيا",
