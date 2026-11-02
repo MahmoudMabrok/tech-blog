@@ -1,5 +1,21 @@
 [
   {
+    "title": "bikesched: a PostgreSQL-backed job scheduler for Java and Kotlin",
+    "date": "2026-11-02T10:21:47+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Kotlin",
+      "Java",
+      "PostgreSQL",
+      "Jobs"
+    ],
+    "content": "## The problem / context\n\nBackends need background jobs with retries, and often multi-step flows that must survive crashes, such as \"create a payment, wait for the webhook, mark paid\". That usually means extra infrastructure, or custom tables and glue code. bikesched keeps everything in PostgreSQL, with only the JDBC driver and SLF4J as core runtime dependencies.\n\n## How it works\n\nJobs live in plain bikesched_* tables, created and migrated on first use. Every app instance (node) claims due jobs with SELECT … FOR UPDATE SKIP LOCKED, and nodes wake each other with LISTEN/NOTIFY, with polling only as a safety net. Handlers can run durable steps whose results survive retries, and wait for events or sleep for days without holding a thread. Each job runs on its own virtual thread (Java 21+).\n\n## Key ideas\n\n1. Retries, timeouts, priorities, idempotency keys, and scheduling inside your own DB transaction.\n2. Steps with compensation (sagas), child jobs, polling steps, postponing on rate limits without using up an attempt.\n3. Crash recovery: a dead node's jobs are released and retried elsewhere.\n4. Optional modules: Kotlin DSL and typed handlers, Jackson, cron, Micrometer, Spring Boot starter, admin UI, test helpers.\n5. Not a workflow engine (no BPMN or cross-service orchestration). Very early (0.2.0-SNAPSHOT), built largely with AI agents — expect breakage.\n\n## Examples\n\n**1. A durable payment flow that waits for a webhook** _(From the README)_\n\n```java\nbikesched.registerJobHandler(\"order\", job -> {\n    Order order = job.payload(Order.class);\n    // runs once; a retried or resumed job gets the id back\n    String paymentIntentId = job.step(\"create-payment-intent\", String.class,\n            step -> stripe.createPaymentIntent(order).id());\n    // suspends (no thread held) until the webhook event arrives\n    PaymentUpdated webhook = job.waitForEvent(\"await-payment\",\n            \"payment-intent-updated\", paymentIntentId, PaymentUpdated.class)\n        .receive();\n    switch (webhook.status()) {\n        case SUCCEEDED -> job.step(\"mark-paid\", () -> orders.markPaid(order, paymentIntentId));\n        case FAILED -> job.step(\"mark-failed\", () -> orders.markFailed(order, paymentIntentId));\n    }\n});\n\n// in the webhook endpoint, minutes or days later\nbikesched.newEvent(\"payment-intent-updated\", webhookPayload.paymentIntentId())\n        .payload(webhookPayload)\n        .publish();\n```\n\n## Why it matters\n\nDurable execution (à la Inngest or Restate) with only the database you already run is attractive for small Kotlin and Java services — but treat it as an experiment until the schema stabilises.\n\nSource: https://github.com/bikesched/bikesched",
+    "summary_ar": "bikesched job scheduler لـ Java و Kotlin بيعتمد على PostgreSQL بس، وفيه durable steps و events و retries.\nلسه في مرحلة مبكرة جدًا ومعرّض يتكسر.",
+    "summary_en": "bikesched is a PostgreSQL-only job scheduler for Java and Kotlin with durable steps, event waits and retries, and no extra infrastructure. It is at a very early, breaking stage.",
+    "url": "https://github.com/bikesched/bikesched"
+  },
+  {
     "title": "Mosaic: build Kotlin backend responses out of Tiles",
     "date": "2026-11-02T10:21:38+02:00",
     "source": "نشرة التكنولوجيا",
