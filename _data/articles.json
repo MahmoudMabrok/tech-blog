@@ -1,5 +1,21 @@
 [
   {
+    "title": "Orrery: a month/week/year calendar for Compose (Multiplatform)",
+    "date": "2026-11-02T10:21:19+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "Calendar",
+      "KMP",
+      "Library"
+    ],
+    "content": "## The problem / context\n\nCalendar UIs (date ranges, booking flows, habit trackers, agendas) are a classic source of custom-view pain. Orrery is a full Compose rewrite of the popular CalendarView library: composable slots instead of view subclassing, and snapshot state instead of listener interfaces. It is built on kotlinx-datetime with Material 3 theming.\n\n## How it works\n\norrery-core holds pure-Kotlin calendar models, grid maths and the selection engine; orrery-compose provides the composables (Android, plus Desktop JVM, iOS and wasmJs variants for KMP). You hoist state with rememberCalendarState / rememberCalendarSelectionState and render each cell yourself through a dayContent slot, optionally stacking decorators.\n\n## Key ideas\n\n1. Composables: HorizontalCalendar, VerticalCalendar, WeekCalendar, YearCalendar; infinite month/week scrolling.\n2. Selection: single, range (min/max days), multi, plus long-press drag-to-select; DisabledDates blocks and greys out dates.\n3. CollapsibleCalendarScaffold collapses from month to two weeks to week as the agenda scrolls.\n4. Material 3 picker dialogs for date, date range, date-time and month/year (e.g. card expiry).\n5. DaySchedule / WeekSchedule time grids, multi-day event banners, and a hospitality style with split check-in/check-out days.\n6. Optional DayInfoProvider modules: Chinese lunisolar, Hijri (Umm al-Qura) and Persian calendars, and public holidays (US, GB, DE, UA).\n\n## Examples\n\n**1. Range selection with decorators** _(From the README)_\n\n```kotlin\n@Composable\nfun CalendarScreen() {\n    val today = remember { currentDate() }\n    val selection = rememberCalendarSelectionState(mode = SelectionMode.Range(maxDays = 14))\n    val lunar = remember { LunarDayInfoProvider() } // optional, from orrery-lunar\n\n    HorizontalCalendar(\n        state = rememberCalendarState(),\n        showWeekNumbers = true,\n        dayContent = { day ->\n            DefaultDay(\n                day = day,\n                selectionState = selection,\n                today = today,\n                info = lunar.info(day.date),\n                decorators = listOf(\n                    DayDecorators.eventDots { date -> eventColors[date].orEmpty() },\n                    DayDecorators.progressRing { date -> habits[date] }, // 0f..1f\n                ),\n            )\n        },\n    )\n}\n```\n\n**2. Install** _(From the README)_\n\n```kotlin\ndependencies {\n    implementation(\"me.kozakov.orrery:orrery-compose:0.9.0\")\n    implementation(\"me.kozakov.orrery:orrery-calendars:0.9.0\") // Hijri, Persian\n}\n```\n\n## Why it matters\n\nBooking, habit and agenda screens need far more than a date picker. Orrery covers ranges, disabled dates, time grids and non-Gregorian calendars (including Hijri) with idiomatic Compose state, from minSdk 23 up to iOS and the web.\n\n> **Note:** There is a live Kotlin/Wasm demo at koza4e4ok.github.io/Orrery/demo.\n\nSource: https://github.com/koza4e4ok/Orrery",
+    "summary_ar": "Orrery مكتبة calendar لـ Compose و Compose Multiplatform فيها month و week و year views و range selection.\nوبتدعم كمان التقويم الهجري والفارسي والصيني كـ modules اختيارية.",
+    "summary_en": "Orrery is a Compose (Multiplatform) calendar library with month, week and year views, range and drag selection, and Material 3 pickers. Optional Hijri, Persian, Chinese lunisolar and holiday modules are available.",
+    "url": "https://github.com/koza4e4ok/Orrery"
+  },
+  {
     "title": "What's new in Android developer tools and performance at Android Dev Summit",
     "date": "2026-11-02T10:21:09+02:00",
     "source": "نشرة التكنولوجيا",
