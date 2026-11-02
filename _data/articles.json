@@ -1,5 +1,20 @@
 [
   {
+    "title": "Your favorite agents are now integrated in Android Studio",
+    "date": "2026-11-02T10:20:58+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Android Studio",
+      "AI Agents",
+      "Code Review"
+    ],
+    "content": "## The problem / context\n\nTeams want to choose their coding agent — for cost, for an enterprise agreement, or simply by preference — without leaving Android tooling behind. Android Studio Rabbit 2 is now stable and opens the IDE's agent window to third-party agents.\n\n## How it works\n\nBring Your Own Agent (BYOA) lets you pick from 40+ ACP-compliant coding agents, including Claude Agent, OpenAI Codex, Junie and Google Antigravity. They get Android Studio tools (Emulator, build system, Logcat) and Android skills. Open the agent window and select one, or go to Settings > Tools > AI > Agents, authenticate, and prompt.\n\n## Key ideas\n\n1. Skills manager: discover, install and manage Android and Firebase agent skills (XML-to-Compose migration, AGP 9 upgrade, adaptive layouts, CameraX); invoke them with @ in chat.\n2. LeakCanary is integrated with the built-in agent in the Profiler: narrative explanations of leaks plus suggested fixes.\n3. AI Change Review works on agent changes, pending commits and the Git log: first recommended fixes, then a guided walkthrough that groups related diff chunks by theme.\n4. Android XR emulators for XR, audio and display glasses are stable; display glasses can use your own 360° photos or a live camera feed.\n5. Gemini Enterprise support: no retention/training on your code, audit logging, and admin policies for approved agents and skills.\n\n## Examples\n\n**1. Reviewing an agent-written refactor** _(Usage scenario)_\n\nAn agent migrates a settings screen from XML to Compose using the built-in skill. Before committing, open Change Review on the agent's changes. It lists recommended fixes first; then Create Walkthrough steps through the diff by theme (state hoisting, theming, tests) instead of alphabetically by file.\n\n## Why it matters\n\nThe bottleneck is shifting from writing code to verifying it. Letting any agent use Android-aware tools — and giving reviewers a structured walkthrough — keeps AI speed without giving up quality.\n\nSource: https://developer.android.com/blog/posts/ai-agents-android-studio-integration",
+    "summary_ar": "Android Studio Rabbit 2 بقى stable وبيدعم أكتر من 40 coding agent جوه الـ IDE من خلال Bring Your Own Agent.\nومعاه Change Review و skills manager و LeakCanary مدمج مع الـ agent.",
+    "summary_en": "Android Studio Rabbit 2 is stable with Bring Your Own Agent, which brings 40+ ACP-compliant coding agents into the IDE. It also adds a skills manager, LeakCanary-powered agent fixes and AI Change Review.",
+    "url": "https://developer.android.com/blog/posts/ai-agents-android-studio-integration"
+  },
+  {
     "title": "Agentic and Flexible: A next era of Android development",
     "date": "2026-11-02T10:20:49+02:00",
     "source": "نشرة التكنولوجيا",
