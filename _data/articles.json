@@ -139,8 +139,8 @@
       "KMP",
       "Migration"
     ],
-    "content": "مش كل الـ migrations لـ Kotlin Multiplatform بتبدأ من الصفر. Daniel Voko بيشرح في الجزء الأول إزاي جهّز تطبيق Android حقيقي للـ migration.\n\nالتركيز على الـ modular architecture واختيار مكتبات portable من البداية. الجزء ده بيحكي عن الخطوات اللي عملها قبل ما يكتب أي كود shared.\n\nلو بتفكر تعمل migration لـ KMP على تطبيق موجود، السلسلة دي هتكون مفيدة.\n\nزكاة العلم نشره 💚\n\n#KMP #Migration #Architecture #mo3talogy",
-    "summary_ar": "مش كل الـ migrations لـ Kotlin Multiplatform بتبدأ من الصفر. Daniel Voko بيشرح في الجزء الأول إزاي جهّز تطبيق Android حقيقي للـ migration.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
+    "content": "مش كل الـ migrations لـ Kotlin Multiplatform بتبدأ من الصفر. Daniel Voko بيشرح في الجزء الأول من السلسلة إزاي جهّز تطبيق Android حقيقي للـ migration.\n\nالتركيز في الجزء ده على الـ modular architecture واختيار مكتبات portable من البداية. قبل ما يكتب أي كود shared، عمل خطوات تخلي الـ migration أسهل بعد كده.\n\nمن الخطوات المهمة: فصل الـ business logic عن الـ Android-specific code، واستخدام مكتبات بتدعم multiplatform أو ليها counterparts على iOS. كمان اتكلم عن إزاي تخطط للـ modules عشان الـ shared code يبقى نظيف.\n\nالجزء الأول ده بيحكي عن التحضير، مش عن الـ implementation الفعلي. لو بتفكر تعمل migration لـ KMP على تطبيق موجود، السلسلة دي هتكون مفيدة، خاصة إن معظم الناس بتواجه مشاكل في الـ setup قبل ما توصل للكود المشترك.\n\nزكاة العلم نشره 💚\n\n#KMP #Migration #Architecture #mo3talogy",
+    "summary_ar": "الجزء الأول من سلسلة عن تجهيز تطبيق Android حقيقي للـ migration لـ Kotlin Multiplatform. التركيز على الـ modular architecture واختيار مكتبات portable قبل ما تبدأ تكتب كود shared. خطوات عملية تخلي الـ migration أسهل بعد كده.\n\n(المصدر في أول كومنت)\n\n#KMP #Migration #mo3talogy",
     "summary_en": "How a real Android app became KMP-ready through early modular architecture and portable library choices (Part 1 of 4).",
     "url": "https://proandroiddev.com/migrating-a-real-android-app-to-kotlin-multiplatform-1-4-before-the-migration-8b1d16f68747"
   },
@@ -153,8 +153,8 @@
       "Kotlin",
       "Value Classes"
     ],
-    "content": "Kotlin 2.5 جاب experimental full value classes و value objects. Arda Kazancı شرح إيه اللي بيجيبه ده لمطوري Android.\n\nالـ value classes كانت موجودة قبل كده، لكن الـ full version بيفتح إمكانيات جديدة في الـ performance والـ memory. المقال بيوضح الفرق والإيه اللي ممكن تستخدمه دلوقتي.\n\nلو بتتابع تطورات Kotlin وعايز تعرف إيه الجديد اللي يأثر على Android، المقال ده مختصر ومفيد.\n\nزكاة العلم نشره 💚\n\n#Kotlin #ValueClasses #mo3talogy",
-    "summary_ar": "Kotlin 2.5 جاب experimental full value classes و value objects. Arda Kazancı شرح إيه اللي بيجيبه ده لمطوري Android.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
+    "content": "Kotlin 2.5 جاب experimental full value classes و value objects. Arda Kazancı شرح إيه اللي بيجيبه ده لمطوري Android.\n\nالـ value classes كانت موجودة قبل كده، لكنها كانت محدودة. الـ full version بيفتح إمكانيات جديدة في الـ performance والـ memory، خاصة في الـ data classes اللي بتستخدم كتير.\n\nالمقال بيوضح الفرق بين الـ value class العادي والـ full واحد، وإزاي الـ value objects بتختلف. كمان بيتكلم عن الـ use cases اللي ممكن تستفيد منها في Android، زي الـ state holders أو الـ data classes اللي بتتبعت كتير.\n\nلسه experimental، لكن لو بتتابع تطورات Kotlin وعايز تعرف إيه الجديد اللي يأثر على Android، المقال ده مختصر ومفيد.\n\nزكاة العلم نشره 💚\n\n#Kotlin #ValueClasses #mo3talogy",
+    "summary_ar": "شرح لـ Kotlin 2.5 experimental full value classes و value objects، وإيه اللي بيجيبه ده لمطوري Android. الفرق عن الـ value classes العادية، والـ use cases المحتملة في الـ performance والـ memory.\n\n(المصدر في أول كومنت)\n\n#Kotlin #mo3talogy",
     "summary_en": "What Kotlin 2.5's experimental full value classes and value objects mean for Android developers.",
     "url": "https://ardakazanci.com/posts/kotlin-2-5-full-value-classes/"
   },
@@ -168,8 +168,8 @@
       "Roadmap",
       "AI"
     ],
-    "content": "Mayank Kumar عمل roadmap لمطوري Android لـ 2027، بيغطي المهارات اللي هتبقى مهمة، مواضيع المقابلات، ودور الـ AI في الشغل.\n\nالمقال مش بيقولك \"اتعلم كده وخلاص\"، لكنه بيحط صورة عن إيه اللي بيتغير في المجال وإزاي تحضّر نفسك.\n\nمفيد لو بتفكر في مسارك المهني أو بتحضّر لمقابلات في الفترة الجاية.\n\nزكاة العلم نشره 💚\n\n#Android #Career #AI #Roadmap #mo3talogy",
-    "summary_ar": "Mayank Kumar عمل roadmap لمطوري Android لـ 2027، بيغطي المهارات اللي هتبقى مهمة، مواضيع المقابلات، ودور الـ AI في الشغل.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
+    "content": "Mayank Kumar عمل roadmap لمطوري Android لـ 2027، بيغطي المهارات اللي هتبقى مهمة، مواضيع المقابلات، ودور الـ AI في الشغل.\n\nالمقال مش بيقولك \"اتعلم كده وخلاص\"، لكنه بيحط صورة عن إيه اللي بيتغير في المجال. الـ AI بقى جزء من الشغل اليومي، سواء في كتابة الكود أو الـ debugging أو حتى الـ interviews.\n\nبيغطي مواضيع زي الـ architecture patterns اللي لسه مهمة، والـ skills الجديدة اللي بقت مطلوبة، وإزاي تحضّر نفسك للمقابلات في الفترة الجاية. كمان بيتكلم عن إزاي تستخدم الـ AI كأداة من غير ما تعتمد عليه اعتماد كامل.\n\nمفيد لو بتفكر في مسارك المهني أو بتحضّر لمقابلات.\n\nزكاة العلم نشره 💚\n\n#Android #Career #AI #Roadmap #mo3talogy",
+    "summary_ar": "Roadmap لمطوري Android لـ 2027 بيغطي المهارات المهمة، مواضيع المقابلات، ودور الـ AI في الشغل اليومي. مش قائمة تعليم، لكنه صورة عن إيه اللي بيتغير في المجال وإزاي تحضّر نفسك.\n\n(المصدر في أول كومنت)\n\n#Android #Career #mo3talogy",
     "summary_en": "Android developer roadmap for 2027 covering skills, interview topics, and the role of AI.",
     "url": "https://imayankkumar.com/blog/android-developer-roadmap-2027/"
   },
@@ -183,8 +183,8 @@
       "DateParser",
       "Multiplatform"
     ],
-    "content": "لو محتاج تعمل parsing لتواريخ زي \"tomorrow from 5PM to 8PM\" في shared code بـ Kotlin Multiplatform، فيه walkthrough جديد بـ DateParser Kotlin 📅\n\nالـ demo بيوريك إزاي تعمل كده offline من غير ما تعتمد على platform-specific APIs.\n\nمفيد لأي تطبيق فيه reminders أو calendar features على Android و iOS مع بعض.\n\nزكاة العلم نشره 💚\n\n#KMP #DateParser #mo3talogy",
-    "summary_ar": "Walkthrough لـ parsing reminder dates زي \"tomorrow from 5PM to 8PM\" offline في shared KMP code بـ DateParser Kotlin.\n\n(المصدر في أول كومنت)\n\n#KMP #mo3talogy",
+    "content": "لو محتاج تعمل parsing لتواريخ طبيعية زي \"tomorrow from 5PM to 8PM\" في shared code بـ Kotlin Multiplatform، فيه walkthrough جديد بـ DateParser Kotlin.\n\nالـ demo بيوريك إزاي تعمل كده offline من غير ما تعتمد على platform-specific APIs زي الـ Android Calendar أو iOS NSDate. كل الـ parsing بيتم في الـ common code.\n\nمفيد لأي تطبيق فيه reminders أو calendar features على Android و iOS مع بعض، وعايز نفس الـ logic يشتغل على الاتنين من غير ما تكتب الكود مرتين.\n\nالمقال فيه أمثلة على الـ input والـ output، وإزاي تتعامل مع الـ edge cases.\n\nزكاة العلم نشره 💚\n\n#KMP #DateParser #Multiplatform #mo3talogy",
+    "summary_ar": "Walkthrough لـ parsing تواريخ طبيعية زي \"tomorrow from 5PM to 8PM\" offline في shared KMP code باستخدام DateParser Kotlin. نفس الـ logic يشتغل على Android و iOS من غير platform-specific APIs.\n\n(المصدر في أول كومنت)\n\n#KMP #DateParser #mo3talogy",
     "summary_en": "Offline KMP walkthrough for parsing natural language reminder dates like 'tomorrow from 5PM to 8PM' using DateParser Kotlin in shared code.",
     "url": "https://alox1d.github.io/dateparser-kotlin/en/kmp-reminder-demo/"
   },
@@ -199,8 +199,8 @@
       "Testing",
       "OnDevice"
     ],
-    "content": "لو بتختبر on-device AI models، فيه مكتبة اسمها proctor بتسمحلك تكتب eval suite مرة واحدة في Kotlin Multiplatform وتشغله على Gemini Nano (Android) و Apple Foundation Models (iOS) 🤖\n\nمفيدة لأي حد بيعمل on-device AI agents أو features ويحتاج يقارن الـ performance بين المنصات.\n\nزكاة العلم نشره 💚\n\n#KMP #AI #OnDevice #mo3talogy",
-    "summary_ar": "proctor بيخلّيك تكتب eval suite مرة واحدة في KMP وتشغله على Gemini Nano و Apple Foundation Models.\n\n(المصدر في أول كومنت)\n\n#KMP #AI #mo3talogy",
+    "content": "لو بتختبر on-device AI models، فيه مكتبة اسمها proctor بتسمحلك تكتب eval suite مرة واحدة في Kotlin Multiplatform وتشغله على Gemini Nano (Android) و Apple Foundation Models (iOS).\n\nالفكرة إنك تعرّف الـ test cases في الـ shared code، والمكتبة تشغلها على الـ platform المناسب. ده بيوفر عليك كتابة نفس الـ tests مرتين، ويخلّيك تقارن الـ performance بين المنصات بسهولة.\n\nمفيدة لأي حد بيعمل on-device AI agents أو features ويحتاج يقيس الـ accuracy أو الـ latency على أكتر من منصة.\n\nزكاة العلم نشره 💚\n\n#KMP #AI #OnDevice #Testing #mo3talogy",
+    "summary_ar": "proctor بيخلّيك تكتب eval suite مرة واحدة في Kotlin Multiplatform وتشغله على Gemini Nano (Android) و Apple Foundation Models (iOS). مفيد لمقارنة on-device AI models بين المنصات.\n\n(المصدر في أول كومنت)\n\n#KMP #AI #mo3talogy",
     "summary_en": "proctor lets you write an eval suite once in Kotlin Multiplatform and run it against Gemini Nano on Android and Apple Foundation Models on iOS.",
     "url": "https://github.com/jantursky/proctor"
   },
