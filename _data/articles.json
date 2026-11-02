@@ -1,5 +1,21 @@
 [
   {
+    "title": "ktrs: ktfmt and ktlint rewritten in Rust",
+    "date": "2026-11-02T10:21:28+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "ktlint",
+      "ktfmt",
+      "Rust",
+      "CI"
+    ],
+    "content": "## The problem / context\n\nFormatting and linting Kotlin usually means starting a JVM for every pre-commit hook, editor save and CI step — hundreds of milliseconds before any work happens. ktrs is a native Rust replacement for ktfmt and ktlint, shipped as small binaries with no runtime.\n\n## How it works\n\nOne install puts three binaries on your PATH: ktrs, ktfmt and ktlint. The ktfmt and ktlint binaries accept the original flags, messages and exit codes, so existing scripts, hooks and CI keep working. Output is byte-identical to ktfmt 0.65 on 6,121 of 6,123 real-world files, and lint matches ktlint 2.0 in all three code styles (plus a ktlint 1.8 compatibility mode).\n\n## Key ideas\n\n1. Formatting okhttp (617 files): 73 ms vs 1.74 s for the ktfmt jar; linting okhttp: 119 ms vs 4.41 s for ktlint.\n2. One file on stdin in under 5 ms — fast enough for editor format-on-save.\n3. All 105 standard ktlint rules; compose-rules runs natively, other -R rule sets fall back to the real ktlint jar.\n4. --changed-since main limits work to files changed since the merge base.\n5. Integrations: GitHub Actions, pre-commit, Gradle/Maven/Spotless, Bazel, reviewdog, Danger; the lossless parser is usable as a library.\n\n## Examples\n\n**1. Usage** _(From the README)_\n\n```bash\nktrs fmt --style kotlinlang src/      # styles: meta (default), google, kotlinlang\nktrs fmt --check                      # CI: exit 1 if files would change\nktrs lint --format src/               # autocorrect, report the rest\nktrs lint --changed-since main\n\n# drop-in: same command lines as the originals\nktfmt --kotlinlang-style --set-exit-if-changed src/\nktlint --relative \"src/**/*.kt\" \"!src/**/generated/**\"\n```\n\n## Why it matters\n\nPre-commit hooks and CI lint steps that took seconds now take milliseconds, with the same output — so teams can enforce formatting everywhere without anyone feeling the cost.\n\n> **Note:** Install via install.sh, cargo, Homebrew, Scoop, npm (@ktrs/cli) or Docker; there is also a WebAssembly playground.\n\nSource: https://github.com/Hexay/ktrs",
+    "summary_ar": "ktrs بديل native مكتوب بـ Rust لـ ktfmt و ktlint، بيطلع نفس الـ output بالظبط ومن غير JVM.\nوأسرع من ١٠ لـ ٢٠٠ مرة، فالـ pre-commit والـ CI بقوا بياخدوا milliseconds.",
+    "summary_en": "ktrs is a Rust drop-in replacement for ktfmt and ktlint with byte-identical output and no JVM. It is 10–200x faster, so hooks and CI lint steps take milliseconds.",
+    "url": "https://github.com/Hexay/ktrs"
+  },
+  {
     "title": "Orrery: a month/week/year calendar for Compose (Multiplatform)",
     "date": "2026-11-02T10:21:19+02:00",
     "source": "نشرة التكنولوجيا",
