@@ -53,10 +53,17 @@ title: المقالات
     <span class="dot">•</span>
     <time datetime="{{ article.date }}">{{ article.date | date: "%Y-%m-%d" }}{% if article.date contains "T" %} · {{ article.date | date: "%H:%M" }}{% endif %}</time>
   </header>
-  {% if article.image %}
+  {% assign imgs = article.images %}
+  {% if imgs == nil or imgs.size == 0 %}{% if article.image %}{% assign imgs = article.image | split: "|" %}{% endif %}{% endif %}
+  {% if imgs and imgs.size > 0 %}
   <figure class="card-cover">
-    {% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{% endif %}<img src="{{ article.image | relative_url }}" alt="{{ article.title | escape }}" loading="lazy" decoding="async">{% if article.url %}</a>{% endif %}
+    {% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{% endif %}<img src="{{ imgs[0] | relative_url }}" alt="{{ article.title | escape }}" loading="lazy" decoding="async">{% if article.url %}</a>{% endif %}
   </figure>
+  {% if imgs.size > 1 %}
+  <div class="card-gallery" dir="rtl">
+    {% for im in imgs offset:1 %}<a href="{{ im | relative_url }}" target="_blank" rel="noopener" title="كبّر الصورة"><img src="{{ im | relative_url }}" alt="{{ article.title | escape }} ({{ forloop.index | plus: 1 }})" loading="lazy" decoding="async"></a>{% endfor %}
+  </div>
+  {% endif %}
   {% endif %}
   <h2>{% if article.url %}<a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h2>
   {% assign sum_ar = article.summary_ar | default: article.summary %}

@@ -199,3 +199,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
   display: block; max-width: 100%; width: 100%; height: auto;
   border-radius: 12px; border: 1px solid #eceef5; background: #f6f7fb;
 }
+
+/* Article image gallery (extra illustrations) */
+.card-gallery {
+  display: flex; gap: 10px; overflow-x: auto; margin: -4px 0 14px; padding-bottom: 6px;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+}
+.card-gallery a { flex: 0 0 auto; width: 46%; max-width: 260px; scroll-snap-align: start; }
+.card-gallery img {
+  display: block; width: 100%; height: auto; border-radius: 10px;
+  border: 1px solid #eceef5; background: #f6f7fb; transition: transform .15s;
+}
+.card-gallery a:hover img { transform: scale(1.03); }
+@media (max-width: 600px) { .card-gallery a { width: 70%; } }
