@@ -1,5 +1,21 @@
 [
   {
+    "title": "Kodee's Kotlin Roundup: Kotlin 2.5.0-Beta2, JDK 17 requirement, Toolchain 0.13 and KotlinConf 2027",
+    "date": "2026-11-02T10:20:29+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Kotlin 2.5",
+      "JDK 17",
+      "KMP",
+      "News"
+    ],
+    "content": "## The problem / context\n\nJetBrains' October roundup mixes community news (Shipaton 2026 winners, KotlinConf 2027) with changes that affect your builds: a second 2.5.0 beta, a coming JDK requirement for the compiler, and a new Kotlin Toolchain release. This card focuses on the technical parts.\n\n## How it works\n\nKotlin 2.5.0-Beta2 (Oct 21) brings stable name-based destructuring in only-syntax mode, an unused-return-value checker, Java 28 support, and Swift export in Beta with a new DSL. Kotlin/Native incremental compilation is now on by default for Apple targets. Kotlin 2.4.21 is the bug-fix maintenance release.\n\n## Key ideas\n\n1. Compiler JDK: older than 17 is a warning in 2.5.0-Beta1, an error (with a temporary opt-out flag) in 2.5.0-Beta2 and 2.5.0, and required from 2.5.20-Beta1.\n2. Kotlin Toolchain 0.13 (formerly Amper): kotlin new for interactive project creation, smoother iOS setup, SwiftPM dependencies and faster Kotlin/Native rebuilds.\n3. State of Kotlin 2026: over half of Kotlin developers work on backend; 93% use at least one AI coding tool.\n4. Klibs.io compares KMP libraries (e.g. Voyager vs Decompose vs Circuit) and has an MCP server for agents.\n5. KotlinConf 2027: Kraków, April 21–23; call for speakers closes November 27. KMP Contest for students open until December 7.\n\n## Examples\n\n**1. Preparing CI for Kotlin 2.5** _(Usage scenario)_\n\nYour CI image still runs Gradle on JDK 11. With Kotlin 2.5.0 the compiler fails with an error (a flag can postpone it), and from 2.5.20 there is no way around it. Bump the CI JDK to 17+ now, while you try 2.5.0-Beta2 on a branch, and enable the unused-return-value checker to catch ignored results.\n\n## Why it matters\n\nThe JDK 17 requirement can break CI pipelines that never touched Kotlin code, and 2.5's language features (name-based destructuring, Swift export Beta) are worth testing before the stable release.\n\nSource: https://blog.jetbrains.com/kotlin/2026/10/kodee-s-kotlin-roundup-shipaton-2026-winners-kotlin-2-5-0-beta2-and-kotlinconf-2027/",
+    "summary_ar": "Kotlin 2.5.0-Beta2 نزل بـ name-based destructuring و Swift export Beta، والـ compiler هيحتاج JDK 17 أو أحدث.\nكمان Kotlin Toolchain 0.13 و KotlinConf 2027 في Kraków.",
+    "summary_en": "JetBrains' roundup covers Kotlin 2.5.0-Beta2 (name-based destructuring, unused-return-value checker, Swift export Beta) and the compiler's move to require JDK 17. It also covers Kotlin Toolchain 0.13 and KotlinConf 2027.",
+    "url": "https://blog.jetbrains.com/kotlin/2026/10/kodee-s-kotlin-roundup-shipaton-2026-winners-kotlin-2-5-0-beta2-and-kotlinconf-2027/"
+  },
+  {
     "title": "Jetpack AppState: لما الـ Premium يخلّص والموسيقى لسه شغالة",
     "date": "2026-11-02T09:30:00+02:00",
     "source": "نشرة التكنولوجيا",
