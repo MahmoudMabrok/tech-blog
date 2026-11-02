@@ -1,5 +1,21 @@
 [
   {
+    "title": "Mosaic: build Kotlin backend responses out of Tiles",
+    "date": "2026-11-02T10:21:38+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Kotlin",
+      "Backend",
+      "Coroutines",
+      "Library"
+    ],
+    "content": "## The problem / context\n\nBackend endpoints that assemble a page (order summary, customer, line items, shipping) usually wire data loading top-down from the database. The same data then gets fetched twice when two branches need it, or a shared \"loader\" layer grows to coordinate them. Mosaic's motto: think from the response up, not the database down.\n\n## How it works\n\nA Tile is a reusable unit of work that reads request or application data and composes other Tiles. composeAsync starts work and await gets the result, so independent branches run concurrently. A request-scoped Mosaic shares repeated Tile work automatically: if two branches ask for LineItemsTile, it runs once. A Canvas holds application services and request inputs (CanvasKey), and withMosaic runs Tiles under the calling coroutine, which owns cancellation.\n\n## Key ideas\n\n1. Response first: the page Tile reads like the response shape; deeper wiring stays inside each Tile.\n2. Sharing is scoped to the same Mosaic and Tile instance — a new request starts fresh.\n3. multiTile wraps bulk APIs: equal keys share work, and pending keys from several calls can be combined into one call.\n4. perKeyTile and chunkedMultiTile are alternative batching strategies with the same caller API.\n5. No registration plugin or annotation processor; Kotlin/JVM, add org.buildmosaic:mosaic-core.\n\n## Examples\n\n**1. Compose the response; shared work runs once** _(From the README)_\n\n```kotlin\nval OrderPageTile by singleTile {\n  val summary = composeAsync(OrderSummaryTile)\n  val logistics = composeAsync(LogisticsTile)\n  OrderPage(summary.await(), logistics.await())\n}\n\nval OrderTotalTile by singleTile {\n  compose(LineItemsTile).sumOf { it.price.amount * it.quantity }\n}\n\nval ProductsByIdTile by multiTile<String, Product> { ids ->\n  source<ProductService>().getProducts(ids.toList())\n}\n```\n\n**2. Running it for one request** _(From the README)_\n\n```kotlin\nsuspend fun orderPage(applicationCanvas: Canvas, orderId: String): OrderPage =\n  applicationCanvas.withLayer {\n    instance(OrderKey, orderId)\n  }.withMosaic { compose(OrderPageTile) }\n```\n\n## Why it matters\n\nIt gives Kotlin backends (BFFs for mobile apps, for example) DataLoader-style deduplication and batching with plain coroutines, and the composition can even be turned into dependency diagrams.\n\nSource: https://github.com/BuildMosaic/Mosaic",
+    "summary_ar": "Mosaic مكتبة Kotlin بتبني الـ backend responses من Tiles صغيرة بتعمل compose لبعض.\nوالشغل المتكرر في نفس الـ request بيتعمل مرة واحدة بس، مع batching للـ bulk APIs.",
+    "summary_en": "Mosaic is a Kotlin library for building backend responses from composable Tiles. Repeated work within a request runs once, and bulk lookups are batched.",
+    "url": "https://github.com/BuildMosaic/Mosaic"
+  },
+  {
     "title": "ktrs: ktfmt and ktlint rewritten in Rust",
     "date": "2026-11-02T10:21:28+02:00",
     "source": "نشرة التكنولوجيا",
