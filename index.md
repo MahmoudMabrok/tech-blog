@@ -9,7 +9,6 @@ title: المقالات
   <h1>{{ site.title }}</h1>
   <p>{{ site.description }}</p>
   <div class="hero-stats">
-    <a href="/settings/" class="stat" style="text-decoration:none;">⚙️ الإعدادات</a>
     <span class="stat">📚 <b>{{ articles.size }}</b> مقالة</span>
     <span class="stat read-stat" hidden>✓ قريت <b class="read-count">0</b> من {{ articles.size }}</span>
   </div>
