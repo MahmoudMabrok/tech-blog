@@ -9,8 +9,8 @@
       "AppState",
       "Architecture"
     ],
-    "content": "لو عندك app فيه subscription و music playback، إزاي تشارك حالة الـ premium بين الـ playback والـ UI؟\n\nArda Kazancı شرح إزاي Jetpack AppState (StateStore و Transform) ممكن يحل المشكلة دي بطريقة نظيفة.\n\nمفيد لأي حد بيعمل apps فيها state معقد مشترك بين features مختلفة.\n\nزكاة العلم نشره 💚\n\n#Android #Jetpack #AppState #mo3talogy",
-    "summary_ar": "شرح لـ Jetpack AppState وإزاي StateStore و Transform ممكن يشاركوا حالة الـ subscription مع الـ playback.\n\n(المصدر في أول كومنت)\n\n#Android #Jetpack #mo3talogy",
+    "content": "لو عندك تطبيق فيه subscription (زي Spotify أو YouTube Premium) والـ playback شغال في الخلفية، إيه اللي يحصل لما الـ premium يخلّص والمستخدم لسه بيسمع؟\n\nArda Kazancı شرح في المقال ده إزاي Jetpack AppState (خاصة StateStore و Transform) ممكن يحل المشكلة دي بطريقة نظيفة من غير ما الـ playback feature يعرف تفاصيل الـ billing.\n\nالفكرة إنك تخلي حالة الـ subscription في مكان مركزي، والـ playback والـ UI يشتركوا فيها. لما الحالة تتغير (الـ premium خلّص)، الـ Transform بيحوّلها لشكل يفهمه الـ player من غير coupling قوي.\n\nده مثال عملي على إزاي تفصل الـ features عن بعض في الـ modular apps، وتخلي الـ state يتدفق بطريقة واضحة. لو بتستخدم AppState أو بتفكر فيه، المقال يستاهل تشوفه.\n\nزكاة العلم نشره 💚\n\n#Android #Jetpack #AppState #Architecture #mo3talogy",
+    "summary_ar": "لو عندك تطبيق فيه subscription (زي Spotify أو YouTube Premium) والـ playback شغال في الخلفية، إيه اللي يحصل لما الـ premium يخلّص والمستخدم لسه بيسمع؟\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "How Jetpack AppState's StateStore and Transform can share subscription state with media playback.",
     "url": "https://ardakazanci.com/posts/jetpack-appstate-explained/"
   },
@@ -24,8 +24,8 @@
       "Flow",
       "Turbine"
     ],
-    "content": "الجزء التاني من سلسلة Flake-Free Tests. Kevin Schildhorn شرح إزاي تصلّب اختبارات Turbine للـ Flows، خاصة مع StateFlow والـ events والـ sync points.\n\nلو اختباراتك بتفشل أحيانًا من غير سبب واضح، المقال ده هيساعدك.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Testing #Flow #mo3talogy",
-    "summary_ar": "إزاي تصلّب اختبارات Turbine للـ Flows عشان متبقاش flaky. يغطي StateFlow و events و sync points.\n\n(المصدر في أول كومنت)\n\n#Testing #Flow #mo3talogy",
+    "content": "الجزء التاني من سلسلة Flake-Free Tests. بعد ما اتكلم عن الـ coroutines في الجزء الأول، Kevin Schildhorn ركز هنا على Turbine، المكتبة الشهيرة لاختبار الـ Flows.\n\nالمشكلة إن اختبارات الـ Flow بتبقى flaky بسهولة، خاصة لما يكون فيه StateFlow أو events أو حاجة محتاجة sync. المقال بيشرح إزاي تستخدم Turbine بطريقة صحيحة، وإزاي تعمل sync points واضحة عشان الاختبار يبقى deterministic.\n\nلو اختباراتك بتعدي أحيانًا وتفشل أحيانًا من غير تغيير في الكود، غالبًا السبب في طريقة الـ collection أو الـ timing. المقال ده فيه recipes عملية تصلّح الموضوع.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Testing #Flow #Turbine #mo3talogy",
+    "summary_ar": "الجزء التاني من سلسلة Flake-Free Tests. بعد ما اتكلم عن الـ coroutines في الجزء الأول، Kevin Schildhorn ركز هنا على Turbine، المكتبة الشهيرة لاختبار الـ Flows.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "How to harden Turbine tests for Flows, covering StateFlow, events, and synchronization points.",
     "url": "https://touchlab.co/flake-free-flow-tests-pt2-turbine"
   },
@@ -39,8 +39,8 @@
       "CI",
       "GitHub Actions"
     ],
-    "content": "KMP Bits شرح setup بسيط لـ CI/CD لـ Kotlin Multiplatform بـ GitHub Actions، بـ 3 jobs.\n\nمفيد لو لسه بتبدأ في مشروع KMP وعايز pipeline شغال بسرعة.\n\nزكاة العلم نشره 💚\n\n#KMP #CI #GitHubActions #mo3talogy",
-    "summary_ar": "Walkthrough لـ CI/CD setup بـ 3 jobs لـ Kotlin Multiplatform باستخدام GitHub Actions.\n\n(المصدر في أول كومنت)\n\n#KMP #CI #mo3talogy",
+    "content": "لو لسه بتبدأ في مشروع Kotlin Multiplatform وعايز CI شغال بسرعة، KMP Bits عمل walkthrough لـ setup بسيط بـ GitHub Actions فيه 3 jobs.\n\nالـ setup بيغطي الـ build والـ test على الـ targets المختلفة من غير تعقيد زيادة. مش الحل النهائي للمشاريع الكبيرة، لكنه نقطة بداية كويسة لأي حد عايز يشوف الـ pipeline يشتغل في أقل وقت ممكن.\n\nلو عندك مشروع KMP صغير أو متوسط، المقال ده يوفر عليك تجارب كتير في إعداد الـ Actions.\n\nزكاة العلم نشره 💚\n\n#KMP #CI #GitHubActions #mo3talogy",
+    "summary_ar": "لو لسه بتبدأ في مشروع Kotlin Multiplatform وعايز CI شغال بسرعة، KMP Bits عمل walkthrough لـ setup بسيط بـ GitHub Actions فيه 3 jobs.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "A three-job GitHub Actions CI setup for Kotlin Multiplatform projects.",
     "url": "https://medium.com/@kmpbits/every-commit-on-the-clock-ci-cd-for-kotlin-multiplatform-with-github-actions-kmp-bits-2c5549c42789"
   },
