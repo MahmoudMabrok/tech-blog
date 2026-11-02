@@ -69,8 +69,8 @@
       "AI",
       "Android"
     ],
-    "content": "Android AppFunctions بتخلّي تطبيقك يشتغل كـ on-device MCP server، يعني agents تانية تقدر تستخدم tools من تطبيقك.\n\nKatie Barnett شرحت إزاي تعمل enable أو disable للـ functions دي في الـ runtime، بناءً على موافقة المستخدم أو feature toggles. مش لازم كل الـ functions تكون متاحة طول الوقت، تقدر تتحكم فيها ديناميكيًا.\n\nمفيد لو بتستخدم AppFunctions وعايز تحترم خصوصية المستخدم أو تخلي الـ features اختيارية.\n\nزكاة العلم نشره 💚\n\n#Android #AppFunctions #AI #mo3talogy",
-    "summary_ar": "Android AppFunctions بتخلّي تطبيقك يشتغل كـ on-device MCP server، يعني agents تانية تقدر تستخدم tools من تطبيقك.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
+    "content": "Android AppFunctions بتخلّي تطبيقك يشتغل كـ on-device MCP server. يعني agents تانية تقدر تستخدم tools من تطبيقك مباشرة، من غير ما تحتاج cloud.\n\nKatie Barnett شرحت إزاي تعمل enable أو disable للـ functions دي في الـ runtime، بناءً على موافقة المستخدم أو feature toggles.\n\nمش لازم كل الـ functions تكون متاحة طول الوقت. ممكن تخلي بعض الـ tools مش متاحة لحد ما المستخدم يوافق صراحة، أو تخليها مربوطة بـ feature flag تقدر تقفله من الـ server.\n\nالمقال بيشرح الـ API اللي تستخدمه عشان تتحكم في الـ functions ديناميكيًا. كمان بيتكلم عن إزاي تتعامل مع الـ state لما الـ function يتقفل والـ agent لسه بيحاول يستخدمه. لو الـ agent طلب tool مش متاح، لازم ترد بطريقة واضحة عشان الـ agent يعرف يتعامل مع الـ situation.\n\nمفيد لو بتستخدم AppFunctions وعايز تحترم خصوصية المستخدم، أو تخلي الـ features اختيارية من غير ما تعيد build الـ app كل مرة.\n\nزكاة العلم نشره 💚\n\n#Android #AppFunctions #AI #mo3talogy",
+    "summary_ar": "Android AppFunctions بتخلّي تطبيقك يشتغل كـ on-device MCP server. يعني agents تانية تقدر تستخدم tools من تطبيقك مباشرة، من غير ما تحتاج cloud.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "How to enable or disable Android AppFunctions at runtime based on user consent or feature toggles.",
     "url": "https://medium.com/proandroiddev/ai-meet-app-enable-or-disable-android-appfunctions-at-runtime-77e18ca3ec95"
   },
@@ -83,8 +83,8 @@
       "Coroutines",
       "Debugging"
     ],
-    "content": "من أكبر مشاكل الـ coroutines إن الـ stack traces بتبقى مش واضحة، خاصة لما يكون فيه custom exceptions.\n\nArda Kazancı شرح إزاي StackTraceRecoverable بيخلي بيانات الـ custom exception سليمة أثناء الـ recovery بتاع الـ coroutine stack trace. يعني لو عملت exception فيها معلومات إضافية، المعلومات دي متضيعش لما الـ coroutine يرميها.\n\nمفيد لأي حد بيشتغل بـ coroutines كتير وبيواجه صعوبة في الـ debugging.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Coroutines #Debugging #mo3talogy",
-    "summary_ar": "من أكبر مشاكل الـ coroutines إن الـ stack traces بتبقى مش واضحة، خاصة لما يكون فيه custom exceptions.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
+    "content": "من أكبر مشاكل الـ coroutines إن الـ stack traces بتبقى مش واضحة. لما الـ exception يحصل جوه coroutine، الـ stack trace الأصلي بيتغير، وبتضيع معلومات مهمة.\n\nArda Kazancı شرح إزاي StackTraceRecoverable بيخلي بيانات الـ custom exception سليمة أثناء الـ recovery بتاع الـ coroutine stack trace.\n\nالفكرة إنك لو عملت exception فيها معلومات إضافية (زي error code أو context)، المعلومات دي متضيعش لما الـ coroutine يرميها. StackTraceRecoverable بيخلي الـ exception يقدر يسترجع الـ stack trace الأصلي مع الحفاظ على البيانات الإضافية.\n\nالمقال فيه أمثلة بالكود بتوضح الفرق بين الـ exception العادي والـ recoverable واحد. كمان بيشرح إزاي تستخدمه مع الـ structured concurrency.\n\nمفيد لأي حد بيشتغل بـ coroutines كتير وبيواجه صعوبة في الـ debugging، خاصة لما الـ exceptions بتبقى مش واضحة في الـ logs.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Coroutines #Debugging #mo3talogy",
+    "summary_ar": "من أكبر مشاكل الـ coroutines إن الـ stack traces بتبقى مش واضحة. لما الـ exception يحصل جوه coroutine، الـ stack trace الأصلي بيتغير، وبتضيع معلومات مهمة.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "How StackTraceRecoverable keeps custom exception data intact during coroutine stack trace recovery.",
     "url": "https://ardakazanci.github.io/blog/posts/kotlin-coroutines-debugging-stacktrace-recoverable/"
   },
@@ -97,7 +97,7 @@
       "KSP",
       "Code Generation"
     ],
-    "content": "KSP (Kotlin Symbol Processing) بقى الأداة الأساسية للـ code generation في Kotlin، لكنه مش مناسب لكل حاجة.\n\nJaewoong Eum شرح في المقال متى يكون KSP الخيار الصح، ومتى الـ incremental model بتاعه مش كفاية. فيه حالات الـ KSP بيوفر وقت كبير، وفيه حالات أحسن تستخدم حاجة تانية.\n\nلو بتفكر تستخدم KSP في مشروعك أو بتواجه مشاكل في الـ build time، المقال ده هيوضحلك الصورة.\n\nزكاة العلم نشره 💚\n\n#KSP #CodeGeneration #Tooling #mo3talogy",
+    "content": "KSP (Kotlin Symbol Processing) بقى الأداة الأساسية للـ code generation في Kotlin، لكنه مش مناسب لكل حاجة.\n\nJaewoong Eum شرح في المقال متى يكون KSP الخيار الصح، ومتى الـ incremental model بتاعه مش كفاية.\n\nKSP بيشتغل على مستوى الـ symbols، وده بيخليه أسرع من الـ annotation processing التقليدي في كتير من الحالات. لكنه incremental، يعني لو غيرت حاجة صغيرة، مش لازم يعيد كل حاجة. في بعض الحالات، الـ incremental model ده بيبقى محدود، وممكن تحتاج حاجة تانية.\n\nالمقال بيوضح الحالات اللي KSP بيوفر فيها وقت كبير، والحالات اللي أحسن تستخدم فيها kapt أو حل تاني. كمان بيتكلم عن الـ performance والـ build time.\n\nلو بتفكر تستخدم KSP في مشروعك أو بتواجه مشاكل في الـ build time، المقال ده هيوضحلك الصورة.\n\nزكاة العلم نشره 💚\n\n#KSP #CodeGeneration #Tooling #mo3talogy",
     "summary_ar": "KSP (Kotlin Symbol Processing) بقى الأداة الأساسية للـ code generation في Kotlin، لكنه مش مناسب لكل حاجة.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "When KSP is the right tool for code generation, and where its incremental model stops being enough.",
     "url": "https://www.revenuecat.com/blog/engineering/when-ksp"
@@ -111,8 +111,8 @@
       "Architecture",
       "Analytics"
     ],
-    "content": "لو بتستخدم أكتر من analytics provider (Firebase و Mixpanel و Adjust مثلاً)، الكود بيتكعّب بسرعة.\n\nMkhytar Mkhoian شرح architecture لـ analytics في الـ modular Android apps، بيفصل الـ events والـ factories والـ trackers. النتيجة إنك تقدر تغير الـ vendor من غير ما تلمس الـ business logic.\n\nمفيد لأي تطبيق متوسط أو كبير عايز يبقى مرن في الـ analytics.\n\nزكاة العلم نشره 💚\n\n#Android #Analytics #Architecture #mo3talogy",
-    "summary_ar": "لو بتستخدم أكتر من analytics provider (Firebase و Mixpanel و Adjust مثلاً)، الكود بيتكعّب بسرعة.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
+    "content": "لو بتستخدم أكتر من analytics provider (Firebase و Mixpanel و Adjust مثلاً)، الكود بيتكعّب بسرعة. كل event لازم تبعته لأكتر من مكان، والـ dependencies بتزيد.\n\nMkhytar Mkhoian شرح architecture لـ analytics في الـ modular Android apps، بيفصل الـ events والـ factories والـ trackers. النتيجة إنك تقدر تغير الـ vendor من غير ما تلمس الـ business logic.\n\nالفكرة إنك تعرّف الـ events في مكان واحد، وتعمل factory تبني الـ event، وبعدين tracker يبعتها للـ provider المناسب. لو عايز تضيف provider جديد، تضيف tracker جديد من غير ما تغير باقي الكود.\n\nالمقال فيه مثال عملي على الـ structure، وإزاي تستخدمه في الـ multi-module project. كمان بيتكلم عن الـ testing، عشان تقدر تختبر الـ analytics من غير ما تبعت data حقيقي.\n\nمفيد لأي تطبيق متوسط أو كبير عايز يبقى مرن في الـ analytics.\n\nزكاة العلم نشره 💚\n\n#Android #Analytics #Architecture #mo3talogy",
+    "summary_ar": "لو بتستخدم أكتر من analytics provider (Firebase و Mixpanel و Adjust مثلاً)، الكود بيتكعّب بسرعة. كل event لازم تبعته لأكتر من مكان، والـ dependencies بتزيد.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "A vendor-agnostic analytics architecture for modular Android apps, splitting events, factories, and trackers.",
     "url": "https://proandroiddev.com/app-architecture-analytics-ec3471ca619b"
   },
@@ -125,7 +125,7 @@
       "Flow",
       "Bugs"
     ],
-    "content": "Kotlin Flow قوي، لكن فيه bugs بتبان صحيحة في الأول وبتظهر في الـ production.\n\nKaustubh Deshmukh شرح 4 bugs شائعة متعلقة بالـ collection و placement الـ catch و conflation و stateIn. كل واحدة فيهم بتبان إنها شغالة في الاختبار، لكن في الواقع بتسبب مشاكل.\n\nلو بتستخدم Flow كتير، المقال ده يستاهل تشوفه قبل ما تواجه المشكلة بنفسك.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Flow #Bugs #mo3talogy",
+    "content": "Kotlin Flow قوي، لكن فيه bugs بتبان صحيحة في الأول وبتظهر في الـ production.\n\nKaustubh Deshmukh شرح 4 bugs شائعة:\n\n1. **Collection**: لو جمعت الـ Flow في الـ wrong scope، ممكن يفضل شغال بعد ما الـ screen تتقفل.\n2. **Catch placement**: مكان الـ catch بيأثر على إيه اللي بيتقبض عليه. لو حطيته في المكان الغلط، ممكن يقبض على exceptions مش عايزها.\n3. **Conflation**: StateFlow بيعمل conflate للقيم السريعة. لو بعت قيم كتير بسرعة، ممكن بعضها يضيع.\n4. **stateIn**: لو استخدمت stateIn بطريقة غلط، ممكن الـ upstream يفضل شغال حتى لو محدش بيجمع.\n\nكل واحدة فيهم بتبان إنها شغالة في الاختبار، لكن في الواقع بتسبب مشاكل. المقال فيه أمثلة بالكود لكل bug، وإزاي تصلحه.\n\nلو بتستخدم Flow كتير، المقال ده يستاهل تشوفه قبل ما تواجه المشكلة بنفسك.\n\nزكاة العلم نشره 💚\n\n#Kotlin #Flow #Bugs #mo3talogy",
     "summary_ar": "Kotlin Flow قوي، لكن فيه bugs بتبان صحيحة في الأول وبتظهر في الـ production.\n\n(المصدر في أول كومنت)\n\n#mo3talogy",
     "summary_en": "Four easy-to-miss Kotlin Flow bugs around collection, catch placement, conflation, and stateIn.",
     "url": "https://kt.academy/article/kaustubh_flow_bugs_that_look_correct_at_first"
