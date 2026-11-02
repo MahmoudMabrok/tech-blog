@@ -1,5 +1,21 @@
 [
   {
+    "title": "Agentic and Flexible: A next era of Android development",
+    "date": "2026-11-02T10:20:49+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Android Dev Summit",
+      "AppFunctions",
+      "AI Agents",
+      "Compose"
+    ],
+    "content": "## The problem / context\n\nThe Android Dev Summit 2026 keynote post. Beyond tooling (BYOA, Android CLI — see the other cards), it announces the APIs that let apps take part in agentic experiences, plus Compose-first foundations for scaling across phones, foldables, Googlebook laptops and XR.\n\n## How it works\n\nApps expose capabilities to agents through Android MCP, built on the AppFunctions API — Android's unified tool-calling layer, now in beta. Agents can answer with real app UI via A2UI for Jetpack Compose (alpha) instead of a wall of text. Apps can run on-device agents with the new ML Kit Agentic API on Gemini Nano 4 (alpha), which auto-executes functions, keeps conversation history, runs the orchestration loop and adds guardrails.\n\n## Key ideas\n\n1. Connected Apps Platform: share app services with users when Gemini is the system agent; prototype in Gemini dev mode, register via Google Connected Console (preview).\n2. AppState (alpha) brings Compose's reactive model to the state layer.\n3. Navigation 3 1.2 is stable, with deep links and richer predictive back.\n4. Compose 1.13 (upcoming stable): Grid and Flexbox go stable, plus Progressive Blur and Formatted Text.\n5. The Compose adaptive skill now audits keyboard shortcuts, pointer cursors, hover states, tooltips and foldable tabletop postures; Google Play will look closely at foldable quality next year.\n6. Core Jetpack XR SDK libraries, XR emulators and XR Engine Hub are stable; XREAL AURA ships as the first wired Android XR glasses.\n\n## Examples\n\n**1. From app feature to agent tool** _(Usage scenario)_\n\nA food-ordering app exposes \"reorder last meal\" as an AppFunction. Gemini, as the system agent, can call it through Android MCP when the user asks. Using A2UI for Compose, the reply shows the app's own order-summary card with a Confirm button instead of plain text.\n\n## Why it matters\n\nIt sketches where Android is heading: apps become tools and UI providers for agents, and one adaptive Compose codebase is expected to cover every screen from phones to laptops and glasses. Most pieces are beta or alpha now, so this is the moment to prototype.\n\n> **Note:** Statuses per the post: AppFunctions beta; A2UI for Compose, ML Kit Agentic API and AppState alpha; Connected Apps Platform preview.\n\nSource: https://developer.android.com/blog/posts/build-it-your-way-a-next-era-of-android-development",
+    "summary_ar": "جوجل في Android Dev Summit أعلنت APIs للتجارب الـ agentic: AppFunctions و A2UI لـ Compose و ML Kit Agentic API على Gemini Nano 4.\nوكمان Compose 1.13 و Navigation 3 و Jetpack XR stable.",
+    "summary_en": "Google's Android Dev Summit keynote post introduces agentic APIs (Android MCP via AppFunctions, A2UI for Compose, the ML Kit Agentic API on Gemini Nano 4). It also covers Compose-first foundations for scaling across phones, foldables, Googlebook and XR.",
+    "url": "https://developer.android.com/blog/posts/build-it-your-way-a-next-era-of-android-development"
+  },
+  {
     "title": "Kodee's Kotlin Roundup: Kotlin 2.5.0-Beta2, JDK 17 requirement, Toolchain 0.13 and KotlinConf 2027",
     "date": "2026-11-02T10:20:29+02:00",
     "source": "نشرة التكنولوجيا",
