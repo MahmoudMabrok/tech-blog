@@ -77,8 +77,8 @@ title: المقالات
   <div class="view view-full content">{{ article.content | markdownify }}</div>
   {% if sum_ar %}<div class="view view-ar summary-box" hidden>{{ sum_ar | newline_to_br | markdownify }}</div>{% endif %}
   {% if sum_en %}<div class="view view-en summary-box" dir="ltr" lang="en" hidden>{{ sum_en | newline_to_br | markdownify }}</div>{% endif %}
-  {% if article.explanations %}
-  <script type="application/json" class="article-explanations">{{ article.explanations | jsonify }}</script>
+  {% if article.explainers %}
+  <script type="application/json" class="article-explainers">{{ article.explainers | jsonify }}</script>
   {% endif %}
   <footer class="card-footer">
     {% if article.tags %}
