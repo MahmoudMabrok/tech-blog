@@ -1,9 +1,9 @@
 (function () {
   var cards = document.querySelectorAll('.card');
 
-  function highlightTerms(root, explanations) {
-    if (!explanations || !explanations.length) return;
-    explanations = explanations.slice().sort(function (a, b) {
+  function highlightTerms(root, explainers) {
+    if (!explainers || !explainers.length) return;
+    explainers = explainers.slice().sort(function (a, b) {
       return ((b.term || '').length - (a.term || '').length);
     });
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
@@ -16,7 +16,7 @@
           parent.classList.contains('explain') || parent.closest('pre, code')) return;
       var lower = text.toLowerCase();
       var matches = [];
-      explanations.forEach(function (exp) {
+      explainers.forEach(function (exp) {
         if (!exp.term || !exp.explanation) return;
         var termLower = exp.term.toLowerCase();
         var idx = 0;
@@ -51,17 +51,17 @@
     });
   }
 
-  function applyExplanations() {
+  function applyExplainers() {
     cards.forEach(function (card) {
-      var script = card.querySelector('.article-explanations');
+      var script = card.querySelector('.article-explainers');
       if (!script) return;
-      var explanations;
-      try { explanations = JSON.parse(script.textContent); } catch (e) { return; }
-      if (!Array.isArray(explanations)) return;
-      card.querySelectorAll('.view').forEach(function (view) { highlightTerms(view, explanations); });
+      var explainers;
+      try { explainers = JSON.parse(script.textContent); } catch (e) { return; }
+      if (!Array.isArray(explainers)) return;
+      card.querySelectorAll('.view').forEach(function (view) { highlightTerms(view, explainers); });
     });
   }
-  applyExplanations();
+  applyExplainers();
 
   var tooltip = document.createElement('div');
   tooltip.className = 'explain-tooltip';
@@ -111,25 +111,31 @@
     if (el) setTimeout(hideTooltip, 150);
   });
 
+  // Copy currently visible view
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('.copy-btn');
     if (!btn) return;
     var card = btn.closest('.card');
-    var view = card.querySelector('.view-full');
+    // Find the currently visible view (not hidden)
+    var view = card.querySelector('.view:not([hidden])');
+    if (!view) view = card.querySelector('.view-full'); // fallback
     if (!view) return;
     var text = (view.innerText || view.textContent || '').trim();
     if (!text) return;
+
     function done() {
       var orig = btn.textContent;
       btn.textContent = 'تم النسخ ✓';
       setTimeout(function () { btn.textContent = orig; }, 2000);
     }
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
     } else {
       fallbackCopy(text, done);
     }
   });
+
   function fallbackCopy(text, done) {
     var ta = document.createElement('textarea');
     ta.value = text;
