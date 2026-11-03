@@ -109,3 +109,4 @@ title: المقالات
 </div>
 
 <script src="{{ '/assets/js/tags.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script src="{{ '/assets/js/explanations.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
