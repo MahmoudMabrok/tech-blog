@@ -14,6 +14,56 @@
     "summary_ar": "فريق DeepSeek Harness نشر تصميم اسمه Super-agent، وده مش موديل جديد لكن معمارية حوالين الموديلات 🤖\n\nفيه Router عايش على طول بيستقبل الأحداث (chat، reviews، CI) ويفلترها بقواعد بسيطة وبعدين بـ LLM، ويوزع المهام على Workers معزولين كل واحد ماسك مهمة.\nالأوامر الطويلة بتشتغل في الخلفية، وحالة الـ session منفصلة عن الأجهزة، وفيه Watchdog بيراقب الشغل اللي وقف.\n\nالأرقام من الفريق نفسه: أسرع بحوالي ٣٩٪ في تجربة محاكاة، بس بـ tokens أكتر بحوالي ٣٫٨ مرة، والـ prototype العام بحثي وشغال بصلاحيات واسعة.\n\nالمصدر: https://kingy.ai/blog/deepseek-super-agent-design-explained/",
     "summary_en": "🇬🇧 English summary:\nDeepSeek Harness's \"Exploring Super-agent Design\" is an architecture proposal, not a new model. A long-lived Router receives events (chat, PR reviews, CI), filters them with cheap rules and then an LLM, and dispatches tasks to isolated Workers that subscribe to related Threads. Long commands run in the background, agent state is separated from execution machines, and a Watchdog supervises stalled work. Team-reported simulated experiments show ~39% faster median completion than a neutral single-session baseline, at ~3.8x the cache-read tokens; coding was simulated, so code quality was not measured. The public MIT prototype is research-only, not an official product, and runs with danger-full-access by default.",
     "url": "https://kingy.ai/blog/deepseek-super-agent-design-explained/",
+    "explainers": [
+      {
+        "term": "Super-agent",
+        "explanation": "تصميم معماري حوالين الموديلات والأدوات، مش موديل جديد. الهدف إن الـ agent يشتغل على مهام وقنوات وأجهزة كتير من غير ما المستخدم يدير كل session بنفسه."
+      },
+      {
+        "term": "session",
+        "explanation": "سياق شغل مستمر للـ agent، زي محادثة أو مهمة لسه مفتوحة. الـ Router ليه session عايشة على طول، وكل مهمة بتاخد session لوحدها."
+      },
+      {
+        "term": "context",
+        "explanation": "المعلومات اللي بتتبعت للموديل في كل طلب عشان يفهم هو شغال على إيه. المهم بيتحط جواها مباشرة، والمعلومة الكبيرة بتتساب برة ومعاها ملخص أو reference."
+      },
+      {
+        "term": "LLM",
+        "explanation": "اختصار Large Language Model، يعني موديل لغوي كبير. هنا بيقيم الأحداث اللي عدّت الفلتر السريع، والموديل الأقوى بيتساب للـ Workers لأن شغلهم هو اللي بيحدد جودة النتيجة."
+      },
+      {
+        "term": "Router",
+        "explanation": "طبقة بتفضل شغالة، بتستقبل كل الرسايل وبتعرف الصورة الكبيرة وبتوزّع المهام. متعمدة إنها متنفّذش الشغل بإيدها، وممكن تشتغل حتى من غير shell."
+      },
+      {
+        "term": "Workers",
+        "explanation": "الطبقة التانية في التصميم: كل Worker ماسك مهمة واحدة في context معزول، ومعاه الأدوات اللي محتاجها. ممكن كمان يشغّل subagents جوه مهمته."
+      },
+      {
+        "term": "subagents",
+        "explanation": "agents أصغر الـ Worker يناديهم عشان ينفّذوا جزء من المهمة جوه سياقه، من غير ما التفاصيل دي تتلخبط مع مهام الـ Workers التانيين."
+      },
+      {
+        "term": "Thread",
+        "explanation": "مجموعة أحداث مرتبطة ببعض، زي الـ pull request والـ comments بتاعته. لما الـ Worker يعمل subscribe عليها، أي تعليق جديد يوصله على طول."
+      },
+      {
+        "term": "pass-through",
+        "explanation": "مرور الحدث الجديد مباشرة للـ Worker المشترك في الـ Thread، من غير ما الـ Router يفكر فيه من الأول. من غيرها الـ Router بياخد قرارات أكتر والـ cache بيتقرأ أكتر."
+      },
+      {
+        "term": "Watchdog",
+        "explanation": "session منفصلة بتشتغل على مواعيد، وبتراقب لو عملية لسه ظاهرة إنها شغالة بس واقفة مكانها، زي Worker بيكرر نفس الغلطة، وتحاول تصلح العطل."
+      },
+      {
+        "term": "prompt injection",
+        "explanation": "هجوم إن محتوى جاي من برة، زي رسالة أو صفحة، فيه تعليمات مخفية تخلي الـ agent ينفّذ أمر مش المفروض يعمله. الخطر بيزيد لما الـ agent يقرأ من برة وينفّذ أوامر بصلاحيات واسعة."
+      },
+      {
+        "term": "tokens",
+        "explanation": "القطع الصغيرة اللي النص بيتقسم لها قبل ما الموديل يقراها، وبيتحسب بيها استهلاك الموديل. الـ cached tokens أجزاء اتقرت قبل كده واتحفظت، فالموديل مش بيعيد حسابها من الصفر."
+      }
+    ],
     "image": "assets/images/articles/deepseek-super-agent-design.jpg",
     "images": [
       "assets/images/articles/deepseek-super-agent-design.jpg",
