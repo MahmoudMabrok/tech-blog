@@ -1,7 +1,7 @@
 (function () {
   var cards = document.querySelectorAll('.card');
 
-  function highlightTerms(root, explainers) {
+  function highlightTerms(root, explainers, usedTerms) {
     if (!explainers || !explainers.length) return;
     explainers = explainers.slice().sort(function (a, b) {
       return ((b.term || '').length - (a.term || '').length);
@@ -18,11 +18,11 @@
       var matches = [];
       explainers.forEach(function (exp) {
         if (!exp.term || !exp.explanation) return;
-        var termLower = exp.term.toLowerCase();
-        var idx = 0;
-        while ((idx = lower.indexOf(termLower, idx)) !== -1) {
-          matches.push({ start: idx, end: idx + exp.term.length, term: text.substr(idx, exp.term.length), explanation: exp.explanation });
-          idx += exp.term.length;
+        var termKey = exp.term.toLowerCase();
+        if (usedTerms[termKey]) return; // already used in this article
+        var idx = lower.indexOf(termKey);
+        if (idx !== -1) {
+          matches.push({ start: idx, end: idx + exp.term.length, term: text.substr(idx, exp.term.length), explanation: exp.explanation, termKey: termKey });
         }
       });
       if (!matches.length) return;
@@ -30,7 +30,11 @@
       var filtered = [];
       var currentEnd = -1;
       matches.forEach(function (m) {
-        if (m.start >= currentEnd) { filtered.push(m); currentEnd = m.end; }
+        if (m.start >= currentEnd && !usedTerms[m.termKey]) {
+          filtered.push(m);
+          currentEnd = m.end;
+          usedTerms[m.termKey] = true;
+        }
       });
       if (!filtered.length) return;
       var fragment = document.createDocumentFragment();
@@ -58,7 +62,10 @@
       var explainers;
       try { explainers = JSON.parse(script.textContent); } catch (e) { return; }
       if (!Array.isArray(explainers)) return;
-      card.querySelectorAll('.view').forEach(function (view) { highlightTerms(view, explainers); });
+      var usedTerms = {}; // shared across all views of this article
+      card.querySelectorAll('.view').forEach(function (view) {
+        highlightTerms(view, explainers, usedTerms);
+      });
     });
   }
   applyExplainers();
@@ -78,7 +85,6 @@
     tooltip.style.top = top + 'px';
     tooltip.style.left = left + 'px';
     tooltip.style.transform = 'translateX(-50%)';
-    // Keep in viewport
     var ttRect = tooltip.getBoundingClientRect();
     if (ttRect.left < 8) {
       tooltip.style.left = (8 + ttRect.width / 2) + 'px';
