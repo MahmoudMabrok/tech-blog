@@ -3,6 +3,48 @@ layout: home
 title: المقالات
 ---
 
+<style>
+.explain {
+  background: linear-gradient(135deg, rgba(79,70,229,.15), rgba(6,182,212,.15));
+  color: #4f46e5;
+  font-weight: 600;
+  border-bottom: 2px dotted #4f46e5;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+.explain:hover, .explain:focus {
+  background: rgba(79,70,229,.25);
+  outline: none;
+}
+.explain-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  background: #1f2937;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: .85rem;
+  line-height: 1.5;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  pointer-events: none;
+  display: none;
+}
+.explain-tooltip.show {
+  display: block;
+}
+.explain-tooltip::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: #1f2937;
+}
+</style>
+
 {% assign articles = site.data.articles | sort: "date" | reverse %}
 
 <section class="hero">
