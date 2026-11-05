@@ -65,25 +65,31 @@
 
   var tooltip = document.createElement('div');
   tooltip.className = 'explain-tooltip';
-  tooltip.hidden = true;
   document.body.appendChild(tooltip);
 
   function showTooltip(el) {
     var text = el.dataset.explain;
     if (!text) return;
     tooltip.textContent = text;
-    tooltip.hidden = false;
+    tooltip.classList.add('show');
     var rect = el.getBoundingClientRect();
-    var top = rect.bottom + window.scrollY + 8;
-    var left = rect.left + window.scrollX + (rect.width / 2);
+    var top = rect.bottom + 8;
+    var left = rect.left + (rect.width / 2);
     tooltip.style.top = top + 'px';
     tooltip.style.left = left + 'px';
     tooltip.style.transform = 'translateX(-50%)';
+    // Keep in viewport
     var ttRect = tooltip.getBoundingClientRect();
-    if (ttRect.left < 8) tooltip.style.left = (8 + ttRect.width / 2) + 'px';
-    else if (ttRect.right > window.innerWidth - 8) tooltip.style.left = (window.innerWidth - 8 - ttRect.width / 2) + 'px';
+    if (ttRect.left < 8) {
+      tooltip.style.left = (8 + ttRect.width / 2) + 'px';
+    } else if (ttRect.right > window.innerWidth - 8) {
+      tooltip.style.left = (window.innerWidth - 8 - ttRect.width / 2) + 'px';
+    }
+    if (ttRect.bottom > window.innerHeight - 8) {
+      tooltip.style.top = (rect.top - ttRect.height - 8) + 'px';
+    }
   }
-  function hideTooltip() { tooltip.hidden = true; }
+  function hideTooltip() { tooltip.classList.remove('show'); }
 
   document.addEventListener('mouseover', function (e) {
     var el = e.target.closest('.explain');
@@ -97,7 +103,7 @@
     var el = e.target.closest('.explain');
     if (el) {
       e.preventDefault(); e.stopPropagation();
-      if (tooltip.hidden) showTooltip(el); else hideTooltip();
+      if (!tooltip.classList.contains('show')) showTooltip(el); else hideTooltip();
       return;
     }
     if (!e.target.closest('.explain-tooltip')) hideTooltip();
@@ -116,9 +122,8 @@
     var btn = e.target.closest('.copy-btn');
     if (!btn) return;
     var card = btn.closest('.card');
-    // Find the currently visible view (not hidden)
     var view = card.querySelector('.view:not([hidden])');
-    if (!view) view = card.querySelector('.view-full'); // fallback
+    if (!view) view = card.querySelector('.view-full');
     if (!view) return;
     var text = (view.innerText || view.textContent || '').trim();
     if (!text) return;
