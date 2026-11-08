@@ -1,5 +1,66 @@
 [
   {
+    "title": "صاحب Kodein بيقدم Inara: توصيل واضح بدل صندوق DI سحري",
+    "date": "2026-11-08T21:40:15+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Inara",
+      "DI",
+      "KMP"
+    ],
+    "content": "بتحب dependency injection، بس مش مرتاح لفكرة اسأل الـ container عن type وهو يتصرف؟ Salomon Brys، اللي عمل Kodein، بيحكي إنه وصل لنفس النقطة. البديل اللي بيقدمه اسمه Inara، والفكرة أقرب لكتابة modules يدويًا، بس من غير تكرار كل طبقة التوصيل بإيدك.\n\nبتكتب interface عليها DIModule وبداخلها أعضاء مسماة بتوفر dependencies. معالج KSP بيولد التنفيذ الرفيع ده وقت البناء. اسم العضو نفسه بيوضح إنت بتطلب أنهي dependency، وتقدر تركب modules من interfaces، وتخلي business classes مستقلة عن إطار التوصيل.\n\nتخيّل NetworkModule بتوفر baseUrl و httpClient. في التطبيق تستخدم single عشان نفس العميل يتشارك في النطاق المناسب، وفي الاختبار provider يرجع fake. المهم إن الاختلاف ظاهر في إنشاء module، مش global state بيتغير من اختبار للتاني وأنت بتدور على سبب التداخل.\n\nالمقال بيعرض bindings كقيم، و factories متولدة لتجميع constructors، وبيذكر دعم suspend bindings وامتداد وتعديل التعريفات و scoping على مستوى module. النقطة مش إن كل abstractions اختفت؛ النقطة إن سطح التوصيل بسيط ومحدد، وممكن تتبعه من interface للمكان اللي بيبني الكائن.\n\nالمشروع له رأي واضح: مفيش modules عالمية mutable. ده اختيار تصميم، مش حكم إن كل فريق لازم ينتقل له. وبالنسبة لـ Kodein، الكاتب أعلن استمرار الصيانة من غير مزايا جديدة، واقترح Koin للي عايز نفس نمط container. القرار عندك مرتبط بالنمط اللي يناسب مشروعك.\n\nعمليًا، قبل ما تعمم الفكرة، اكتب السؤال اللي عايز التجربة تجاوب عليه في جملة واحدة. هل المشكلة وضوح الاستخدام، ولا وقت التنفيذ، ولا صحة السلوك؟ لو السؤال مفتوح زيادة، أي ديمو شكله حلو هيبان حل. خليك محدد في نقطة البداية والنتيجة المتوقعة، وسيب مقارنة عادلة بالطريقة اللي بتستخدمها دلوقتي.\n\nللمراجعة، افصل بين اللي المصدر بيعرضه وبين الطريقة اللي ممكن توظفه بيها. الأمثلة التطبيقية هنا لتوضيح التفكير، مش تقرير إن الأداة اتجربت على مشروعك. وثّق الإعداد اللي اختبرته، وراجع الحالة العادية وحالة الفشل، عشان ما يتحولش نجاح لحظة واحدة لتوقع عام الفريق يبني عليه شغله.\n\nالأهم إنك تخرج بقرار صغير تقدر تشرحه: هتتبنى إيه، وهتأجل إيه، وإيه الدليل اللي ممكن يغير رأيك. وجود حدود واضحة مش تقليل من الفكرة؛ بالعكس، ده اللي يحول المعرفة من لينك اتحفظ لقيمة عملية. ولو النتيجة ما ناسبتكش، ارجع للسبب بدل ما تزود تعقيد جديد عشان تدافع عن الاختيار.\n\nوالتجربة المفيدة مش لازم تكون تغيير كبير. اختار جزء محدود يسهل عزله، وخلي فيه طريقة واضحة للرجوع لو الفرضية طلعت غلط. بعد كده شارك النتيجة مع الفريق بالسياق: إيه اللي اتقاس أو اتراجع، وإيه اللي لسه ما نعرفهوش. كده النقاش يبقى عن سلوك ودليل، مش عن اسم أداة جديدة أو انطباع من عنوان.\n\nإنت مرتاح أكتر مع graph صريح في interfaces، ولا مع container بيوفر dependencies حسب النوع؟\n\nزكاة العلم نشره.\n\n#Kotlin #Android #mo3talogy",
+    "summary_ar": "بتحب dependency injection، بس مش مرتاح لفكرة اسأل الـ container عن type وهو يتصرف؟ Salomon Brys، اللي عمل Kodein، بيحكي إنه وصل لنفس النقطة. البديل اللي بيقدمه اسمه Inara، والفكرة أقرب لكتابة modules يدويًا، بس من غير تكرار كل طبقة التوصيل بإيدك.\n\nبتكتب interface عليها DIModule وبداخلها أعضاء مسماة بتوفر dependencies. معالج KSP بيولد التنفيذ الرفيع ده وقت البناء. اسم العضو نفسه بيوضح إنت بتطلب أنهي dependency، وتقدر تركب modules من interfaces، وتخلي business classes مستقلة عن إطار التوصيل.\n\nتخيّل NetworkModule بتوفر baseUrl و httpClient. في التطبيق تستخدم single عشان نفس العميل يتشارك في النطاق المناسب، وفي الاختبار provider يرجع fake. المهم إن الاختلاف ظاهر في إنشاء module، مش global state بيتغير من اختبار للتاني وأنت بتدور على سبب التداخل.\n\nالمشروع له رأي واضح: مفيش modules عالمية mutable. ده اختيار تصميم، مش حكم إن كل فريق لازم ينتقل له. وبالنسبة لـ Kodein، الكاتب أعلن استمرار الصيانة من غير مزايا جديدة، واقترح Koin للي عايز نفس نمط container. القرار عندك مرتبط بالنمط اللي يناسب مشروعك.\n\nإنت مرتاح أكتر مع graph صريح في interfaces، ولا مع container بيوفر dependencies حسب النوع؟",
+    "summary_en": "🇬🇧 Manual interface-based DI is explicit and easy to isolate, but repeatedly writing module implementations is tedious. Inara uses KSP to generate a thin implementation around @DIModule interfaces. Named module members identify dependencies; bindings choose values, single instances or providers. The trade-off is deliberately opinionated wiring with visible contracts rather than runtime lookup magic.",
+    "url": "https://kodein-koders.com/en/blog/inara-inject-your-dependencies-at-compile-time/",
+    "image": "assets/images/articles/kw536-aw752-inara-explicit-compile-time-di-for-kotlin-multiplatform.svg",
+    "images": [
+      "assets/images/articles/kw536-aw752-inara-explicit-compile-time-di-for-kotlin-multiplatform.svg"
+    ],
+    "explainers": [
+      {
+        "term": "dependency injection",
+        "explanation": "أسلوب بيمرر احتياجات الكائن من بره، وده بيفصل منطق الشغل عن طريقة إنشاء الخدمات."
+      },
+      {
+        "term": "container",
+        "explanation": "مكوّن بيحتفظ بتعريفات التوصيل وبيوفر الكائنات المطلوبة وفق قواعد الإطار المستخدم."
+      },
+      {
+        "term": "KSP",
+        "explanation": "اختصار Kotlin Symbol Processing؛ واجهة لمعالجة رموز كود كوتلن وتوليد كود إضافي وقت البناء."
+      },
+      {
+        "term": "interface",
+        "explanation": "عقد بيحدد أعضاء وسلوك متوقع من غير ما يلزمك بتنفيذ واحد بعينه."
+      },
+      {
+        "term": "provider",
+        "explanation": "دالة أو آلية بتوفر كائن عند الطلب بدل ما المستهلك ينشئه بنفسه."
+      },
+      {
+        "term": "global state",
+        "explanation": "حالة مشتركة على نطاق واسع، وتغييرها ممكن يربط اختبارات أو أجزاء كانت المفروض تبقى مستقلة."
+      },
+      {
+        "term": "bindings",
+        "explanation": "تعريفات بتربط الاحتياج بمصدر القيمة أو طريقة إنشاء الكائن اللي هيلبيه."
+      },
+      {
+        "term": "factories",
+        "explanation": "دوال أو كائنات مسؤولة عن إنشاء كائنات جديدة وتجميع مدخلات إنشائها."
+      },
+      {
+        "term": "scoping",
+        "explanation": "تحديد النطاق اللي الكائن بيعيش فيه وبيتشارك جواه بدل إعادة إنشائه أو الاحتفاظ بيه بلا حدود."
+      },
+      {
+        "term": "mutable",
+        "explanation": "قابل للتغيير بعد الإنشاء؛ مشاركته محتاجة وضوح في مين يملك التعديل وعمر القيمة."
+      }
+    ]
+  },
+  {
     "title": "نفس Dispatchers.Default ونفس الكود… بس الويب لسه بيهنّج؟",
     "date": "2026-11-08T21:40:15+02:00",
     "source": "نشرة التكنولوجيا",
