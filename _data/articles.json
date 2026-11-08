@@ -1,5 +1,66 @@
 [
   {
+    "title": "من ملف Kotlin لحد DEX: إنت بتفحص أنهي نسخة من برنامجك؟",
+    "date": "2026-11-08T21:40:15+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Kotlin",
+      "DEX",
+      "R8"
+    ],
+    "content": "الكود شغال في debug، وبيتكسر في release، فتبدأ تشك إن Kotlin غيّرت معنى الدالة. قبل الشك، اسأل سؤال أبسط: الدالة اللي بتبص عليها دلوقتي هي المصدر، ولا bytecode، ولا اللي فضل جوه APK بعد التحسين؟ دول مش نفس artifact ولا نفس مرحلة التنفيذ.\n\nالمسار بيبدأ بتحليل Kotlin في K2، وتحويلات عبر IR وإضافات compiler زي Compose، وبعدها JVM backend يطلع class files. أدوات Android بتحولها لـ DEX: D8 مسؤول عن التحويل، ومع إعدادات التحسين R8 يقدر يصغر البرنامج ويعمل inlining ودمج وإعادة تسمية، وكمان ينتج DEX.\n\nتخيّل دالة extension بتستدعيها كأنها عضو في String. على مستوى class file غالبًا هتلاقيها static داخل file facade والـ receiver بقى parameter. بعد R8 ممكن جسمها يندمج عند الاستدعاء وما تلاقيش نفس الدالة مستقلة. اختفاؤها هنا مش لوحده دليل إن compiler غلط.\n\nالمقال بيفصل بين jvmTarget و compileSdk و minSdk. الأول مستوى class file، والتاني APIs اللي المترجم شايفها، والتالت أقل Android مدعوم. اختيار bytecode حديث مش معناه إن الجهاز بقى desktop JVM، ولا إن كل مكتبات JDK الحديثة متاحة. و desugaring بيغطي حالات محددة، مش سحر عام.\n\nخطة التحقيق تبقى عند أول حد ظهر عنده الاختلاف: راجع المصادر المتولدة، وبعدها class باستخدام javap، وبعدها DEX و APK Analyzer، ثم سلوك ART على الجهاز. لو فيه reflection أو serialization، راجع keep rules وملفات mapping في release. متعتمدش على debug بس في تشخيص مشكلة تحسين.\n\nعمليًا، قبل ما تعمم الفكرة، اكتب السؤال اللي عايز التجربة تجاوب عليه في جملة واحدة. هل المشكلة وضوح الاستخدام، ولا وقت التنفيذ، ولا صحة السلوك؟ لو السؤال مفتوح زيادة، أي ديمو شكله حلو هيبان حل. خليك محدد في نقطة البداية والنتيجة المتوقعة، وسيب مقارنة عادلة بالطريقة اللي بتستخدمها دلوقتي.\n\nللمراجعة، افصل بين اللي المصدر بيعرضه وبين الطريقة اللي ممكن توظفه بيها. الأمثلة التطبيقية هنا لتوضيح التفكير، مش تقرير إن الأداة اتجربت على مشروعك. وثّق الإعداد اللي اختبرته، وراجع الحالة العادية وحالة الفشل، عشان ما يتحولش نجاح لحظة واحدة لتوقع عام الفريق يبني عليه شغله.\n\nالأهم إنك تخرج بقرار صغير تقدر تشرحه: هتتبنى إيه، وهتأجل إيه، وإيه الدليل اللي ممكن يغير رأيك. وجود حدود واضحة مش تقليل من الفكرة؛ بالعكس، ده اللي يحول المعرفة من لينك اتحفظ لقيمة عملية. ولو النتيجة ما ناسبتكش، ارجع للسبب بدل ما تزود تعقيد جديد عشان تدافع عن الاختيار.\n\nوالتجربة المفيدة مش لازم تكون تغيير كبير. اختار جزء محدود يسهل عزله، وخلي فيه طريقة واضحة للرجوع لو الفرضية طلعت غلط. بعد كده شارك النتيجة مع الفريق بالسياق: إيه اللي اتقاس أو اتراجع، وإيه اللي لسه ما نعرفهوش. كده النقاش يبقى عن سلوك ودليل، مش عن اسم أداة جديدة أو انطباع من عنوان.\n\nإيه آخر مشكلة build اكتشفت إن سببها في مرحلة غير المرحلة اللي كنت بتشك فيها؟\n\nزكاة العلم نشره.\n\n#Kotlin #Android #mo3talogy",
+    "summary_ar": "الكود شغال في debug، وبيتكسر في release، فتبدأ تشك إن Kotlin غيّرت معنى الدالة. قبل الشك، اسأل سؤال أبسط: الدالة اللي بتبص عليها دلوقتي هي المصدر، ولا bytecode، ولا اللي فضل جوه APK بعد التحسين؟ دول مش نفس artifact ولا نفس مرحلة التنفيذ.\n\nالمسار بيبدأ بتحليل Kotlin في K2، وتحويلات عبر IR وإضافات compiler زي Compose، وبعدها JVM backend يطلع class files. أدوات Android بتحولها لـ DEX: D8 مسؤول عن التحويل، ومع إعدادات التحسين R8 يقدر يصغر البرنامج ويعمل inlining ودمج وإعادة تسمية، وكمان ينتج DEX.\n\nتخيّل دالة extension بتستدعيها كأنها عضو في String. على مستوى class file غالبًا هتلاقيها static داخل file facade والـ receiver بقى parameter. بعد R8 ممكن جسمها يندمج عند الاستدعاء وما تلاقيش نفس الدالة مستقلة. اختفاؤها هنا مش لوحده دليل إن compiler غلط.\n\nخطة التحقيق تبقى عند أول حد ظهر عنده الاختلاف: راجع المصادر المتولدة، وبعدها class باستخدام javap، وبعدها DEX و APK Analyzer، ثم سلوك ART على الجهاز. لو فيه reflection أو serialization، راجع keep rules وملفات mapping في release. متعتمدش على debug بس في تشخيص مشكلة تحسين.\n\nإيه آخر مشكلة build اكتشفت إن سببها في مرحلة غير المرحلة اللي كنت بتشك فيها؟",
+    "summary_en": "🇬🇧 A Kotlin source function, a JVM class file and the instructions in a release APK are different representations. K2 analyses Kotlin, compiler plugins transform the program, and the JVM backend emits class files. D8 converts bytecode to DEX; configured R8 builds also shrink, optimise and rename. ART executes DEX on-device. Inspect the boundary where behaviour first diverges: generated source, class file, DEX, package, then runtime.",
+    "url": "https://medium.com/@ravirawal13/from-kotlin-source-to-dex-android-compilation-pipeline-6d575c13e695",
+    "image": "assets/images/articles/kw536-aw752-kotlin-to-dex-know-which-compiler-stage-you-are-debugging.svg",
+    "images": [
+      "assets/images/articles/kw536-aw752-kotlin-to-dex-know-which-compiler-stage-you-are-debugging.svg"
+    ],
+    "explainers": [
+      {
+        "term": "bytecode",
+        "explanation": "تعليمات وسيطة ناتجة عن الترجمة، مختلفة عن كود المصدر ومش بالضرورة هي آخر صيغة على الجهاز."
+      },
+      {
+        "term": "DEX",
+        "explanation": "صيغة ملفات التعليمات اللي بيستخدمها نظام تشغيل تطبيقات أندرويد بدل ملفات JVM class مباشرة."
+      },
+      {
+        "term": "JVM backend",
+        "explanation": "جزء المترجم اللي بيحوّل التمثيل الداخلي لمخرجات تستهدف Java Virtual Machine."
+      },
+      {
+        "term": "inlining",
+        "explanation": "تحسين بينقل جسم الدالة لمكان استدعائها، فممكن ما تفضلش موجودة كدالة مستقلة في الناتج."
+      },
+      {
+        "term": "jvmTarget",
+        "explanation": "إعداد بيحدد مستوى ملفات class الناتجة، مش أقل إصدار أندرويد يقدر يشغّل التطبيق."
+      },
+      {
+        "term": "compileSdk",
+        "explanation": "إصدار واجهات أندرويد المتاحة وقت البناء، ومش معناه إن كل الأجهزة بتوفرها وقت التشغيل."
+      },
+      {
+        "term": "minSdk",
+        "explanation": "أقل مستوى API أندرويد التطبيق بيعلن إنه بيدعمه، وده بيؤثر على توافق الأجهزة."
+      },
+      {
+        "term": "desugaring",
+        "explanation": "تحويلات بتسمح بتشغيل خصائص لغة أو واجهات محددة على بيئات أقدم، مش دعم تلقائي لكل JDK."
+      },
+      {
+        "term": "reflection",
+        "explanation": "فحص الأنواع وأعضائها أو استدعاؤها وقت التشغيل، وده ممكن يحتاج قواعد حفظ مع تصغير الكود."
+      },
+      {
+        "term": "keep rules",
+        "explanation": "تعليمات لأداة التحسين عشان تحافظ على كود أو أسماء مطلوبة، خصوصًا لما الاستخدام مش ظاهر في الاستدعاءات العادية."
+      }
+    ]
+  },
+  {
     "title": "صاحب Kodein بيقدم Inara: توصيل واضح بدل صندوق DI سحري",
     "date": "2026-11-08T21:40:15+02:00",
     "source": "نشرة التكنولوجيا",
