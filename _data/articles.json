@@ -1,5 +1,1571 @@
 [
   {
+    "title": "لفّ الـ callback بـ callbackFlow من غير ما تسرّب socket",
+    "date": "2026-11-19T23:50:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Flow",
+      "Coroutines",
+      "WebSocket"
+    ],
+    "content": "أي SDK بيبعتلك events بـ callback، وإنت شغال بـ Kotlin وعايز Flow. الـ callbackFlow هو الكوبري بينهم، وهو قصير، بس فيه تفصيلتين هما اللي بيفرقوا بين كود نضيف وكود بيسرّب sockets 🔌\n\nالمقال بيلف WebSocket client بـ callbackFlow. ولعشان يبقى فيه حاجة حقيقية تتجرب، بيستخدم شبكة عامة بتطلع block جديد كل ١٥ ثانية من غير API key ولا حساب، فالكود بيشتغل زي ما هو مكتوب. الكاتب جرّبه فعلًا، وعرض output من تشغيل حقيقي فيه ٣ blocks الفرق بينهم حوالي ١٥ ثانية.\n\nتخيّل شاشة بتتابع feed لحظي. المستخدم يدخلها ويخرج منها كذا مرة. لو الـ socket اتفتح برا الـ Flow أو التنضيف اتحط في مكان غلط، كل خروج بيسيب connection مفتوحة والسيرفر لسه شايفك مشترك.\n\nالتفصيلة الأولى إن التنضيف كله يتحط في awaitClose وبس. الـ awaitClose بيوقف الـ builder لحد ما الـ collector يمشي، وبعدها ينفّذ الـ block بتاعه، وده بيغطي كل الحالات مرة واحدة: take خلص، أو الـ coroutine اتلغت، أو withTimeout انتهى، أو جه exception من تحت. المقال بيعمل unsubscribe الأول عشان السيرفر يعرف، وبعدين يقفل الـ socket. ولو نسيت awaitClose هيرمي الـ callbackFlow exception وقت التشغيل. والتفصيلة التانية إن الـ resource يتفتح جوه الـ builder عشان الـ Flow يبقى cold: استدعاء الدالة لوحده ما بيفتحش حاجة، وكل collector ياخد socket خاص بيه. ولو عايز socket واحد مشترك، ضيف shareIn عند مكان الاستدعاء مع WhileSubscribed، وهيقفل لما آخر collector يمشي.\n\nخد بالك إن الـ SDK والشبكة في المقال مجرد مثال للتجربة، فالمهم تنقل الفكرة للـ client بتاعك. وراجع هو بينادي الـ callback من أنهي thread، وإيه اللي بيحصل لو الـ collector أبطأ من الـ events. المقال بيستخدم trySend جوه الـ callback، وده معناه إنك لازم تفكر في سلوك الـ buffer مش بس تنقل الكود.\n\nآخر مرة لفّيت فيها callback API بـ callbackFlow، حطيت التنضيف فين؟\n\nزكاة العلم نشره.\n\n#Kotlin #Coroutines #Flow #WebSocket #mo3talogy",
+    "summary_ar": "أي SDK بيبعتلك events بـ callback، وإنت شغال بـ Kotlin وعايز Flow. الـ callbackFlow هو الكوبري بينهم، وهو قصير، بس فيه تفصيلتين هما اللي بيفرقوا بين كود نضيف وكود بيسرّب sockets 🔌\n\nالمقال بيلف WebSocket client بـ callbackFlow. ولعشان يبقى فيه حاجة حقيقية تتجرب، بيستخدم شبكة عامة بتطلع block جديد كل ١٥ ثانية من غير API key ولا حساب، فالكود بيشتغل زي ما هو مكتوب. الكاتب جرّبه فعلًا، وعرض output من تشغيل حقيقي فيه ٣ blocks الفرق بينهم حوالي ١٥ ثانية.\n\nتخيّل شاشة بتتابع feed لحظي. المستخدم يدخلها ويخرج منها كذا مرة. لو الـ socket اتفتح برا الـ Flow أو التنضيف اتحط في مكان غلط، كل خروج بيسيب connection مفتوحة والسيرفر لسه شايفك مشترك.\n\nخد بالك إن الـ SDK والشبكة في المقال مجرد مثال للتجربة، فالمهم تنقل الفكرة للـ client بتاعك. وراجع هو بينادي الـ callback من أنهي thread، وإيه اللي بيحصل لو الـ collector أبطأ من الـ events. المقال بيستخدم trySend جوه الـ callback، وده معناه إنك لازم تفكر في سلوك الـ buffer مش بس تنقل الكود.\n\nآخر مرة لفّيت فيها callback API بـ callbackFlow، حطيت التنضيف فين؟",
+    "summary_en": "callbackFlow bridges push-style callback APIs into Kotlin Flow, but two details decide whether it leaks: put all cleanup in awaitClose (it runs when the collector finishes, is cancelled, times out or fails), and open the resource inside the builder so the Flow stays cold. For a shared socket, add shareIn with WhileSubscribed at the call site. The article runs against a public WebSocket feed that needs no API key.",
+    "url": "https://dev.to/syriandeveloper/turn-a-callback-websocket-feed-into-a-kotlin-flow-with-callbackflow-with-a-live-feed-to-try-it-on-lj0",
+    "image": "assets/images/articles/kw537-aw753-callbackflow-wrap-a-callback-api-without-leaking-the-socket.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-callbackflow-wrap-a-callback-api-without-leaking-the-socket.svg"
+    ],
+    "explainers": [
+      {
+        "term": "callbackFlow",
+        "explanation": "دالة بتحوّل API بيبعت النتايج بـ callback لـ Flow، بتديك channel تبعت فيه القيم."
+      },
+      {
+        "term": "awaitClose",
+        "explanation": "دالة بتوقف الـ builder لحد ما الـ collector يختفي، وبعدها بتنفّذ كود التنضيف بتاعك."
+      },
+      {
+        "term": "cold Flow",
+        "explanation": "Flow مابيبدأش شغله غير لما حد يعمل collect، وكل collector بيبدأ من الأول."
+      },
+      {
+        "term": "shareIn",
+        "explanation": "عامل بيحوّل cold Flow لـ shared Flow عشان أكتر من collector يتشاركوا مصدر واحد."
+      },
+      {
+        "term": "WhileSubscribed",
+        "explanation": "سياسة مشاركة بتشغّل المصدر طول ما فيه مشتركين، وبتوقفه بعد آخر واحد بمهلة اختيارية."
+      },
+      {
+        "term": "trySend",
+        "explanation": "إرسال قيمة للـ channel من غير suspend، مناسب جوه callback عادي مش suspend."
+      },
+      {
+        "term": "WebSocket",
+        "explanation": "اتصال مفتوح بين التطبيق والسيرفر بيسمح للسيرفر يبعت data في أي لحظة من غير طلب جديد."
+      },
+      {
+        "term": "unsubscribe",
+        "explanation": "إلغاء الاشتراك في السيرفر عشان يبطل يبعتلك events قبل ما تقفل الـ socket."
+      }
+    ],
+    "linkedin_body": "أي SDK بيبعتلك events بـ callback، وإنت شغال بـ Kotlin وعايز Flow. الـ callbackFlow هو الكوبري بينهم، وهو قصير، بس فيه تفصيلتين هما اللي بيفرقوا بين كود نضيف وكود بيسرّب sockets 🔌\n\nالمقال بيلف WebSocket client بـ callbackFlow. ولعشان يبقى فيه حاجة حقيقية تتجرب، بيستخدم شبكة عامة بتطلع block جديد كل ١٥ ثانية من غير API key ولا حساب، فالكود بيشتغل زي ما هو مكتوب. الكاتب جرّبه فعلًا، وعرض output من تشغيل حقيقي فيه ٣ blocks الفرق بينهم حوالي ١٥ ثانية.\n\nتخيّل شاشة بتتابع feed لحظي. المستخدم يدخلها ويخرج منها كذا مرة. لو الـ socket اتفتح برا الـ Flow أو التنضيف اتحط في مكان غلط، كل خروج بيسيب connection مفتوحة والسيرفر لسه شايفك مشترك.\n\nالتفصيلة الأولى إن التنضيف كله يتحط في awaitClose وبس. الـ awaitClose بيوقف الـ builder لحد ما الـ collector يمشي، وبعدها ينفّذ الـ block بتاعه، وده بيغطي كل الحالات مرة واحدة: take خلص، أو الـ coroutine اتلغت، أو withTimeout انتهى، أو جه exception من تحت. المقال بيعمل unsubscribe الأول عشان السيرفر يعرف، وبعدين يقفل الـ socket. ولو نسيت awaitClose هيرمي الـ callbackFlow exception وقت التشغيل. والتفصيلة التانية إن الـ resource يتفتح جوه الـ builder عشان الـ Flow يبقى cold: استدعاء الدالة لوحده ما بيفتحش حاجة، وكل collector ياخد socket خاص بيه. ولو عايز socket واحد مشترك، ضيف shareIn عند مكان الاستدعاء مع WhileSubscribed، وهيقفل لما آخر collector يمشي.\n\nخد بالك إن الـ SDK والشبكة في المقال مجرد مثال للتجربة، فالمهم تنقل الفكرة للـ client بتاعك. وراجع هو بينادي الـ callback من أنهي thread، وإيه اللي بيحصل لو الـ collector أبطأ من الـ events. المقال بيستخدم trySend جوه الـ callback، وده معناه إنك لازم تفكر في سلوك الـ buffer مش بس تنقل الكود.\n\nلو عندك SDK بيبعت events بـ callback في مشروعك، افتحه النهارده وراجع حاجتين: التنضيف متحط في awaitClose ولا لا، والـ resource بيتفتح جوه الـ builder ولا برا. وبعدين اكتب test صغير بـ take(1) أو بـ cancel بعد أول event، وتأكد إن الـ unsubscribe والـ close حصلوا فعلًا. فحص زي ده بياخد دقايق، ويوفر عليك connections مفتوحة ملهاش لازمة.\n\nآخر مرة لفّيت فيها callback API بـ callbackFlow، حطيت التنضيف فين؟\n\nزكاة العلم نشره.\n\n#Kotlin #Coroutines #Flow #WebSocket #mo3talogy"
+  },
+  {
+    "title": "مكتبة Mosaic: اجمع نداءات كذا service في endpoint واحد من غير تكرار",
+    "date": "2026-11-19T23:49:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Mosaic",
+      "Backend",
+      "Concurrency"
+    ],
+    "content": "عندك endpoint للأوردر محتاج بيانات العميل والمنتجات والأسعار وعروض الشحن، وكل حاجة من service مختلفة، وأكتر من جزء في الرد محتاج نفس الأوردر. إزاي تجمعهم من غير ما تنده على نفس الـ service مرتين؟ 🧩\n\nدليل Mosaic بيحل ده بفكرة الـ Tile: كل جزء من الرد يطلب dependencies بتاعته بنفسه، والمكتبة بتشارك الشغل المتكرر جوه نفس الـ request. المثال مبني على order example في الـ repository، وبيانات الـ services فيه in-memory، فتقدر تجربه من غير حسابات خارجية.\n\nتخيّل رد الأوردر متقسم لجزئين: ملخص الأوردر، والـ logistics. تكتب Tile لكل جزء وتركّبهم في صفحة واحدة. الملخص محتاج الأوردر والعميل وبنود الطلب، والعميل والبنود نفسهم محتاجين الأوردر. لما كلهم يطلبوا نفس الـ OrderTile في نفس الـ Mosaic، بيتنفذ مرة واحدة ويتشارك.\n\nالتفصيلة المهمة إن الفرعين بيبدأوا قبل ما أي نتيجة تتستنى: composeAsync للشغل المستقل، و compose لما الخطوة اللي بعدها محتاجة نتيجة قبل ما تكمل. وصفحة الأوردر مش لازم تعرف الملخص بينده على أنهي services، هي بس بتعتمد على الجزء اللي محتاجاه من الرد.\n\nخد بالك إن Mosaic بيتولى التركيب بس. الـ clients بتاعتك هي اللي لسه مسؤولة عن طلبات HTTP والـ timeouts والـ retries. وبيانات المثال in-memory، فالأرقام والتوقيتات في الواقع هتتأثر بالشبكة. والدليل نفسه بيقول ابدأ بالـ Quick Start لو المكتبة جديدة عليك.\n\nعندك endpoint بيجمع بيانات من أكتر من service، وبتنده على نفس الـ service أكتر من مرة؟\n\nزكاة العلم نشره.\n\n#Kotlin #Mosaic #Backend #Concurrency #mo3talogy",
+    "summary_ar": "عندك endpoint للأوردر محتاج بيانات العميل والمنتجات والأسعار وعروض الشحن، وكل حاجة من service مختلفة، وأكتر من جزء في الرد محتاج نفس الأوردر. إزاي تجمعهم من غير ما تنده على نفس الـ service مرتين؟ 🧩\n\nدليل Mosaic بيحل ده بفكرة الـ Tile: كل جزء من الرد يطلب dependencies بتاعته بنفسه، والمكتبة بتشارك الشغل المتكرر جوه نفس الـ request. المثال مبني على order example في الـ repository، وبيانات الـ services فيه in-memory، فتقدر تجربه من غير حسابات خارجية.\n\nتخيّل رد الأوردر متقسم لجزئين: ملخص الأوردر، والـ logistics. تكتب Tile لكل جزء وتركّبهم في صفحة واحدة. الملخص محتاج الأوردر والعميل وبنود الطلب، والعميل والبنود نفسهم محتاجين الأوردر. لما كلهم يطلبوا نفس الـ OrderTile في نفس الـ Mosaic، بيتنفذ مرة واحدة ويتشارك.\n\nخد بالك إن Mosaic بيتولى التركيب بس. الـ clients بتاعتك هي اللي لسه مسؤولة عن طلبات HTTP والـ timeouts والـ retries. وبيانات المثال in-memory، فالأرقام والتوقيتات في الواقع هتتأثر بالشبكة. والدليل نفسه بيقول ابدأ بالـ Quick Start لو المكتبة جديدة عليك.\n\nعندك endpoint بيجمع بيانات من أكتر من service، وبتنده على نفس الـ service أكتر من مرة؟",
+    "summary_en": "Mosaic's aggregation guide builds an order endpoint from Tiles: each part of the response asks for its own dependencies, and repeated work such as loading the same order is shared within one request. composeAsync starts independent branches before awaiting, while compose is for steps that need a result first. Mosaic handles composition only; your clients still own HTTP calls, timeouts and retries.",
+    "url": "https://buildmosaic.org/guides/kotlin-api-aggregation/",
+    "image": "assets/images/articles/kw537-aw753-mosaic-combine-several-backend-calls-into-one-kotlin-endpoint.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-mosaic-combine-several-backend-calls-into-one-kotlin-endpoint.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Tile",
+        "explanation": "وحدة في Mosaic بتوصف جزء من الرد وبتطلب dependencies بتاعته بنفسها."
+      },
+      {
+        "term": "composeAsync",
+        "explanation": "بتبدأ الشغل المستقل في الخلفية وتسيبك تستنى النتيجة بعدين بـ await."
+      },
+      {
+        "term": "compose",
+        "explanation": "بتنفذ الخطوة وتستنى نتيجتها قبل ما تكمل، مناسبة لما اللي بعدها محتاج الناتج."
+      },
+      {
+        "term": "aggregation",
+        "explanation": "تجميع بيانات من مصادر كتير في رد واحد."
+      },
+      {
+        "term": "in-flight",
+        "explanation": "طلب لسه بيتنفذ ومخلصش، وبيتشارك لو حد تاني طلب نفس الحاجة."
+      },
+      {
+        "term": "timeout",
+        "explanation": "أقصى مدة بتستناها لطلب قبل ما تعتبره فشل."
+      },
+      {
+        "term": "retry",
+        "explanation": "إعادة محاولة طلب فشل، ولازم تتظبط بحذر عشان ما تضاعفش الحمل."
+      },
+      {
+        "term": "Quick Start",
+        "explanation": "صفحة البداية السريعة في المكتبة، بتعرّفك على الأساسيات قبل الأمثلة."
+      }
+    ],
+    "linkedin_body": "عندك endpoint للأوردر محتاج بيانات العميل والمنتجات والأسعار وعروض الشحن، وكل حاجة من service مختلفة، وأكتر من جزء في الرد محتاج نفس الأوردر. إزاي تجمعهم من غير ما تنده على نفس الـ service مرتين؟ 🧩\n\nدليل Mosaic بيحل ده بفكرة الـ Tile: كل جزء من الرد يطلب dependencies بتاعته بنفسه، والمكتبة بتشارك الشغل المتكرر جوه نفس الـ request. المثال مبني على order example في الـ repository، وبيانات الـ services فيه in-memory، فتقدر تجربه من غير حسابات خارجية.\n\nتخيّل رد الأوردر متقسم لجزئين: ملخص الأوردر، والـ logistics. تكتب Tile لكل جزء وتركّبهم في صفحة واحدة. الملخص محتاج الأوردر والعميل وبنود الطلب، والعميل والبنود نفسهم محتاجين الأوردر. لما كلهم يطلبوا نفس الـ OrderTile في نفس الـ Mosaic، بيتنفذ مرة واحدة ويتشارك.\n\nالتفصيلة المهمة إن الفرعين بيبدأوا قبل ما أي نتيجة تتستنى: composeAsync للشغل المستقل، و compose لما الخطوة اللي بعدها محتاجة نتيجة قبل ما تكمل. وصفحة الأوردر مش لازم تعرف الملخص بينده على أنهي services، هي بس بتعتمد على الجزء اللي محتاجاه من الرد.\n\nخد بالك إن Mosaic بيتولى التركيب بس. الـ clients بتاعتك هي اللي لسه مسؤولة عن طلبات HTTP والـ timeouts والـ retries. وبيانات المثال in-memory، فالأرقام والتوقيتات في الواقع هتتأثر بالشبكة. والدليل نفسه بيقول ابدأ بالـ Quick Start لو المكتبة جديدة عليك.\n\nلو عندك endpoint بيجمع بيانات من أكتر من service، ارسم الأول إيه اللي بيتنده ومين محتاجه، وحدد المكرر. بعدها جرّب تحوّل جزء واحد بس لـ Tile وقارن عدد النداءات قبل وبعد. وسيب الـ timeouts والـ retries في الـ clients زي ما هي، لأن الـ Mosaic مش بيشيلهم عنك.\n\nعندك endpoint بيجمع بيانات من أكتر من service، وبتنده على نفس الـ service أكتر من مرة؟\n\nزكاة العلم نشره.\n\n#Kotlin #Mosaic #Backend #Concurrency #mo3talogy"
+  },
+  {
+    "title": "تطبيق بيفتح أبطأ ٢٫٨ مرة على موبايل متوسط: إزاي تقيس الأول قبل ما تحسّن",
+    "date": "2026-11-19T23:48:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Performance",
+      "Perfetto",
+      "Startup"
+    ],
+    "content": "التطبيق حاسسه سريع على Pixel 9 Pro، بس على Redmi Note 10 Pro من ٢٠٢١ بيرسم أول frame في ٣٧٧ ملّي ثانية مقابل ١٣٣ على الـ Pixel. قبل ما تغيّر سطر كود، السؤال الأهم: الوقت ضايع فين أصلًا؟ ⏱️\n\nالمقال الأول في سلسلة، وفيها Tanvi Goyal قاست التطبيق Ritune على الموبايلين بـ release builds وtrace واحد من Perfetto لكولد ستارت. وجدت إن ٤٠٪ من الوقت بيعدي قبل ما أي كود من التطبيق يشتغل، وإن فتح قاعدة Room هو ٢٧ ملّي ثانية من ٣٤ بيستناهم الـ splash. ومفيش أي تحسين اتعمل في المقال، هو عن الوصول لأرقام تثق فيها.\n\nتخيّل إنك قررت تسرّع الـ database لأنها شكلها المتهم. الـ trace بيقولك إن الـ theme read بياخد تقريبًا نفس الوقت وبيشتغل بالتوازي، فتسريع واحدة بس هيحرك الـ critical path للتانية، والمكسب حوالي ٢ ملّي ثانية.\n\nمن القواعد اللي حطها: الأرقام المنشورة من موبايلات حقيقية بس، و release builds بس، وكل نتيجة تتسجل معاها حالة الـ compilation. والموبايل Redmi رفض أمر compile من الـ shell وطبع Success من غير ما يغيّر حاجة، فاستخدمت bg-dexopt-job. وقاست كمان الضوضاء بين الجلسات: ١٠٪ تقريبًا بين جلستين على نفس الجهاز، فأي تغيير أصغر من كده محتاج ٢٠ لـ ٣٠ تشغيل.\n\nخد بالك إن المقال الأول عن القياس والـ instrumentation بس، والتحسين والـ Baseline Profile هييجوا في الجزء التاني. والأرقام دي لموبايلين ونسخة واحدة من التطبيق، فاعتبرها طريقة تفكير مش قاعدة تتعمم على كل الأجهزة.\n\nآخر مرة قست فيها startup تطبيقك على موبايل متوسط مش على أحدث جهاز عندك؟\n\nزكاة العلم نشره.\n\n#Android #Performance #Perfetto #AppStartup #mo3talogy",
+    "summary_ar": "التطبيق حاسسه سريع على Pixel 9 Pro، بس على Redmi Note 10 Pro من ٢٠٢١ بيرسم أول frame في ٣٧٧ ملّي ثانية مقابل ١٣٣ على الـ Pixel. قبل ما تغيّر سطر كود، السؤال الأهم: الوقت ضايع فين أصلًا؟ ⏱️\n\nالمقال الأول في سلسلة، وفيها Tanvi Goyal قاست التطبيق Ritune على الموبايلين بـ release builds وtrace واحد من Perfetto لكولد ستارت. وجدت إن ٤٠٪ من الوقت بيعدي قبل ما أي كود من التطبيق يشتغل، وإن فتح قاعدة Room هو ٢٧ ملّي ثانية من ٣٤ بيستناهم الـ splash. ومفيش أي تحسين اتعمل في المقال، هو عن الوصول لأرقام تثق فيها.\n\nتخيّل إنك قررت تسرّع الـ database لأنها شكلها المتهم. الـ trace بيقولك إن الـ theme read بياخد تقريبًا نفس الوقت وبيشتغل بالتوازي، فتسريع واحدة بس هيحرك الـ critical path للتانية، والمكسب حوالي ٢ ملّي ثانية.\n\nخد بالك إن المقال الأول عن القياس والـ instrumentation بس، والتحسين والـ Baseline Profile هييجوا في الجزء التاني. والأرقام دي لموبايلين ونسخة واحدة من التطبيق، فاعتبرها طريقة تفكير مش قاعدة تتعمم على كل الأجهزة.\n\nآخر مرة قست فيها startup تطبيقك على موبايل متوسط مش على أحدث جهاز عندك؟",
+    "summary_en": "Part 1 of a startup-performance series: Ritune took 377 ms to first frame on a 2021 Redmi versus 133 ms on a Pixel. A single Perfetto trace showed 40% of that time passes before app code runs, and opening Room is 27 of the 34 ms the splash waits for. Because the theme read runs in parallel, speeding up only the database would save about 2 ms. Nothing is optimised yet; the article is about trustworthy measurement.",
+    "url": "https://medium.com/@goyaltanvi94/ritune-takes-2-8-longer-to-start-on-a-mid-range-phone-here-is-how-i-found-where-the-time-goes-ee1453c9b3e2",
+    "image": "assets/images/articles/kw537-aw753-ritune-starts-2-8x-slower-on-a-mid-range-phone-measure-before-you-optimise.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-ritune-starts-2-8x-slower-on-a-mid-range-phone-measure-before-you-optimise.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Cold start",
+        "explanation": "فتح التطبيق من الصفر والـ process مش شغال، وهو أبطأ نوع فتح."
+      },
+      {
+        "term": "TTID",
+        "explanation": "الوقت لحد ما التطبيق يرسم أول frame، اختصار Time To Initial Display."
+      },
+      {
+        "term": "TTFD",
+        "explanation": "الوقت لحد ما الشاشة تعرض بيانات حقيقية، اختصار Time To Full Display."
+      },
+      {
+        "term": "Perfetto",
+        "explanation": "أداة لتسجيل system traces وعرض الـ threads والـ slices على timeline واحد."
+      },
+      {
+        "term": "trace section",
+        "explanation": "شريحة مسمّاة بتكتبها في الـ trace عشان تشوف شغل تطبيقك جنب شغل النظام."
+      },
+      {
+        "term": "critical path",
+        "explanation": "أطول سلسلة خطوات بتحدد الوقت الكلي، ومفيش فايدة في تسريع حاجة برا منها."
+      },
+      {
+        "term": "compilation state",
+        "explanation": "حالة ترجمة كود التطبيق، من مفسَّر على أول يوم لحد مترجم بعد ما النظام يتعلم الأجزاء الساخنة."
+      },
+      {
+        "term": "Baseline Profile",
+        "explanation": "ملف بيقول للنظام أنهي methods تتترجم مقدمًا عشان الفتح يبقى أسرع."
+      }
+    ],
+    "linkedin_body": "التطبيق حاسسه سريع على Pixel 9 Pro، بس على Redmi Note 10 Pro من ٢٠٢١ بيرسم أول frame في ٣٧٧ ملّي ثانية مقابل ١٣٣ على الـ Pixel. قبل ما تغيّر سطر كود، السؤال الأهم: الوقت ضايع فين أصلًا؟ ⏱️\n\nالمقال الأول في سلسلة، وفيها Tanvi Goyal قاست التطبيق Ritune على الموبايلين بـ release builds وtrace واحد من Perfetto لكولد ستارت. وجدت إن ٤٠٪ من الوقت بيعدي قبل ما أي كود من التطبيق يشتغل، وإن فتح قاعدة Room هو ٢٧ ملّي ثانية من ٣٤ بيستناهم الـ splash. ومفيش أي تحسين اتعمل في المقال، هو عن الوصول لأرقام تثق فيها.\n\nتخيّل إنك قررت تسرّع الـ database لأنها شكلها المتهم. الـ trace بيقولك إن الـ theme read بياخد تقريبًا نفس الوقت وبيشتغل بالتوازي، فتسريع واحدة بس هيحرك الـ critical path للتانية، والمكسب حوالي ٢ ملّي ثانية.\n\nمن القواعد اللي حطها: الأرقام المنشورة من موبايلات حقيقية بس، و release builds بس، وكل نتيجة تتسجل معاها حالة الـ compilation. والموبايل Redmi رفض أمر compile من الـ shell وطبع Success من غير ما يغيّر حاجة، فاستخدمت bg-dexopt-job. وقاست كمان الضوضاء بين الجلسات: ١٠٪ تقريبًا بين جلستين على نفس الجهاز، فأي تغيير أصغر من كده محتاج ٢٠ لـ ٣٠ تشغيل.\n\nخد بالك إن المقال الأول عن القياس والـ instrumentation بس، والتحسين والـ Baseline Profile هييجوا في الجزء التاني. والأرقام دي لموبايلين ونسخة واحدة من التطبيق، فاعتبرها طريقة تفكير مش قاعدة تتعمم على كل الأجهزة.\n\nجرّب الطريقة دي في تطبيقك: سجّل trace واحد لكولد ستارت على موبايل متوسط، وضيف trace sections حوالين الخطوات اللي الـ splash بيستناها، وسجّل مع كل رقم الجهاز ونوع الـ build وحالة الـ compilation. وقبل ما تحسّن، قيس الضوضاء بين تشغيلتين متتاليتين، عشان تعرف أصغر فرق تقدر تصدّقه.\n\nآخر مرة قست فيها startup تطبيقك على موبايل متوسط مش على أحدث جهاز عندك؟\n\nزكاة العلم نشره.\n\n#Android #Performance #Perfetto #AppStartup #mo3talogy"
+  },
+  {
+    "title": "١٢ tester لمدة ١٤ يوم: إزاي تعدّي الـ closed testing في Google Play",
+    "date": "2026-11-19T23:47:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Google Play",
+      "Testing",
+      "Publishing"
+    ],
+    "content": "خلصت تطبيقك وجاهز للنشر، وجوجل بتقولك: مش هنسمحلك تنشر على production قبل closed test فيه ١٢ tester على الأقل لمدة ١٤ يوم. ناس كتير بتقف عند النقطة دي أسابيع 😅\n\nDavid Kirsch بيحكي تجربته مع تطبيقه SnapReturn. لو حسابك الشخصي في Play Console اتعمل بعد ١٣ نوفمبر ٢٠٢٣، لازم ١٢ tester يفضلوا opted in بشكل متواصل ١٤ يوم، وبعدين تجاوب على أسئلة عن الاختبار وتستنى مراجعة جوجل. الحسابات الخاصة بمنظمات مالهاش القاعدة دي.\n\nتخيّل إنك جبت ١٢ اسم بس نصهم فتحوا التطبيق مرة واحدة. جوجل بتسألك عن مدى تفاعل الـ testers وإيه الـ feedback واتغير إيه بسببه، وكتير من المطورين بيتقالهم كمّل اختبار حتى بعد ما وصلوا ١٢. فالهدف مش ١٢ اسم، هو ١٢ شخص بيستخدموا التطبيق فعلًا.\n\nالمقال بيستعرض مصادر الـ testers: الأصحاب والعيلة (موثوقين بس قليلين وبعضهم iPhone)، و Reddit swap posts زي r/AndroidClosedTesting (مجانية بس الناس بتختفي بهدوء، فاحتفظ بقايمة وارجع لكل swap)، ومجتمعات تبادل المطورين لبعض. ويقول إن اللي عدّاه فعلًا كان مجموعة مطورين بيختبروا تطبيقات بعض. والـ ١٤ يوم لازم تكون متتالية، ومين يخرج ويدخل تاني عدّاده يبدأ من الأول.\n\nخد بالك إن قواعد جوجل ممكن تتغير، فراجع صفحة المساعدة الرسمية قبل ما تبني خطتك على أرقام المقال. والمقال بيعرض تجربة مطوّر واحد ومنتج بيعرض خدمته في الآخر، فاعتبره دليل عملي مش قاعدة رسمية.\n\nمرّيت بتجربة الـ closed test قبل كده؟ مين كان أكتر مصدر مفيد للـ testers عندك؟\n\nزكاة العلم نشره.\n\n#Android #GooglePlay #ClosedTesting #IndieDev #mo3talogy",
+    "summary_ar": "خلصت تطبيقك وجاهز للنشر، وجوجل بتقولك: مش هنسمحلك تنشر على production قبل closed test فيه ١٢ tester على الأقل لمدة ١٤ يوم. ناس كتير بتقف عند النقطة دي أسابيع 😅\n\nDavid Kirsch بيحكي تجربته مع تطبيقه SnapReturn. لو حسابك الشخصي في Play Console اتعمل بعد ١٣ نوفمبر ٢٠٢٣، لازم ١٢ tester يفضلوا opted in بشكل متواصل ١٤ يوم، وبعدين تجاوب على أسئلة عن الاختبار وتستنى مراجعة جوجل. الحسابات الخاصة بمنظمات مالهاش القاعدة دي.\n\nتخيّل إنك جبت ١٢ اسم بس نصهم فتحوا التطبيق مرة واحدة. جوجل بتسألك عن مدى تفاعل الـ testers وإيه الـ feedback واتغير إيه بسببه، وكتير من المطورين بيتقالهم كمّل اختبار حتى بعد ما وصلوا ١٢. فالهدف مش ١٢ اسم، هو ١٢ شخص بيستخدموا التطبيق فعلًا.\n\nخد بالك إن قواعد جوجل ممكن تتغير، فراجع صفحة المساعدة الرسمية قبل ما تبني خطتك على أرقام المقال. والمقال بيعرض تجربة مطوّر واحد ومنتج بيعرض خدمته في الآخر، فاعتبره دليل عملي مش قاعدة رسمية.\n\nمرّيت بتجربة الـ closed test قبل كده؟ مين كان أكتر مصدر مفيد للـ testers عندك؟",
+    "summary_en": "Google Play requires personal developer accounts created after 13 November 2023 to run a closed test with at least 12 testers opted in for 14 consecutive days before production. The author argues that engagement matters more than the headcount, since Google asks how testers used the app and what changed. Sources discussed: friends and family, Reddit swap posts, and tester-swap communities. Check Google's help page because the rules can change.",
+    "url": "https://getfourteen.app/how-to-get-12-testers",
+    "image": "assets/images/articles/kw537-aw753-getting-12-testers-for-google-play-closed-testing-and-actually-passing.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-getting-12-testers-for-google-play-closed-testing-and-actually-passing.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Closed testing",
+        "explanation": "مرحلة اختبار على Google Play بتتاح لمجموعة محددة قبل النشر العام."
+      },
+      {
+        "term": "Play Console",
+        "explanation": "لوحة جوجل اللي بتدير منها تطبيقاتك ونشرها."
+      },
+      {
+        "term": "production access",
+        "explanation": "إذن النشر العام على المتجر بعد ما تعدّي متطلبات الاختبار."
+      },
+      {
+        "term": "opted in",
+        "explanation": "tester وافق ودخل برنامج الاختبار وفضل مشترك."
+      },
+      {
+        "term": "tester swap",
+        "explanation": "اتفاق بين مطورين إن كل واحد يختبر تطبيق التاني."
+      },
+      {
+        "term": "engagement",
+        "explanation": "مدى استخدام الـ testers للتطبيق فعلًا، مش بس تسجيل أسمائهم."
+      },
+      {
+        "term": "r/AndroidClosedTesting",
+        "explanation": "مجتمع على Reddit للمطورين اللي بيدوّروا على testers لتطبيقاتهم."
+      },
+      {
+        "term": "feedback",
+        "explanation": "ملاحظات الـ testers اللي بتقول إيه اتعدّل بسببها."
+      }
+    ],
+    "linkedin_body": "خلصت تطبيقك وجاهز للنشر، وجوجل بتقولك: مش هنسمحلك تنشر على production قبل closed test فيه ١٢ tester على الأقل لمدة ١٤ يوم. ناس كتير بتقف عند النقطة دي أسابيع 😅\n\nDavid Kirsch بيحكي تجربته مع تطبيقه SnapReturn. لو حسابك الشخصي في Play Console اتعمل بعد ١٣ نوفمبر ٢٠٢٣، لازم ١٢ tester يفضلوا opted in بشكل متواصل ١٤ يوم، وبعدين تجاوب على أسئلة عن الاختبار وتستنى مراجعة جوجل. الحسابات الخاصة بمنظمات مالهاش القاعدة دي.\n\nتخيّل إنك جبت ١٢ اسم بس نصهم فتحوا التطبيق مرة واحدة. جوجل بتسألك عن مدى تفاعل الـ testers وإيه الـ feedback واتغير إيه بسببه، وكتير من المطورين بيتقالهم كمّل اختبار حتى بعد ما وصلوا ١٢. فالهدف مش ١٢ اسم، هو ١٢ شخص بيستخدموا التطبيق فعلًا.\n\nالمقال بيستعرض مصادر الـ testers: الأصحاب والعيلة (موثوقين بس قليلين وبعضهم iPhone)، و Reddit swap posts زي r/AndroidClosedTesting (مجانية بس الناس بتختفي بهدوء، فاحتفظ بقايمة وارجع لكل swap)، ومجتمعات تبادل المطورين لبعض. ويقول إن اللي عدّاه فعلًا كان مجموعة مطورين بيختبروا تطبيقات بعض. والـ ١٤ يوم لازم تكون متتالية، ومين يخرج ويدخل تاني عدّاده يبدأ من الأول.\n\nخد بالك إن قواعد جوجل ممكن تتغير، فراجع صفحة المساعدة الرسمية قبل ما تبني خطتك على أرقام المقال. والمقال بيعرض تجربة مطوّر واحد ومنتج بيعرض خدمته في الآخر، فاعتبره دليل عملي مش قاعدة رسمية.\n\nلو هتعمل closed test، ابدأ بجدول بسيط: أسماء الـ testers وتاريخ دخولهم وآخر مرة فتحوا فيها التطبيق. وابعت لهم من الأول إيه المطلوب منهم كل كام يوم، واحتفظ بالـ feedback اللي جالك والتعديلات اللي عملتها بسببه، لأنك هتحتاجهم في إجابات الـ production access.\n\nمرّيت بتجربة الـ closed test قبل كده؟ مين كان أكتر مصدر مفيد للـ testers عندك؟\n\nزكاة العلم نشره.\n\n#Android #GooglePlay #ClosedTesting #IndieDev #mo3talogy"
+  },
+  {
+    "title": "مكتبة Pose: annotation واحدة تولّد preview لكل حالة وتتحول لـ screenshot test",
+    "date": "2026-11-19T23:46:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "Previews",
+      "KSP"
+    ],
+    "content": "حدّثت previews الـ Compose للمرة الرابعة النهارده، والـ LLM اللي كان بيكتبها بيقولك آسف نسيت أحدّثها 😅 Akshay Chordiya قال: لو الـ preview دالة و annotation وبيانات وهمية، والـ LLM يقدر يكتبها من الـ signature، يبقى الـ compiler يقدر كمان.\n\nالفكرة في Pose إنك تحط annotation @Pose على الـ composable اللي بياخد state من نوع sealed interface. في الـ build اللي بعده بيتولّد كود في build/generated فيه preview لكل subtype، باسمه، في light و dark.\n\nتخيّل شاشة بحث ليها ٣ حالات: Loading و NoResults و Results. بتضيف حالة رابعة؟ تظهر preview رابعة لوحدها. بتغيّر اسم onRetry؟ الكود بيتولّد من جديد من غير ما حاجة تتكسر. بتمسح الـ composable؟ الـ preview بتختفي. يعني مفيش preview قديمة بتفضل غلط.\n\nالجزء الأحلى إن Paparazzi و Roborazzi وأداة الـ screenshot بتاعة جوجل بتدوّر على @Preview، والـ previews المتولدة بتتترجم لنفس الشيء اللي كنت هتكتبه بإيدك. فبتاخد annotation واحدة، تطلع ٣ previews، ٦ renders، ٦ screenshot tests من غير سطر test. وبيمنع الانجراف لأنها بتتولّد في كل build.\n\nخد بالك إن Pose بتبدأ من state من نوع sealed. لو الـ composable بتاعك مش معمول على الشكل ده، المكتبة مش هتفيدك زي ما هي. وقيم القيمة الوهمية المتولدة زي «Query» و ٠ مجرد placeholders، فالـ screenshot هيثبّت شكل القيمة دي مش حالة حقيقية من الـ domain.\n\nعندك شاشات Compose بـ sealed state ومحدّش بيحدّث previews بتاعتها؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #Previews #ScreenshotTesting #mo3talogy",
+    "summary_ar": "حدّثت previews الـ Compose للمرة الرابعة النهارده، والـ LLM اللي كان بيكتبها بيقولك آسف نسيت أحدّثها 😅 Akshay Chordiya قال: لو الـ preview دالة و annotation وبيانات وهمية، والـ LLM يقدر يكتبها من الـ signature، يبقى الـ compiler يقدر كمان.\n\nالفكرة في Pose إنك تحط annotation @Pose على الـ composable اللي بياخد state من نوع sealed interface. في الـ build اللي بعده بيتولّد كود في build/generated فيه preview لكل subtype، باسمه، في light و dark.\n\nتخيّل شاشة بحث ليها ٣ حالات: Loading و NoResults و Results. بتضيف حالة رابعة؟ تظهر preview رابعة لوحدها. بتغيّر اسم onRetry؟ الكود بيتولّد من جديد من غير ما حاجة تتكسر. بتمسح الـ composable؟ الـ preview بتختفي. يعني مفيش preview قديمة بتفضل غلط.\n\nخد بالك إن Pose بتبدأ من state من نوع sealed. لو الـ composable بتاعك مش معمول على الشكل ده، المكتبة مش هتفيدك زي ما هي. وقيم القيمة الوهمية المتولدة زي «Query» و ٠ مجرد placeholders، فالـ screenshot هيثبّت شكل القيمة دي مش حالة حقيقية من الـ domain.\n\nعندك شاشات Compose بـ sealed state ومحدّش بيحدّث previews بتاعتها؟",
+    "summary_en": "Pose is a Compose build-time tool: annotate a composable with @Pose and, for each subtype of its sealed state, it generates light and dark @Preview functions in build/generated. Add a state and a preview appears; rename a parameter and it regenerates; delete the composable and the preview vanishes. Because screenshot tools such as Paparazzi, Roborazzi and Google's plugin scan for @Preview, the generated previews also become screenshot tests.",
+    "url": "https://akshaychordiya.dev/articles/introducing-pose-library",
+    "image": "assets/images/articles/kw537-aw753-pose-one-annotation-generates-a-preview-for-every-ui-state.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-pose-one-annotation-generates-a-preview-for-every-ui-state.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Compose Preview",
+        "explanation": "دالة بتعرض شكل الـ composable جوه Android Studio من غير تشغيل التطبيق."
+      },
+      {
+        "term": "sealed interface",
+        "explanation": "نوع بيحدد مجموعة محدودة من الأنواع الفرعية، فالـ compiler يعرفها كلها."
+      },
+      {
+        "term": "subtype",
+        "explanation": "نوع فرعي من النوع الأب، زي Loading و Results داخل SearchState."
+      },
+      {
+        "term": "build/generated",
+        "explanation": "فولدر بيكتب فيه الـ build كود متولد تلقائيًا."
+      },
+      {
+        "term": "Paparazzi",
+        "explanation": "مكتبة لعمل screenshot tests للواجهة من غير emulator."
+      },
+      {
+        "term": "Roborazzi",
+        "explanation": "مكتبة screenshot tests بتشتغل على JVM بـ Robolectric."
+      },
+      {
+        "term": "visual regression",
+        "explanation": "اختبار بيقارن شكل الشاشة بصورة مرجعية عشان يكشف أي تغيير بصري."
+      },
+      {
+        "term": "placeholder",
+        "explanation": "قيمة افتراضية مؤقتة بتتحط لحد ما تيجي القيمة الحقيقية."
+      }
+    ],
+    "linkedin_body": "حدّثت previews الـ Compose للمرة الرابعة النهارده، والـ LLM اللي كان بيكتبها بيقولك آسف نسيت أحدّثها 😅 Akshay Chordiya قال: لو الـ preview دالة و annotation وبيانات وهمية، والـ LLM يقدر يكتبها من الـ signature، يبقى الـ compiler يقدر كمان.\n\nالفكرة في Pose إنك تحط annotation @Pose على الـ composable اللي بياخد state من نوع sealed interface. في الـ build اللي بعده بيتولّد كود في build/generated فيه preview لكل subtype، باسمه، في light و dark.\n\nتخيّل شاشة بحث ليها ٣ حالات: Loading و NoResults و Results. بتضيف حالة رابعة؟ تظهر preview رابعة لوحدها. بتغيّر اسم onRetry؟ الكود بيتولّد من جديد من غير ما حاجة تتكسر. بتمسح الـ composable؟ الـ preview بتختفي. يعني مفيش preview قديمة بتفضل غلط.\n\nالجزء الأحلى إن Paparazzi و Roborazzi وأداة الـ screenshot بتاعة جوجل بتدوّر على @Preview، والـ previews المتولدة بتتترجم لنفس الشيء اللي كنت هتكتبه بإيدك. فبتاخد annotation واحدة، تطلع ٣ previews، ٦ renders، ٦ screenshot tests من غير سطر test. وبيمنع الانجراف لأنها بتتولّد في كل build.\n\nخد بالك إن Pose بتبدأ من state من نوع sealed. لو الـ composable بتاعك مش معمول على الشكل ده، المكتبة مش هتفيدك زي ما هي. وقيم القيمة الوهمية المتولدة زي «Query» و ٠ مجرد placeholders، فالـ screenshot هيثبّت شكل القيمة دي مش حالة حقيقية من الـ domain.\n\nجرّب Pose على شاشة واحدة عندها sealed state، وبعدين شغّل الـ screenshot tests اللي عندك عليها. وشوف إيه اللي ظهر من حالات ما كنتش بتكتب لها preview أصلًا، لأن ده أحيانًا أول مكان بتلاقي فيه حالة ما اتشافتش بصريًا.\n\nعندك شاشات Compose بـ sealed state ومحدّش بيحدّث previews بتاعتها؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #Previews #ScreenshotTesting #mo3talogy"
+  },
+  {
+    "title": "إزاي تخلّي كلمة تدوب في التانية بـ Compose: تأثير Morph Text بـ blur و threshold",
+    "date": "2026-11-19T23:45:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Compose Multiplatform",
+      "Graphics",
+      "Animation"
+    ],
+    "content": "تأثير Morph Text بيخلّي حرف الكلمة يتغبّش ويلزق في بعضه وبعدين يتحدد في الكلمة الجديدة. والمثير إن الفكرة كلها شاشتين Text متغبّشين و color matrix واحدة 🫧\n\nJuan Silva نقل التأثير لـ Compose لمكتبة Glaze، معرض لمكونات Compose Multiplatform. الأصل لـ Victor Welander وهو React component بيستخدم SVG filters. والنسخة بتشتغل بنفس الشكل على Android ١٢+ و iOS والويب، وفيه live demo تلعب فيه بالقيم وإنت بتقرا.\n\nتخيّل كلمتين فوق بعض. القديمة بتتغبّش وهي بتختفي، والجديدة بتتحدد وهي بتظهر. لوحدها دي مجرد cross-fade مع blur. بعدين الشكل كله بيعدي على threshold على الـ alpha: أي pixel فوق حد معين يبقى صلب وتحته يختفي. الحروف المتغبّشة ليها حواف ناعمة وذيول باهتة، فالـ threshold بيحولها لبقع صلبة، ولما بقع الكلمتين تتقاطع بتندمج في شكل واحد.\n\nالتنفيذ في Compose بيستخدم BlurEffect للـ blur و ColorFilter.colorMatrix للـ threshold. الـ animation حلقة من حالتين: morph لمدة morphTime، وبعدين تثبيت للكلمة الجديدة لمدة cooldownTime، ويتحرك بـ withFrameMillis جوه LaunchedEffect عشان يتبع الـ refresh rate. والـ blur مش خطي: بيزيد بسرعة في آخر الـ fade، وفيه حد أقصى blurMaxDp، والـ alpha بيستخدم t^٠٫٤ عشان الكلمة تفضل معتمة لحد متأخر.\n\nخد بالك من تفصيلة Compose: الـ blur بيتمدد برا حدود الـ layout بتاع الـ text، فالـ Box الداخلي لازم يتعمله padding، وإلا الـ blur هيتقص عند حدود الـ threshold layer. والتأثير بصري، فاختبره على أجهزة مختلفة قبل ما تعتمد عليه.\n\nشفت قبل كده تأثير بصري بسيط في الفكرة وقدرت تنقله لـ Compose بالأدوات اللي موجودة؟\n\nزكاة العلم نشره.\n\n#Kotlin #ComposeMultiplatform #Animation #Graphics #mo3talogy",
+    "summary_ar": "تأثير Morph Text بيخلّي حرف الكلمة يتغبّش ويلزق في بعضه وبعدين يتحدد في الكلمة الجديدة. والمثير إن الفكرة كلها شاشتين Text متغبّشين و color matrix واحدة 🫧\n\nJuan Silva نقل التأثير لـ Compose لمكتبة Glaze، معرض لمكونات Compose Multiplatform. الأصل لـ Victor Welander وهو React component بيستخدم SVG filters. والنسخة بتشتغل بنفس الشكل على Android ١٢+ و iOS والويب، وفيه live demo تلعب فيه بالقيم وإنت بتقرا.\n\nتخيّل كلمتين فوق بعض. القديمة بتتغبّش وهي بتختفي، والجديدة بتتحدد وهي بتظهر. لوحدها دي مجرد cross-fade مع blur. بعدين الشكل كله بيعدي على threshold على الـ alpha: أي pixel فوق حد معين يبقى صلب وتحته يختفي. الحروف المتغبّشة ليها حواف ناعمة وذيول باهتة، فالـ threshold بيحولها لبقع صلبة، ولما بقع الكلمتين تتقاطع بتندمج في شكل واحد.\n\nخد بالك من تفصيلة Compose: الـ blur بيتمدد برا حدود الـ layout بتاع الـ text، فالـ Box الداخلي لازم يتعمله padding، وإلا الـ blur هيتقص عند حدود الـ threshold layer. والتأثير بصري، فاختبره على أجهزة مختلفة قبل ما تعتمد عليه.\n\nشفت قبل كده تأثير بصري بسيط في الفكرة وقدرت تنقله لـ Compose بالأدوات اللي موجودة؟",
+    "summary_en": "Morph Text blurs one word out while the next blurs in, then applies an alpha threshold so the soft edges turn into blobs that merge. Juan Silva ported Victor Welander's React effect to Compose Multiplatform for the Glaze gallery using BlurEffect and ColorFilter.colorMatrix, driven frame by frame with withFrameMillis. The blur curve is non-linear and capped, and the inner Box needs padding because blur spreads past the layout bounds.",
+    "url": "https://dev.to/lightscout/how-morph-text-dissolves-one-word-into-the-next-47cl",
+    "image": "assets/images/articles/kw537-aw753-morph-text-in-compose-one-word-dissolves-into-the-next.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-morph-text-in-compose-one-word-dissolves-into-the-next.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Morph Text",
+        "explanation": "تأثير بيحوّل كلمة لكلمة تانية بالـ blur والاندماج بدل التبديل المفاجئ."
+      },
+      {
+        "term": "threshold",
+        "explanation": "حد بيحوّل كل pixel فوقه لصلب وكل pixel تحته لشفاف."
+      },
+      {
+        "term": "alpha",
+        "explanation": "قناة الشفافية للـ pixel، من شفاف تمامًا لمعتم."
+      },
+      {
+        "term": "color matrix",
+        "explanation": "مصفوفة بتتحكم في تحويل ألوان وشفافية الـ pixels."
+      },
+      {
+        "term": "BlurEffect",
+        "explanation": "تأثير في Compose بيعمل غباش على layer."
+      },
+      {
+        "term": "withFrameMillis",
+        "explanation": "دالة بتستنى الـ frame الجاي وتديك وقته، فالـ animation يتبع الـ refresh rate."
+      },
+      {
+        "term": "cross-fade",
+        "explanation": "تلاشي عنصر وظهور التاني في نفس الوقت."
+      },
+      {
+        "term": "Glaze",
+        "explanation": "معرض مكونات Compose Multiplatform اللي اتنقل له التأثير."
+      }
+    ],
+    "linkedin_body": "تأثير Morph Text بيخلّي حرف الكلمة يتغبّش ويلزق في بعضه وبعدين يتحدد في الكلمة الجديدة. والمثير إن الفكرة كلها شاشتين Text متغبّشين و color matrix واحدة 🫧\n\nJuan Silva نقل التأثير لـ Compose لمكتبة Glaze، معرض لمكونات Compose Multiplatform. الأصل لـ Victor Welander وهو React component بيستخدم SVG filters. والنسخة بتشتغل بنفس الشكل على Android ١٢+ و iOS والويب، وفيه live demo تلعب فيه بالقيم وإنت بتقرا.\n\nتخيّل كلمتين فوق بعض. القديمة بتتغبّش وهي بتختفي، والجديدة بتتحدد وهي بتظهر. لوحدها دي مجرد cross-fade مع blur. بعدين الشكل كله بيعدي على threshold على الـ alpha: أي pixel فوق حد معين يبقى صلب وتحته يختفي. الحروف المتغبّشة ليها حواف ناعمة وذيول باهتة، فالـ threshold بيحولها لبقع صلبة، ولما بقع الكلمتين تتقاطع بتندمج في شكل واحد.\n\nالتنفيذ في Compose بيستخدم BlurEffect للـ blur و ColorFilter.colorMatrix للـ threshold. الـ animation حلقة من حالتين: morph لمدة morphTime، وبعدين تثبيت للكلمة الجديدة لمدة cooldownTime، ويتحرك بـ withFrameMillis جوه LaunchedEffect عشان يتبع الـ refresh rate. والـ blur مش خطي: بيزيد بسرعة في آخر الـ fade، وفيه حد أقصى blurMaxDp، والـ alpha بيستخدم t^٠٫٤ عشان الكلمة تفضل معتمة لحد متأخر.\n\nخد بالك من تفصيلة Compose: الـ blur بيتمدد برا حدود الـ layout بتاع الـ text، فالـ Box الداخلي لازم يتعمله padding، وإلا الـ blur هيتقص عند حدود الـ threshold layer. والتأثير بصري، فاختبره على أجهزة مختلفة قبل ما تعتمد عليه.\n\nلو عايز تجرب الفكرة، ابدأ بالـ blur والـ threshold لوحدهم على كلمة ثابتة وشوف إيه اللي بيحصل لما تغيّر الحد. بعدها اربط التقدم بـ animation. وراقب الأداء على موبايل متوسط، لأن blur كبير على نص كبير ممكن يكون تقيل.\n\nشفت قبل كده تأثير بصري بسيط في الفكرة وقدرت تنقله لـ Compose بالأدوات اللي موجودة؟\n\nزكاة العلم نشره.\n\n#Kotlin #ComposeMultiplatform #Animation #Graphics #mo3talogy"
+  },
+  {
+    "title": "بناء KMP على iOS بطيء؟ قبل ما تلوم الـ Kotlin، حدد المرحلة المتأخرة",
+    "date": "2026-11-19T23:44:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "KMP",
+      "iOS",
+      "Gradle"
+    ],
+    "content": "بناء iOS في مشروع Kotlin Multiplatform بطيء، فتلوم Kotlin/Native. بس الوقت ممكن يكون في Gradle أو الـ LLVM أو الـ linking أو إعداد Xcode، وكل مرحلة ليها علاج مختلف 🍎\n\nRavi Rawal بيقسّم الرحلة: Gradle configuration، وتجميع Kotlin/Native، وتحسين LLVM، والـ linking، وإنشاء الـ framework، وربطه بـ Xcode. وبيقول إن زيادة ذاكرة Gradle ما بتساعدش LLVM، والـ build cache ما بيلغيش كل عمليات الـ linking، وتغيير Xcode ما بيصلحش graph تجميع تقيل.\n\nتخيّل إنك على Mac بمعالج Apple Silicon وبتبني XCFramework كامل بـ iosArm64 و iosSimulatorArm64 و iosX64 مع إن كل اللي محتاجه simulator واحد. الحل الأول إنك تبني الهدف المطلوب بس، زي linkDebugFrameworkIosSimulatorArm64، وتخلي الـ XCFramework للتوزيع والـ CI.\n\nالمقال بيقترح تقيس ٣ سيناريوهات: build نضيف، وبدون تغيير، وبعد تعديل ملف Kotlin واحد، مع --profile أو Build Scans. وبعدها: احتفظ بـ ~/.konan في الـ CI، وحدد exports الـ framework بوضوح وانتبه لـ transitiveExport، واظبط gradle.properties (daemon و parallel و caching و configuration-cache)، وراجع إن الـ Run Script في Xcode مش بينفذ Gradle أكتر من مرة.\n\nخد بالك إن parallel بيزوّد الضغط على الذاكرة لو أكتر من native target اتجمّعوا في نفس الوقت، فاقيس CPU والذاكرة قبل ما تزوّد التوازي. والمقال عام وتوضيحي، فالـ task names ممكن تختلف حسب إعداد الـ framework عندك.\n\nآخر مرة قست فيها بناء iOS بتاع مشروعك مرحلة مرحلة قبل ما تحاول تسرّعه؟\n\nزكاة العلم نشره.\n\n#Kotlin #KMP #iOS #Gradle #mo3talogy",
+    "summary_ar": "بناء iOS في مشروع Kotlin Multiplatform بطيء، فتلوم Kotlin/Native. بس الوقت ممكن يكون في Gradle أو الـ LLVM أو الـ linking أو إعداد Xcode، وكل مرحلة ليها علاج مختلف 🍎\n\nRavi Rawal بيقسّم الرحلة: Gradle configuration، وتجميع Kotlin/Native، وتحسين LLVM، والـ linking، وإنشاء الـ framework، وربطه بـ Xcode. وبيقول إن زيادة ذاكرة Gradle ما بتساعدش LLVM، والـ build cache ما بيلغيش كل عمليات الـ linking، وتغيير Xcode ما بيصلحش graph تجميع تقيل.\n\nتخيّل إنك على Mac بمعالج Apple Silicon وبتبني XCFramework كامل بـ iosArm64 و iosSimulatorArm64 و iosX64 مع إن كل اللي محتاجه simulator واحد. الحل الأول إنك تبني الهدف المطلوب بس، زي linkDebugFrameworkIosSimulatorArm64، وتخلي الـ XCFramework للتوزيع والـ CI.\n\nخد بالك إن parallel بيزوّد الضغط على الذاكرة لو أكتر من native target اتجمّعوا في نفس الوقت، فاقيس CPU والذاكرة قبل ما تزوّد التوازي. والمقال عام وتوضيحي، فالـ task names ممكن تختلف حسب إعداد الـ framework عندك.\n\nآخر مرة قست فيها بناء iOS بتاع مشروعك مرحلة مرحلة قبل ما تحاول تسرّعه؟",
+    "summary_en": "A slow Kotlin Multiplatform iOS build is not always Kotlin/Native. The article splits it into Gradle configuration, Kotlin/Native compilation, LLVM optimisation, linking, framework creation and Xcode integration, and advises profiling per task with clean, unchanged and incremental builds. Practical wins include building only the needed architecture, preserving ~/.konan in CI, keeping framework exports explicit, and checking the Xcode run script.",
+    "url": "https://ravirawal13.medium.com/kmp-ios-build-performance-7fb8a239e211",
+    "image": "assets/images/articles/kw537-aw753-slow-kmp-ios-build-is-it-kotlin-gradle-or-the-linker.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-slow-kmp-ios-build-is-it-kotlin-gradle-or-the-linker.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Kotlin/Native",
+        "explanation": "مترجم Kotlin بيطلّع binaries native بدل JVM bytecode، بيعتمد على LLVM."
+      },
+      {
+        "term": "LLVM",
+        "explanation": "بنية تحتية للـ compilers بتعمل تحسين الكود وتولّد كود الـ machine."
+      },
+      {
+        "term": "linking",
+        "explanation": "مرحلة تجميع الأجزاء المترجمة في binary أو framework نهائي."
+      },
+      {
+        "term": "XCFramework",
+        "explanation": "حزمة framework واحدة بتجمع binaries لأكتر من architecture."
+      },
+      {
+        "term": "iosSimulatorArm64",
+        "explanation": "هدف بناء لـ iOS simulator على أجهزة Mac بمعالج Apple Silicon."
+      },
+      {
+        "term": "~/.konan",
+        "explanation": "فولدر بيخزن فيه Kotlin/Native مكونات المترجم والـ caches."
+      },
+      {
+        "term": "transitiveExport",
+        "explanation": "إعداد بيصدّر الـ dependencies كلها في واجهة الـ framework وممكن يكبّر الحجم."
+      },
+      {
+        "term": "configuration cache",
+        "explanation": "ميزة Gradle بتحفظ نتيجة مرحلة الـ configuration وتعيد استخدامها."
+      }
+    ],
+    "linkedin_body": "بناء iOS في مشروع Kotlin Multiplatform بطيء، فتلوم Kotlin/Native. بس الوقت ممكن يكون في Gradle أو الـ LLVM أو الـ linking أو إعداد Xcode، وكل مرحلة ليها علاج مختلف 🍎\n\nRavi Rawal بيقسّم الرحلة: Gradle configuration، وتجميع Kotlin/Native، وتحسين LLVM، والـ linking، وإنشاء الـ framework، وربطه بـ Xcode. وبيقول إن زيادة ذاكرة Gradle ما بتساعدش LLVM، والـ build cache ما بيلغيش كل عمليات الـ linking، وتغيير Xcode ما بيصلحش graph تجميع تقيل.\n\nتخيّل إنك على Mac بمعالج Apple Silicon وبتبني XCFramework كامل بـ iosArm64 و iosSimulatorArm64 و iosX64 مع إن كل اللي محتاجه simulator واحد. الحل الأول إنك تبني الهدف المطلوب بس، زي linkDebugFrameworkIosSimulatorArm64، وتخلي الـ XCFramework للتوزيع والـ CI.\n\nالمقال بيقترح تقيس ٣ سيناريوهات: build نضيف، وبدون تغيير، وبعد تعديل ملف Kotlin واحد، مع --profile أو Build Scans. وبعدها: احتفظ بـ ~/.konan في الـ CI، وحدد exports الـ framework بوضوح وانتبه لـ transitiveExport، واظبط gradle.properties (daemon و parallel و caching و configuration-cache)، وراجع إن الـ Run Script في Xcode مش بينفذ Gradle أكتر من مرة.\n\nخد بالك إن parallel بيزوّد الضغط على الذاكرة لو أكتر من native target اتجمّعوا في نفس الوقت، فاقيس CPU والذاكرة قبل ما تزوّد التوازي. والمقال عام وتوضيحي، فالـ task names ممكن تختلف حسب إعداد الـ framework عندك.\n\nابدأ بجدول بسيط بـ ٣ أرقام: وقت الـ clean build، وبدون تغيير، وبعد تعديل ملف واحد. وبعدين اتأكد إن بيئة التطوير بتبني simulator واحد بس. الفرق بين التطوير المحلي والـ PR CI والـ release CI يستاهل يتفصل في workflows مختلفة.\n\nآخر مرة قست فيها بناء iOS بتاع مشروعك مرحلة مرحلة قبل ما تحاول تسرّعه؟\n\nزكاة العلم نشره.\n\n#Kotlin #KMP #iOS #Gradle #mo3talogy"
+  },
+  {
+    "title": "نظام plugins لتطبيق Kotlin من غير JavaScript: Hammer بيشغّل WASM جواه",
+    "date": "2026-11-19T23:43:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "WASI",
+      "KMP",
+      "Plugins"
+    ],
+    "content": "تطبيقك مكتوب بـ Kotlin، وعايز ناس تعمله plugins بأي لغة. المشكلة إن مفيش JavaScript engine جاهز جواه زي ما Obsidian عنده، لأنه Electron من الأصل 🔌\n\nAdam Brown بيشرح إزاي Hammer 4.0 هيبقى فيه plugin system. الفكرة إنه يدمج WASI runtime مكتوب بـ Kotlin Multiplatform جوه التطبيق. والـ WASI معيار بيخلّي كود WASM يشتغل برا المتصفح، شبه runtime عام زي JVM أو .NET.\n\nتخيّل مستخدم عايز ميزة متخصصة جدًا ما ينفعش تتحط في القايمة الرئيسية. بدل ما القوايم تتحشر زي Photoshop، يكتب plugin بأي لغة بتتترجم لـ WASM. والـ plugin بينده Hammer مباشرة.\n\nالربط عن طريق إنه يعرض كل Operation جديدة من الـ Operations Layer كدالة للـ runtime. الكاتب بيقول إنه قفز من الكرسي لما عرف إن فيه عدة مشاريع open source بتنفذ WASI runtime بـ KMP. والميزة إن البرنامج يفضل خفيف والكود قابل للصيانة، ومع ذلك المستخدمين يقدروا يزودوا اللي محتاجينه.\n\nخد بالك إن المقال بيشرح الفكرة والتصميم من وجهة نظر المطوّر، مش شرح تنفيذ كامل. وأي plugin system محتاج تفكير في الصلاحيات والأمان وتوافق الإصدارات، والمقال مش بيغطي دول بالتفصيل.\n\nعندك تطبيق Kotlin محتاج plugins بدون ما تشحن JavaScript engine؟\n\nزكاة العلم نشره.\n\n#Kotlin #WebAssembly #WASI #Plugins #mo3talogy",
+    "summary_ar": "تطبيقك مكتوب بـ Kotlin، وعايز ناس تعمله plugins بأي لغة. المشكلة إن مفيش JavaScript engine جاهز جواه زي ما Obsidian عنده، لأنه Electron من الأصل 🔌\n\nAdam Brown بيشرح إزاي Hammer 4.0 هيبقى فيه plugin system. الفكرة إنه يدمج WASI runtime مكتوب بـ Kotlin Multiplatform جوه التطبيق. والـ WASI معيار بيخلّي كود WASM يشتغل برا المتصفح، شبه runtime عام زي JVM أو .NET.\n\nتخيّل مستخدم عايز ميزة متخصصة جدًا ما ينفعش تتحط في القايمة الرئيسية. بدل ما القوايم تتحشر زي Photoshop، يكتب plugin بأي لغة بتتترجم لـ WASM. والـ plugin بينده Hammer مباشرة.\n\nخد بالك إن المقال بيشرح الفكرة والتصميم من وجهة نظر المطوّر، مش شرح تنفيذ كامل. وأي plugin system محتاج تفكير في الصلاحيات والأمان وتوافق الإصدارات، والمقال مش بيغطي دول بالتفصيل.\n\nعندك تطبيق Kotlin محتاج plugins بدون ما تشحن JavaScript engine؟",
+    "summary_en": "Hammer 4.0 gets a plugin system by embedding a WASI runtime written in Kotlin Multiplatform. Each new operation from its Operations Layer is exposed as a function, so plugins can be written in any language that compiles to WASM. The author argues this keeps the core app simple while niche features live in plugins; the post is design-level and does not cover permissions or compatibility in depth.",
+    "url": "https://hammer.ink/blog/development/plugins",
+    "image": "assets/images/articles/kw537-aw753-hammer-plugins-embedding-a-kotlin-wasi-runtime.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-hammer-plugins-embedding-a-kotlin-wasi-runtime.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Plugin system",
+        "explanation": "نظام بيسمح بإضافة ميزات برا الكود الأساسي عن طريق إضافات."
+      },
+      {
+        "term": "WASI",
+        "explanation": "واجهة نظام لـ WebAssembly بتخلّي كود WASM يشتغل برا المتصفح."
+      },
+      {
+        "term": "WASM",
+        "explanation": "تنسيق bytecode ثنائي بيتولد من لغات كتير وبيشتغل بأمان في runtime."
+      },
+      {
+        "term": "runtime",
+        "explanation": "بيئة بتنفّذ الكود وبتوفرله الخدمات اللي محتاجها."
+      },
+      {
+        "term": "Operations Layer",
+        "explanation": "طبقة في Hammer بتعرض عمليات البرنامج كدوال مستقلة."
+      },
+      {
+        "term": "Electron",
+        "explanation": "إطار بيبني تطبيقات desktop من تقنيات الويب ومعاه JavaScript engine."
+      },
+      {
+        "term": "KMP",
+        "explanation": "Kotlin Multiplatform: كود Kotlin مشترك لأكتر من منصة."
+      },
+      {
+        "term": "sandbox",
+        "explanation": "عزل بيحدّ من اللي الكود يقدر يوصله في النظام."
+      }
+    ],
+    "linkedin_body": "تطبيقك مكتوب بـ Kotlin، وعايز ناس تعمله plugins بأي لغة. المشكلة إن مفيش JavaScript engine جاهز جواه زي ما Obsidian عنده، لأنه Electron من الأصل 🔌\n\nAdam Brown بيشرح إزاي Hammer 4.0 هيبقى فيه plugin system. الفكرة إنه يدمج WASI runtime مكتوب بـ Kotlin Multiplatform جوه التطبيق. والـ WASI معيار بيخلّي كود WASM يشتغل برا المتصفح، شبه runtime عام زي JVM أو .NET.\n\nتخيّل مستخدم عايز ميزة متخصصة جدًا ما ينفعش تتحط في القايمة الرئيسية. بدل ما القوايم تتحشر زي Photoshop، يكتب plugin بأي لغة بتتترجم لـ WASM. والـ plugin بينده Hammer مباشرة.\n\nالربط عن طريق إنه يعرض كل Operation جديدة من الـ Operations Layer كدالة للـ runtime. الكاتب بيقول إنه قفز من الكرسي لما عرف إن فيه عدة مشاريع open source بتنفذ WASI runtime بـ KMP. والميزة إن البرنامج يفضل خفيف والكود قابل للصيانة، ومع ذلك المستخدمين يقدروا يزودوا اللي محتاجينه.\n\nخد بالك إن المقال بيشرح الفكرة والتصميم من وجهة نظر المطوّر، مش شرح تنفيذ كامل. وأي plugin system محتاج تفكير في الصلاحيات والأمان وتوافق الإصدارات، والمقال مش بيغطي دول بالتفصيل.\n\nلو عندك تطبيق فيه طلبات ميزات متخصصة، اسأل نفسك: هل الميزة دي في قلب المنتج ولا plugin؟ لو الإجابة plugin، حدد الأول الدوال اللي هتعرضها للـ plugins وقلل سطحها قد ما تقدر. ده بيسهّل تحافظ على توافق الإصدارات بعدين.\n\nعندك تطبيق Kotlin محتاج plugins بدون ما تشحن JavaScript engine؟\n\nزكاة العلم نشره.\n\n#Kotlin #WebAssembly #WASI #Plugins #mo3talogy"
+  },
+  {
+    "title": "أداة droidmap: خريطة لـ wiring تطبيق Android بتكتشف مشاكل Room و Hilt قبل ما تتكسر",
+    "date": "2026-11-19T23:42:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Android",
+      "MCP",
+      "CI"
+    ],
+    "content": "أدوات الـ code graph العامة بتشوف classes وcalls، بس مش هتقولك إن نسخة Room رقم ٤ ما ليهاش migration لنسخة ٥، فالمستخدمين هيقعوا بعد التحديث 💥\n\nHussain Shirazi عمل droidmap عشان يقرا الـ wiring بتاع Android مباشرة: Gradle و Room و Navigation و Hilt و Koin والـ manifest، بـ Kotlin و Java، ويحوّلها لـ graph. تشغّله كـ CLI أو GitHub Action أو Gradle plugin أو MCP server.\n\nتخيّل Pull Request غيّر Status.PAUSED وRoom كان بيخزّنه بالاسم في صفوف المستخدمين، فالقراءة هتقع بعد التحديث. أو شاشة بتجيب @HiltViewModel بـ viewModel() بدل hiltViewModel(). أو navigate(\"settings\") لـ route ما حدش سجّله في NavHost. دي أمثلة من اللي بيكتشفه.\n\nالأداة بتقرا ملفات المصدر بس: ما بتشغّلش Gradle ولا بتبني الكود ولا بتبعت حاجة لحد (الـ GitHub Action بتشغّل task واحدة بس للـ manifest المدمج لو طلبت). على Now in Android (٣٥ module) بتاخد حوالي ثانية ونص، وتطلع تحذيرات زي room-migration-untested. وتقدر تسألها إيه اللي بيعتمد على class قبل ما تغيّره.\n\nخد بالك إن الفحص static على المصدر، فاللي بيقوله تحذيرات تراجعها مش حكم نهائي. وهي بتغطي الأنماط اللي كتبها المطوّر، فمش هتلاقي بيها كل مشكلة. شغّلها في الـ CI كجزء من المراجعة، مش بديل عن اختبارات الـ migration الحقيقية.\n\nكام مرة اتكسر عندك تحديث بسبب migration ناقصة أو dependency مش متربطة؟\n\nزكاة العلم نشره.\n\n#Android #MCP #Room #Hilt #mo3talogy",
+    "summary_ar": "أدوات الـ code graph العامة بتشوف classes وcalls، بس مش هتقولك إن نسخة Room رقم ٤ ما ليهاش migration لنسخة ٥، فالمستخدمين هيقعوا بعد التحديث 💥\n\nHussain Shirazi عمل droidmap عشان يقرا الـ wiring بتاع Android مباشرة: Gradle و Room و Navigation و Hilt و Koin والـ manifest، بـ Kotlin و Java، ويحوّلها لـ graph. تشغّله كـ CLI أو GitHub Action أو Gradle plugin أو MCP server.\n\nتخيّل Pull Request غيّر Status.PAUSED وRoom كان بيخزّنه بالاسم في صفوف المستخدمين، فالقراءة هتقع بعد التحديث. أو شاشة بتجيب @HiltViewModel بـ viewModel() بدل hiltViewModel(). أو navigate(\"settings\") لـ route ما حدش سجّله في NavHost. دي أمثلة من اللي بيكتشفه.\n\nخد بالك إن الفحص static على المصدر، فاللي بيقوله تحذيرات تراجعها مش حكم نهائي. وهي بتغطي الأنماط اللي كتبها المطوّر، فمش هتلاقي بيها كل مشكلة. شغّلها في الـ CI كجزء من المراجعة، مش بديل عن اختبارات الـ migration الحقيقية.\n\nكام مرة اتكسر عندك تحديث بسبب migration ناقصة أو dependency مش متربطة؟",
+    "summary_en": "droidmap reads Android wiring directly (Gradle, Room, Navigation, Hilt, Koin and the manifest) and builds a graph to catch problems such as a missing Room migration, an unbound dependency or an unregistered navigation route. It runs as a CLI, GitHub Action, Gradle plugin or MCP server, reads source files only, and takes about 1.5 seconds on Now in Android. It produces warnings to review, not a replacement for migration tests.",
+    "url": "https://github.com/hussainshirazi/droidmap",
+    "image": "assets/images/articles/kw537-aw753-droidmap-an-android-aware-map-of-room-navigation-hilt-and-gradle.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-droidmap-an-android-aware-map-of-room-navigation-hilt-and-gradle.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Room migration",
+        "explanation": "كود بينقل قاعدة بيانات Room من نسخة لنسخة أحدث من غير ما يضيع data."
+      },
+      {
+        "term": "Hilt",
+        "explanation": "إطار dependency injection لـ Android مبني على Dagger."
+      },
+      {
+        "term": "Koin",
+        "explanation": "إطار dependency injection خفيف لـ Kotlin بيتحل وقت التشغيل."
+      },
+      {
+        "term": "NavHost",
+        "explanation": "حاوية في Navigation Compose بتسجل الـ routes وتعرض الوجهة الحالية."
+      },
+      {
+        "term": "MCP",
+        "explanation": "بروتوكول بيخلّي الـ AI agents تتصل بأدوات خارجية."
+      },
+      {
+        "term": "static analysis",
+        "explanation": "فحص الكود من غير تشغيله."
+      },
+      {
+        "term": "merged manifest",
+        "explanation": "الـ manifest النهائي بعد دمج manifests التطبيق والمكتبات."
+      },
+      {
+        "term": "convention plugin",
+        "explanation": "Gradle plugin بيوحّد إعدادات البناء بين modules."
+      }
+    ],
+    "linkedin_body": "أدوات الـ code graph العامة بتشوف classes وcalls، بس مش هتقولك إن نسخة Room رقم ٤ ما ليهاش migration لنسخة ٥، فالمستخدمين هيقعوا بعد التحديث 💥\n\nHussain Shirazi عمل droidmap عشان يقرا الـ wiring بتاع Android مباشرة: Gradle و Room و Navigation و Hilt و Koin والـ manifest، بـ Kotlin و Java، ويحوّلها لـ graph. تشغّله كـ CLI أو GitHub Action أو Gradle plugin أو MCP server.\n\nتخيّل Pull Request غيّر Status.PAUSED وRoom كان بيخزّنه بالاسم في صفوف المستخدمين، فالقراءة هتقع بعد التحديث. أو شاشة بتجيب @HiltViewModel بـ viewModel() بدل hiltViewModel(). أو navigate(\"settings\") لـ route ما حدش سجّله في NavHost. دي أمثلة من اللي بيكتشفه.\n\nالأداة بتقرا ملفات المصدر بس: ما بتشغّلش Gradle ولا بتبني الكود ولا بتبعت حاجة لحد (الـ GitHub Action بتشغّل task واحدة بس للـ manifest المدمج لو طلبت). على Now in Android (٣٥ module) بتاخد حوالي ثانية ونص، وتطلع تحذيرات زي room-migration-untested. وتقدر تسألها إيه اللي بيعتمد على class قبل ما تغيّره.\n\nخد بالك إن الفحص static على المصدر، فاللي بيقوله تحذيرات تراجعها مش حكم نهائي. وهي بتغطي الأنماط اللي كتبها المطوّر، فمش هتلاقي بيها كل مشكلة. شغّلها في الـ CI كجزء من المراجعة، مش بديل عن اختبارات الـ migration الحقيقية.\n\nجرّب droidmap على مشروعك مرة واحدة وشوف إيه التحذيرات اللي ظهرت. لو لقيت migration ناقصة أو navigation route مش متسجّلة، حوّل التحذير لقاعدة في الـ CI. وقبل ما تسلّم الأداة لـ AI agent عبر MCP، افهم إيه اللي بتقرأه عشان تعرف تثق في إجاباتها.\n\nكام مرة اتكسر عندك تحديث بسبب migration ناقصة أو dependency مش متربطة؟\n\nزكاة العلم نشره.\n\n#Android #MCP #Room #Hilt #mo3talogy"
+  },
+  {
+    "title": "ComposeLintAI: يراقب كود Compose اللي بيكتبه الـ AI ويلتزم بالـ design system",
+    "date": "2026-11-19T23:41:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Compose",
+      "MCP",
+      "Lint"
+    ],
+    "content": "الـ AI agent بيكتب Compose بسرعة، بس مين بيضمن إنه التزم بألوان وأبعاد الـ design system بتاعك ولا حط hardcoded values في كل حتة؟ 🎨\n\nGalal Aldeen Abas عمل ComposeLintAI، وهو linter و MCP server هدفه يخلّي كود Jetpack Compose اللي بيكتبه الـ AI ماشي مع الـ design system. الـ README بيوصفه كمنصة لحوكمة الـ agents وتشخيص المعمارية وتعديل الكود بشكل جراحي.\n\nتخيّل agent ضاف لون hex مباشرة في composable بدل ما يستخدم token من الـ theme. المفروض إن الـ linter يمسكها ويقولله يصلحها قبل ما تتدمج.\n\nفيه نسخة Community مفتوحة المصدر بترخيص Apache 2.0 بتشتغل كـ Python MCP/WebSocket server مع IDE plugin، ونسخة Pro تجارية جوه JetBrains IDE بـ Kotlin PSI. والجدول بيقارن بينهم: قواعد في ملف .composelintai.json واحد بيشتغل في الـ IDE والـ CLI بوضعين warn و block، وإعداد MCP بضغطة لـ Cursor و Claude Desktop و Gemini وغيرهم.\n\nخد بالك إن الـ README فيه عروض إطلاق للنسخة Pro، فاقرأه بعين تفرق بين الميزات المجانية والمدفوعة. والأداة بتتبنى على تحليل الكود، فاختبرها على شغلك قبل ما تعتمد عليها كبوابة في الـ CI.\n\nعندك قواعد design system واضحة كفاية إن linter يقدر يمسكها في كود الـ agent؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #MCP #AIAgents #mo3talogy",
+    "summary_ar": "الـ AI agent بيكتب Compose بسرعة، بس مين بيضمن إنه التزم بألوان وأبعاد الـ design system بتاعك ولا حط hardcoded values في كل حتة؟ 🎨\n\nGalal Aldeen Abas عمل ComposeLintAI، وهو linter و MCP server هدفه يخلّي كود Jetpack Compose اللي بيكتبه الـ AI ماشي مع الـ design system. الـ README بيوصفه كمنصة لحوكمة الـ agents وتشخيص المعمارية وتعديل الكود بشكل جراحي.\n\nتخيّل agent ضاف لون hex مباشرة في composable بدل ما يستخدم token من الـ theme. المفروض إن الـ linter يمسكها ويقولله يصلحها قبل ما تتدمج.\n\nخد بالك إن الـ README فيه عروض إطلاق للنسخة Pro، فاقرأه بعين تفرق بين الميزات المجانية والمدفوعة. والأداة بتتبنى على تحليل الكود، فاختبرها على شغلك قبل ما تعتمد عليها كبوابة في الـ CI.\n\nعندك قواعد design system واضحة كفاية إن linter يقدر يمسكها في كود الـ agent؟",
+    "summary_en": "ComposeLintAI is a linter and MCP server that keeps AI-generated Jetpack Compose code aligned with a design system. A free Apache-2.0 Community edition runs as a Python MCP/WebSocket server with an IDE plugin, while a commercial Pro edition is native Kotlin inside JetBrains IDEs. Rules live in one .composelintai.json file shared by the IDE and CLI, with warn and block modes. Review the free versus paid features before relying on it in CI.",
+    "url": "https://github.com/TechsOneAi/ComposeLintAI",
+    "image": "assets/images/articles/kw537-aw753-composelintai-keep-ai-generated-compose-code-in-line-with-your-design-system.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-composelintai-keep-ai-generated-compose-code-in-line-with-your-design-system.svg"
+    ],
+    "explainers": [
+      {
+        "term": "linter",
+        "explanation": "أداة بتفحص الكود وتحذّر من أنماط غلط أو مخالفات قواعد."
+      },
+      {
+        "term": "design system",
+        "explanation": "مجموعة قواعد ومكونات وألوان وأبعاد موحدة للتطبيق."
+      },
+      {
+        "term": "MCP server",
+        "explanation": "خادم بيعرض أدوات للـ AI agents عبر Model Context Protocol."
+      },
+      {
+        "term": "AST",
+        "explanation": "شجرة بتمثل بنية الكود، بتسمح بتحليله وتعديله بدقة."
+      },
+      {
+        "term": "PSI",
+        "explanation": "نموذج الكود جوه IntelliJ اللي بتعتمد عليه تحليلات الـ IDE."
+      },
+      {
+        "term": "hardcoded value",
+        "explanation": "قيمة مكتوبة مباشرة في الكود بدل ما تتاخد من الـ theme."
+      },
+      {
+        "term": "warn و block",
+        "explanation": "وضعين: الأول بيحذّر والتاني بيمنع الـ merge أو الـ build."
+      },
+      {
+        "term": "Apache 2.0",
+        "explanation": "ترخيص open source متساهل بيسمح بالاستخدام والتعديل."
+      }
+    ],
+    "linkedin_body": "الـ AI agent بيكتب Compose بسرعة، بس مين بيضمن إنه التزم بألوان وأبعاد الـ design system بتاعك ولا حط hardcoded values في كل حتة؟ 🎨\n\nGalal Aldeen Abas عمل ComposeLintAI، وهو linter و MCP server هدفه يخلّي كود Jetpack Compose اللي بيكتبه الـ AI ماشي مع الـ design system. الـ README بيوصفه كمنصة لحوكمة الـ agents وتشخيص المعمارية وتعديل الكود بشكل جراحي.\n\nتخيّل agent ضاف لون hex مباشرة في composable بدل ما يستخدم token من الـ theme. المفروض إن الـ linter يمسكها ويقولله يصلحها قبل ما تتدمج.\n\nفيه نسخة Community مفتوحة المصدر بترخيص Apache 2.0 بتشتغل كـ Python MCP/WebSocket server مع IDE plugin، ونسخة Pro تجارية جوه JetBrains IDE بـ Kotlin PSI. والجدول بيقارن بينهم: قواعد في ملف .composelintai.json واحد بيشتغل في الـ IDE والـ CLI بوضعين warn و block، وإعداد MCP بضغطة لـ Cursor و Claude Desktop و Gemini وغيرهم.\n\nخد بالك إن الـ README فيه عروض إطلاق للنسخة Pro، فاقرأه بعين تفرق بين الميزات المجانية والمدفوعة. والأداة بتتبنى على تحليل الكود، فاختبرها على شغلك قبل ما تعتمد عليها كبوابة في الـ CI.\n\nقبل ما تضيف أداة زي دي، اكتب قواعد الـ design system بتاعك بشكل صريح: إيه الألوان والأبعاد المسموحة. وجرّب القواعد على PR واحد كتبه agent، وابدأ بوضع warn قبل ما تحوّله لـ block.\n\nعندك قواعد design system واضحة كفاية إن linter يقدر يمسكها في كود الـ agent؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #MCP #AIAgents #mo3talogy"
+  },
+  {
+    "title": "Compose SwiftUI: اكتب شاشات SwiftUI بـ Kotlin وسيب الـ ViewModels زي ما هي",
+    "date": "2026-11-19T23:40:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "SwiftUI",
+      "Compose Runtime",
+      "iOS"
+    ],
+    "content": "عايز تكتب شاشات iOS بـ Kotlin من غير ما ترسمهم بـ Skia زي Compose Multiplatform؟ فيه فكرة تانية: استخدم الـ Compose runtime، بس خلي اللي بيترسم SwiftUI الأصلي 🍏\n\nElie Gambache عمل Compose SwiftUI. الـ composables بتبني شجرة من SwiftUI views، والتطبيق بيرسمها بـ SwiftUI نفسها. فهو بيستخدم الـ Compose runtime مش الـ Compose UI، وبنفس الفكرة Compose HTML بيبني DOM المتصفح.\n\nتخيّل شاشة عداد: الـ CounterViewModel و StateFlow و remember بتشتغل زي ما هي، وإنت بتعيد كتابة طبقة الـ UI بس. المثال بيستخدم composeSwiftUI و NavigationStack و VStack و Button، وبيتحط في ComposeView.\n\nالدوكيومنتيشن ٣٢ فصل من التثبيت لأول تطبيق لحد القوائم والتنقل والـ animation والـ accessibility وتكاملات Apple frameworks والـ previews والأداء. وأمثلة Kotlin فيه بتتجمع مع كل تغيير. بيدعم MapKit و Swift Charts و StoreKit و PhotosPicker و WebView و Sign in with Apple و widgets وغيرها. المطلوب iOS 17.0+ و macOS 14.0+ و tvOS 17.0+ و watchOS 10.0+.\n\nخد بالك إن ده اختيار معماري مختلف عن Compose Multiplatform: الواجهة هنا native SwiftUI يتحكم فيها Kotlin، فمش هتستخدم مكونات Compose UI المعتادة. وجرّب المكتبة على شاشة صغيرة الأول، لأن جودة التغطية لكل SwiftUI view وحدودها لازم تتشاف على مشروعك.\n\nتفضّل واجهة iOS مرسومة بـ Compose Multiplatform ولا SwiftUI native يتحكم فيها Kotlin؟\n\nزكاة العلم نشره.\n\n#Kotlin #SwiftUI #ComposeRuntime #iOS #mo3talogy",
+    "summary_ar": "عايز تكتب شاشات iOS بـ Kotlin من غير ما ترسمهم بـ Skia زي Compose Multiplatform؟ فيه فكرة تانية: استخدم الـ Compose runtime، بس خلي اللي بيترسم SwiftUI الأصلي 🍏\n\nElie Gambache عمل Compose SwiftUI. الـ composables بتبني شجرة من SwiftUI views، والتطبيق بيرسمها بـ SwiftUI نفسها. فهو بيستخدم الـ Compose runtime مش الـ Compose UI، وبنفس الفكرة Compose HTML بيبني DOM المتصفح.\n\nتخيّل شاشة عداد: الـ CounterViewModel و StateFlow و remember بتشتغل زي ما هي، وإنت بتعيد كتابة طبقة الـ UI بس. المثال بيستخدم composeSwiftUI و NavigationStack و VStack و Button، وبيتحط في ComposeView.\n\nخد بالك إن ده اختيار معماري مختلف عن Compose Multiplatform: الواجهة هنا native SwiftUI يتحكم فيها Kotlin، فمش هتستخدم مكونات Compose UI المعتادة. وجرّب المكتبة على شاشة صغيرة الأول، لأن جودة التغطية لكل SwiftUI view وحدودها لازم تتشاف على مشروعك.\n\nتفضّل واجهة iOS مرسومة بـ Compose Multiplatform ولا SwiftUI native يتحكم فيها Kotlin؟",
+    "summary_en": "Compose SwiftUI lets you write SwiftUI screens in Kotlin using the Compose runtime rather than Compose UI: composables build a tree of SwiftUI views that Apple's SwiftUI renders, much like Compose HTML does for the DOM. Existing Kotlin ViewModels, StateFlows and remember state work unchanged. Docs run to 32 chapters with compiled examples; supported platforms are iOS 17+, macOS 14+, tvOS 17+ and watchOS 10+.",
+    "url": "https://nucleusframework.github.io/ComposeSwiftUI/",
+    "image": "assets/images/articles/kw537-aw753-compose-swiftui-write-swiftui-screens-in-kotlin.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-compose-swiftui-write-swiftui-screens-in-kotlin.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Compose runtime",
+        "explanation": "الجزء اللي بيدير الـ state والـ recomposition من غير ما يرسم UI بنفسه."
+      },
+      {
+        "term": "Compose UI",
+        "explanation": "طبقة الرسم والـ layout في Compose، غير موجودة هنا."
+      },
+      {
+        "term": "SwiftUI",
+        "explanation": "إطار Apple التصريحي لبناء واجهات iOS و macOS وغيرها."
+      },
+      {
+        "term": "NavigationStack",
+        "explanation": "حاوية تنقل في SwiftUI بتدير مكدس الشاشات."
+      },
+      {
+        "term": "ViewModel",
+        "explanation": "كلاس بيحتفظ بحالة الشاشة ومنطقها بعيد عن الـ UI."
+      },
+      {
+        "term": "StateFlow",
+        "explanation": "Flow بيحتفظ بآخر قيمة وبيستخدم كمصدر حالة للواجهة."
+      },
+      {
+        "term": "Compose HTML",
+        "explanation": "نسخة من Compose بتبني DOM المتصفح بدل رسم Skia."
+      },
+      {
+        "term": "MapKit",
+        "explanation": "إطار Apple لعرض الخرائط."
+      }
+    ],
+    "linkedin_body": "عايز تكتب شاشات iOS بـ Kotlin من غير ما ترسمهم بـ Skia زي Compose Multiplatform؟ فيه فكرة تانية: استخدم الـ Compose runtime، بس خلي اللي بيترسم SwiftUI الأصلي 🍏\n\nElie Gambache عمل Compose SwiftUI. الـ composables بتبني شجرة من SwiftUI views، والتطبيق بيرسمها بـ SwiftUI نفسها. فهو بيستخدم الـ Compose runtime مش الـ Compose UI، وبنفس الفكرة Compose HTML بيبني DOM المتصفح.\n\nتخيّل شاشة عداد: الـ CounterViewModel و StateFlow و remember بتشتغل زي ما هي، وإنت بتعيد كتابة طبقة الـ UI بس. المثال بيستخدم composeSwiftUI و NavigationStack و VStack و Button، وبيتحط في ComposeView.\n\nالدوكيومنتيشن ٣٢ فصل من التثبيت لأول تطبيق لحد القوائم والتنقل والـ animation والـ accessibility وتكاملات Apple frameworks والـ previews والأداء. وأمثلة Kotlin فيه بتتجمع مع كل تغيير. بيدعم MapKit و Swift Charts و StoreKit و PhotosPicker و WebView و Sign in with Apple و widgets وغيرها. المطلوب iOS 17.0+ و macOS 14.0+ و tvOS 17.0+ و watchOS 10.0+.\n\nخد بالك إن ده اختيار معماري مختلف عن Compose Multiplatform: الواجهة هنا native SwiftUI يتحكم فيها Kotlin، فمش هتستخدم مكونات Compose UI المعتادة. وجرّب المكتبة على شاشة صغيرة الأول، لأن جودة التغطية لكل SwiftUI view وحدودها لازم تتشاف على مشروعك.\n\nلو عندك منطق مشترك بـ Kotlin وفريق iOS بيحب SwiftUI، قارن المكتبة دي بـ Compose Multiplatform على شاشة واحدة: حجم الكود، وإحساس الـ native، وتكلفة الـ debugging. القرار بيعتمد على مين هيصون الواجهة وإزاي.\n\nتفضّل واجهة iOS مرسومة بـ Compose Multiplatform ولا SwiftUI native يتحكم فيها Kotlin؟\n\nزكاة العلم نشره.\n\n#Kotlin #SwiftUI #ComposeRuntime #iOS #mo3talogy"
+  },
+  {
+    "title": "Compose Script: اكتب Compose جوه صفحة HTML بسطر script واحد",
+    "date": "2026-11-19T23:39:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Compose",
+      "Wasm",
+      "Web"
+    ],
+    "content": "عايز تجرب كود Compose أو تعرضه في صفحة ويب من غير build ولا server؟ فيه مكتبة بتخليك تضيف script واحد وتكتب Compose جوه الـ HTML نفسه 🌐\n\nMahmoud Aly عمل Compose Script. بتضيف script من الـ CDN، وبعدها تكتب كود Compose جوه script من نوع text/compose-content أو text/compose-preview، وبيتحوّل لـ element فيه Compose live. المكتبة شغالة فوق Fast Compose.\n\nتخيّل مدوّن بيكتب مقال عن animation. بدل صورة ثابتة، يحط button بـ remember و mutableStateOf والقارئ يضغط عليه جوه الصفحة. الأمثلة على CodePen زي Sound Wave و Travel Explorer و Live Showcase.\n\nالنوعين: text/compose-content بيعرض composable واحدة من غير labels أو frames، وtext/compose-preview بيعرض كل دوال @Preview بـ labels و frames بارتفاع ٤٠٠ بكسل افتراضي. وكل script بيتبدل بـ element بنفس id و class و style، فتقدر تنسّقه بـ CSS. وأخطاء الـ parse والتشغيل بتظهر جوه الـ element، وكل واحد بيبدأ لما يوصله الـ scroll.\n\nخد بالك إن المكتبة لازم تتحمّل بـ script عادي مش type=\"module\" لأنها بتحمّل ملفات .wasm من مكانها. وغير تحديد النسخة في الـ URL هتاخد آخر نسخة، فلو عايز ثبات حدد النسخة. وحجم تحميل ملفات wasm مهم في الصفحات الخفيفة.\n\nلو كتبت مقال عن Compose، هتحط فيه مثال حي ولا صورة؟\n\nزكاة العلم نشره.\n\n#Kotlin #JetpackCompose #Wasm #Web #mo3talogy",
+    "summary_ar": "عايز تجرب كود Compose أو تعرضه في صفحة ويب من غير build ولا server؟ فيه مكتبة بتخليك تضيف script واحد وتكتب Compose جوه الـ HTML نفسه 🌐\n\nMahmoud Aly عمل Compose Script. بتضيف script من الـ CDN، وبعدها تكتب كود Compose جوه script من نوع text/compose-content أو text/compose-preview، وبيتحوّل لـ element فيه Compose live. المكتبة شغالة فوق Fast Compose.\n\nتخيّل مدوّن بيكتب مقال عن animation. بدل صورة ثابتة، يحط button بـ remember و mutableStateOf والقارئ يضغط عليه جوه الصفحة. الأمثلة على CodePen زي Sound Wave و Travel Explorer و Live Showcase.\n\nخد بالك إن المكتبة لازم تتحمّل بـ script عادي مش type=\"module\" لأنها بتحمّل ملفات .wasm من مكانها. وغير تحديد النسخة في الـ URL هتاخد آخر نسخة، فلو عايز ثبات حدد النسخة. وحجم تحميل ملفات wasm مهم في الصفحات الخفيفة.\n\nلو كتبت مقال عن Compose، هتحط فيه مثال حي ولا صورة؟",
+    "summary_en": "Compose Script renders live Jetpack Compose inside a static HTML page: add one script tag from a CDN and write Compose in text/compose-content or text/compose-preview blocks. Each script becomes a styleable element and errors appear inside it. It runs on Fast Compose, must be loaded as a plain script (not a module) because it fetches .wasm files, and the CDN URL can pin a version.",
+    "url": "https://github.com/fast-compose/compose-script",
+    "image": "assets/images/articles/kw537-aw753-compose-script-live-compose-inside-any-web-page.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-compose-script-live-compose-inside-any-web-page.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Compose Script",
+        "explanation": "مكتبة بتحوّل script tags فيها كود Compose لعناصر live في الصفحة."
+      },
+      {
+        "term": "Fast Compose",
+        "explanation": "المشروع اللي بتشتغل عليه المكتبة وبيشغّل Compose على الويب."
+      },
+      {
+        "term": "WebAssembly",
+        "explanation": "تنسيق ثنائي بيشغّل كود بسرعة قريبة من native في المتصفح."
+      },
+      {
+        "term": "CDN",
+        "explanation": "شبكة سيرفرات بتوزّع الملفات من أقرب مكان للمستخدم."
+      },
+      {
+        "term": "text/compose-content",
+        "explanation": "نوع script بيعرض composable واحدة من غير إطار."
+      },
+      {
+        "term": "text/compose-preview",
+        "explanation": "نوع script بيعرض كل دوال @Preview بـ labels و frames."
+      },
+      {
+        "term": "CodePen",
+        "explanation": "موقع بيجرّب فيه المطورين كود ويب ويشاركوه."
+      },
+      {
+        "term": "type=\"module\"",
+        "explanation": "نوع script بيحمّل ES modules، وغير مناسب هنا لأن المكتبة بتحمّل ملفات wasm."
+      }
+    ],
+    "linkedin_body": "عايز تجرب كود Compose أو تعرضه في صفحة ويب من غير build ولا server؟ فيه مكتبة بتخليك تضيف script واحد وتكتب Compose جوه الـ HTML نفسه 🌐\n\nMahmoud Aly عمل Compose Script. بتضيف script من الـ CDN، وبعدها تكتب كود Compose جوه script من نوع text/compose-content أو text/compose-preview، وبيتحوّل لـ element فيه Compose live. المكتبة شغالة فوق Fast Compose.\n\nتخيّل مدوّن بيكتب مقال عن animation. بدل صورة ثابتة، يحط button بـ remember و mutableStateOf والقارئ يضغط عليه جوه الصفحة. الأمثلة على CodePen زي Sound Wave و Travel Explorer و Live Showcase.\n\nالنوعين: text/compose-content بيعرض composable واحدة من غير labels أو frames، وtext/compose-preview بيعرض كل دوال @Preview بـ labels و frames بارتفاع ٤٠٠ بكسل افتراضي. وكل script بيتبدل بـ element بنفس id و class و style، فتقدر تنسّقه بـ CSS. وأخطاء الـ parse والتشغيل بتظهر جوه الـ element، وكل واحد بيبدأ لما يوصله الـ scroll.\n\nخد بالك إن المكتبة لازم تتحمّل بـ script عادي مش type=\"module\" لأنها بتحمّل ملفات .wasm من مكانها. وغير تحديد النسخة في الـ URL هتاخد آخر نسخة، فلو عايز ثبات حدد النسخة. وحجم تحميل ملفات wasm مهم في الصفحات الخفيفة.\n\nلو بتكتب مقالات تقنية عن Compose، جرّب تحط مثال تفاعلي واحد بالمكتبة دي بدل screenshot. وثبّت رقم النسخة في الـ URL، واختبر الصفحة على اتصال بطيء قبل ما تنشر.\n\nلو كتبت مقال عن Compose، هتحط فيه مثال حي ولا صورة؟\n\nزكاة العلم نشره.\n\n#Kotlin #JetpackCompose #Wasm #Web #mo3talogy"
+  },
+  {
+    "title": "نفس تلميحات IntelliJ في الـ CI والـ agents: rules لـ detekt منقولة من الـ inspections",
+    "date": "2026-11-19T23:38:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "detekt",
+      "IntelliJ",
+      "CI"
+    ],
+    "content": "الـ IntelliJ بيديك تلميحات على كودك وإنت بتكتب، بس الـ CI والـ AI agent مش بيشوفوها. المشروع ده بيحاول يوصّل نفس التلميحات لهم 🔍\n\nPavel Shurmilov نقل inspections من IntelliJ IDEA لـ rules في detekt: ليها علاقة بـ Kotlin و JVM و Android و Gradle و Compose Multiplatform. تضيفها كـ detektPlugins، وتحصل على نفس الـ hints برا الـ IDE.\n\nتخيّل agent كتب كود Kotlin فيه مقارنة BigDecimal بـ equals. الـ IDE كان هيحذّرك، بس الـ agent شغال في terminal. بوجود الـ rule في detekt، الـ CI أو الـ agent نفسه يشوف التحذير.\n\nالمشروع بيطلب detekt ٢ (الـ Gradle plugin dev.detekt). والـ artifacts مقسمة: kotlin-all و jvm-all و android-all و gradle-best-practices و compose-multiplatform-preview، وممكن تاخد sets معينة. ولازم تضبط buildUponDefaultConfig = true مع ملف config خاص بيك، وإلا القواعد مش هتتفعّل.\n\nخد بالك من تحذير README: أغلب الـ rules محتاجة type resolution، والـ task العادية detekt بتتخطاها بصمت. في KMP شغّل tasks كل الـ targets زي detektMainJvm و detektMainIosArm64. وبعض القواعد غير مفعلة افتراضيًا زي KotlinBigDecimalEquals.\n\nبتشغّل في الـ CI نفس الفحوصات اللي بتشوفها في الـ IDE، ولا فيه فرق بينهم؟\n\nزكاة العلم نشره.\n\n#Kotlin #detekt #IntelliJ #CI #mo3talogy",
+    "summary_ar": "الـ IntelliJ بيديك تلميحات على كودك وإنت بتكتب، بس الـ CI والـ AI agent مش بيشوفوها. المشروع ده بيحاول يوصّل نفس التلميحات لهم 🔍\n\nPavel Shurmilov نقل inspections من IntelliJ IDEA لـ rules في detekt: ليها علاقة بـ Kotlin و JVM و Android و Gradle و Compose Multiplatform. تضيفها كـ detektPlugins، وتحصل على نفس الـ hints برا الـ IDE.\n\nتخيّل agent كتب كود Kotlin فيه مقارنة BigDecimal بـ equals. الـ IDE كان هيحذّرك، بس الـ agent شغال في terminal. بوجود الـ rule في detekt، الـ CI أو الـ agent نفسه يشوف التحذير.\n\nخد بالك من تحذير README: أغلب الـ rules محتاجة type resolution، والـ task العادية detekt بتتخطاها بصمت. في KMP شغّل tasks كل الـ targets زي detektMainJvm و detektMainIosArm64. وبعض القواعد غير مفعلة افتراضيًا زي KotlinBigDecimalEquals.\n\nبتشغّل في الـ CI نفس الفحوصات اللي بتشوفها في الـ IDE، ولا فيه فرق بينهم؟",
+    "summary_en": "intellij-inspections-detekt-rules ports IntelliJ IDEA's Kotlin, JVM, Android, Gradle and Compose Multiplatform inspections to detekt rules so CI and AI agents get the same hints as the IDE. It requires detekt 2 (dev.detekt) and needs buildUponDefaultConfig = true. Most rules need type resolution, so the plain detekt task silently skips them; in KMP run each target's detekt task.",
+    "url": "https://github.com/overpas/intellij-inspections-detekt-rules",
+    "image": "assets/images/articles/kw537-aw753-intellij-inspections-as-detekt-rules-for-ci-and-ai-agents.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-intellij-inspections-as-detekt-rules-for-ci-and-ai-agents.svg"
+    ],
+    "explainers": [
+      {
+        "term": "detekt",
+        "explanation": "أداة static analysis لـ Kotlin بتفحص الكود حسب قواعد."
+      },
+      {
+        "term": "inspection",
+        "explanation": "فحص في IntelliJ بيكتشف مشكلة في الكود وبيقترح حل."
+      },
+      {
+        "term": "detektPlugins",
+        "explanation": "configuration بتضيف rule sets خارجية لـ detekt."
+      },
+      {
+        "term": "type resolution",
+        "explanation": "تحليل بيعرف الأنواع الحقيقية للتعبيرات، مش بس شكل الكود."
+      },
+      {
+        "term": "buildUponDefaultConfig",
+        "explanation": "إعداد بيبني ملف config بتاعك فوق الافتراضي بدل ما يستبدله."
+      },
+      {
+        "term": "rule set",
+        "explanation": "مجموعة قواعد detekt بتتفعل مع بعض."
+      },
+      {
+        "term": "CI",
+        "explanation": "نظام بيبني ويفحص الكود تلقائيًا مع كل تغيير."
+      },
+      {
+        "term": "BigDecimal.equals",
+        "explanation": "بيقارن القيمة والـ scale مع بعض، فـ ٢٫٠ و ٢٫٠٠ مش متساويين."
+      }
+    ],
+    "linkedin_body": "الـ IntelliJ بيديك تلميحات على كودك وإنت بتكتب، بس الـ CI والـ AI agent مش بيشوفوها. المشروع ده بيحاول يوصّل نفس التلميحات لهم 🔍\n\nPavel Shurmilov نقل inspections من IntelliJ IDEA لـ rules في detekt: ليها علاقة بـ Kotlin و JVM و Android و Gradle و Compose Multiplatform. تضيفها كـ detektPlugins، وتحصل على نفس الـ hints برا الـ IDE.\n\nتخيّل agent كتب كود Kotlin فيه مقارنة BigDecimal بـ equals. الـ IDE كان هيحذّرك، بس الـ agent شغال في terminal. بوجود الـ rule في detekt، الـ CI أو الـ agent نفسه يشوف التحذير.\n\nالمشروع بيطلب detekt ٢ (الـ Gradle plugin dev.detekt). والـ artifacts مقسمة: kotlin-all و jvm-all و android-all و gradle-best-practices و compose-multiplatform-preview، وممكن تاخد sets معينة. ولازم تضبط buildUponDefaultConfig = true مع ملف config خاص بيك، وإلا القواعد مش هتتفعّل.\n\nخد بالك من تحذير README: أغلب الـ rules محتاجة type resolution، والـ task العادية detekt بتتخطاها بصمت. في KMP شغّل tasks كل الـ targets زي detektMainJvm و detektMainIosArm64. وبعض القواعد غير مفعلة افتراضيًا زي KotlinBigDecimalEquals.\n\nلو بتستخدم detekt، ضيف rule set واحد بس الأول وشوف عدد التحذيرات الجديدة. وتأكد إن الـ CI بيشغّل tasks الـ type resolution مش detekt العادية، وإلا هتفتكر إن الكود نضيف وهو مش متفحص.\n\nبتشغّل في الـ CI نفس الفحوصات اللي بتشوفها في الـ IDE، ولا فيه فرق بينهم؟\n\nزكاة العلم نشره.\n\n#Kotlin #detekt #IntelliJ #CI #mo3talogy"
+  },
+  {
+    "title": "الـ accessibility في Compose Multiplatform: الـ semantics هي اللوحة اللي TalkBack بيقراها",
+    "date": "2026-11-19T23:37:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Accessibility",
+      "Compose Multiplatform",
+      "Semantics"
+    ],
+    "content": "لوحة الـ pit بتعدّي على السواق مرة كل لفة لمدة ثانية، فالفريق بيختار بالظبط إيه اللي يتكتب عليها. وقارئ الشاشة بيدي المستخدم نفس الصفقة: swipe واحدة، إعلان واحد، ومفيش نظرة سريعة على باقي الشاشة 🏁\n\nمقال KMP Bits بيقول إن Compose بترسم كل حاجة بنفسها، بس الـ TalkBack و VoiceOver بيقروا الـ semantics tree: شجرة موازية فيها role و label و state و action لكل node. لو ما حدّدتش حاجة، بيستنتج Compose اللي يقدر عليه، والـ Box مع gesture detector بيطلّع معلومات أقل بكتير مما تتخيل.\n\nتخيّل صف قايمة فيه صورة وعنوان وعنوان فرعي وزرار مفضلة بأيقونة بس. من غير ضبط، العنوانين بيطلعوا كـ stops منفصلة والزرار بيتقرا «button» من غير اسم. الحل: clickable على الصف كله بيدمج أولاده في node واحد، مع onClickLabel زي «افتح التفاصيل»، و contentDescription متغيّر حسب الحالة وجاي من stringResource.\n\nكمان: heading() على عناوين الأقسام، و toggleable مع Role.Switch للـ switch بتاعك مع تمرير null للـ Switch الداخلي عشان ما يبقاش فيه stop مكرر، و clearAndSetSemantics للاستثناءات، وminimumInteractiveComponentSize بـ ٤٨dp للمكونات المخصصة، ونص بـ sp مجرّب على أكبر حجم. وعلى iOS الـ semantics بتتحول لـ accessibility objects، و testTag بيبقى accessibilityIdentifier. وتقدر تختبرها بـ runComposeUiTest.\n\nخد بالك إن الـ shared semantics خط أساس بس، فـ VoiceOver ممكن ينطق الـ role بشكل مختلف وترتيب الـ focus ممكن يختلف. والديسكتوب أصعب: على Windows محتاج Java Access Bridge، و Linux مش مدعوم. والاختبار الآلي بيتأكد إن الـ label موجود، لكن مش إن الإعلان منطقي، فاسمع التطبيق بـ TalkBack و VoiceOver كل release.\n\nجرّبت تسمع تطبيقك بـ TalkBack أو VoiceOver ولو مرة؟ إيه أول حاجة ضايقتك؟\n\nزكاة العلم نشره.\n\n#Android #ComposeMultiplatform #Accessibility #TalkBack #mo3talogy",
+    "summary_ar": "لوحة الـ pit بتعدّي على السواق مرة كل لفة لمدة ثانية، فالفريق بيختار بالظبط إيه اللي يتكتب عليها. وقارئ الشاشة بيدي المستخدم نفس الصفقة: swipe واحدة، إعلان واحد، ومفيش نظرة سريعة على باقي الشاشة 🏁\n\nمقال KMP Bits بيقول إن Compose بترسم كل حاجة بنفسها، بس الـ TalkBack و VoiceOver بيقروا الـ semantics tree: شجرة موازية فيها role و label و state و action لكل node. لو ما حدّدتش حاجة، بيستنتج Compose اللي يقدر عليه، والـ Box مع gesture detector بيطلّع معلومات أقل بكتير مما تتخيل.\n\nتخيّل صف قايمة فيه صورة وعنوان وعنوان فرعي وزرار مفضلة بأيقونة بس. من غير ضبط، العنوانين بيطلعوا كـ stops منفصلة والزرار بيتقرا «button» من غير اسم. الحل: clickable على الصف كله بيدمج أولاده في node واحد، مع onClickLabel زي «افتح التفاصيل»، و contentDescription متغيّر حسب الحالة وجاي من stringResource.\n\nخد بالك إن الـ shared semantics خط أساس بس، فـ VoiceOver ممكن ينطق الـ role بشكل مختلف وترتيب الـ focus ممكن يختلف. والديسكتوب أصعب: على Windows محتاج Java Access Bridge، و Linux مش مدعوم. والاختبار الآلي بيتأكد إن الـ label موجود، لكن مش إن الإعلان منطقي، فاسمع التطبيق بـ TalkBack و VoiceOver كل release.\n\nجرّبت تسمع تطبيقك بـ TalkBack أو VoiceOver ولو مرة؟ إيه أول حاجة ضايقتك؟",
+    "summary_en": "Compose Multiplatform builds a semantics tree that TalkBack and VoiceOver read, so what you label is what screen-reader users get. The article shows merging a list row with clickable and onClickLabel, state-aware contentDescription from stringResource, heading(), toggleable with Role.Switch, 48dp touch targets and sp text. iOS maps semantics to native accessibility objects, but focus order and phrasing can differ, desktop support varies, and tests cannot judge whether an announcement makes sense.",
+    "url": "https://medium.com/@kmpbits/pit-board-reading-accessibility-in-compose-multiplatform-kmp-bits-4be2c9bffe4c",
+    "image": "assets/images/articles/kw537-aw753-pit-board-reading-accessibility-in-compose-multiplatform.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-pit-board-reading-accessibility-in-compose-multiplatform.svg"
+    ],
+    "explainers": [
+      {
+        "term": "semantics tree",
+        "explanation": "شجرة موازية للـ UI بتقراها قارئات الشاشة، فيها role و label و state."
+      },
+      {
+        "term": "TalkBack",
+        "explanation": "قارئ الشاشة في Android."
+      },
+      {
+        "term": "VoiceOver",
+        "explanation": "قارئ الشاشة في iOS و macOS."
+      },
+      {
+        "term": "contentDescription",
+        "explanation": "وصف نصي لعنصر مش ليه نص عشان قارئ الشاشة ينطقه."
+      },
+      {
+        "term": "onClickLabel",
+        "explanation": "وصف للفعل اللي هيحصل لما المستخدم يضغط ضغطتين."
+      },
+      {
+        "term": "mergeDescendants",
+        "explanation": "دمج الـ nodes الأولاد في node واحد بإعلان واحد."
+      },
+      {
+        "term": "clearAndSetSemantics",
+        "explanation": "بيمسح semantics الأولاد ويحط اللي تكتبه بدالها."
+      },
+      {
+        "term": "minimumInteractiveComponentSize",
+        "explanation": "حد أدنى لمنطقة اللمس، ٤٨dp في مكونات Material."
+      }
+    ],
+    "linkedin_body": "لوحة الـ pit بتعدّي على السواق مرة كل لفة لمدة ثانية، فالفريق بيختار بالظبط إيه اللي يتكتب عليها. وقارئ الشاشة بيدي المستخدم نفس الصفقة: swipe واحدة، إعلان واحد، ومفيش نظرة سريعة على باقي الشاشة 🏁\n\nمقال KMP Bits بيقول إن Compose بترسم كل حاجة بنفسها، بس الـ TalkBack و VoiceOver بيقروا الـ semantics tree: شجرة موازية فيها role و label و state و action لكل node. لو ما حدّدتش حاجة، بيستنتج Compose اللي يقدر عليه، والـ Box مع gesture detector بيطلّع معلومات أقل بكتير مما تتخيل.\n\nتخيّل صف قايمة فيه صورة وعنوان وعنوان فرعي وزرار مفضلة بأيقونة بس. من غير ضبط، العنوانين بيطلعوا كـ stops منفصلة والزرار بيتقرا «button» من غير اسم. الحل: clickable على الصف كله بيدمج أولاده في node واحد، مع onClickLabel زي «افتح التفاصيل»، و contentDescription متغيّر حسب الحالة وجاي من stringResource.\n\nكمان: heading() على عناوين الأقسام، و toggleable مع Role.Switch للـ switch بتاعك مع تمرير null للـ Switch الداخلي عشان ما يبقاش فيه stop مكرر، و clearAndSetSemantics للاستثناءات، وminimumInteractiveComponentSize بـ ٤٨dp للمكونات المخصصة، ونص بـ sp مجرّب على أكبر حجم. وعلى iOS الـ semantics بتتحول لـ accessibility objects، و testTag بيبقى accessibilityIdentifier. وتقدر تختبرها بـ runComposeUiTest.\n\nخد بالك إن الـ shared semantics خط أساس بس، فـ VoiceOver ممكن ينطق الـ role بشكل مختلف وترتيب الـ focus ممكن يختلف. والديسكتوب أصعب: على Windows محتاج Java Access Bridge، و Linux مش مدعوم. والاختبار الآلي بيتأكد إن الـ label موجود، لكن مش إن الإعلان منطقي، فاسمع التطبيق بـ TalkBack و VoiceOver كل release.\n\nجرّب النهارده تفتح TalkBack على شاشة قايمة عندك وتسمع صف واحد بس. لو سمعت عنوان وعنوان فرعي في stops منفصلة أو زرار من غير اسم، ابدأ بـ clickable على الصف وcontentDescription للأيقونات. وبعدها اكتب test صغير يتأكد إن الـ label موجود.\n\nجرّبت تسمع تطبيقك بـ TalkBack أو VoiceOver ولو مرة؟ إيه أول حاجة ضايقتك؟\n\nزكاة العلم نشره.\n\n#Android #ComposeMultiplatform #Accessibility #TalkBack #mo3talogy"
+  },
+  {
+    "title": "إزاي SmileID وصّل لـ ١٨٫٠٠٠ نوع جهاز Android بـ CameraX",
+    "date": "2026-11-19T23:36:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "CameraX",
+      "Camera",
+      "Identity"
+    ],
+    "content": "تطبيقات البنوك وتسجيل الـ SIM محتاجة صورة وش واضحة عشان تكتشف التزييف والـ deepfakes. بس إزاي تضمن صورة بالجودة دي على موبايلات رخيصة وأجهزة POS ومعالجات ضعيفة؟ 📷\n\nمدونة Android Developers بتحكي قصة SmileID، SDK للتحقق من الهوية في أفريقيا، و Android هي ٨٥٪ من الأجهزة المستهدفة عندهم. قبل CameraX كانت المشاكل مألوفة: preview ممطوط، واتجاه sensor مقلوب، و out-of-memory crashes، وعيوب خاصة بكل OEM.\n\nتخيّل موبايل بذاكرة ١ جيجا أو أقل. معالجة صورة عالية الدقة خام عليه كانت بتوقعه. وعلى جهاز تاني الـ aspect ratio كان بيمط الوش فتبقى الـ biometric verification ملهاش لازمة.\n\nSmileID أعادت بناء الـ SDKs بـ CameraX واستخدمت Preview و ImageAnalysis في pipeline واحد: الأول بيعرض الـ feed بنسبة صح للمستخدم، والتاني بيعالج الـ frames محليًا لـ liveness وتحديد الوش واستخراج السيلفي. ووفقًا لهم: نمو الـ adoption وصل ٢٠ ضعف في السنة التانية بدل ٢ لـ ٣، ونسب النجاح زادت ٢٠٪، ودقة الالتقاط زادت ٤ أضعاف، و ١٨٫٠٠٠+ نوع جهاز مدعوم، و ١٦٠ مليون+ عملية تحقق.\n\nخد بالك إن الأرقام دي بتنسبها المقالة لـ SmileID نفسها، فاعتبرها شهادة استخدام مش benchmark مستقل. والمقال مدونة رسمية من جوجل بتعرض قصة نجاح، فالتحديات على تطبيقك هتختلف حسب الأجهزة اللي بتستهدفها.\n\nبتختبر الكاميرا في تطبيقك على أضعف جهاز يستخدمه عملاؤك؟\n\nزكاة العلم نشره.\n\n#Android #CameraX #IdentityVerification #Camera #mo3talogy",
+    "summary_ar": "تطبيقات البنوك وتسجيل الـ SIM محتاجة صورة وش واضحة عشان تكتشف التزييف والـ deepfakes. بس إزاي تضمن صورة بالجودة دي على موبايلات رخيصة وأجهزة POS ومعالجات ضعيفة؟ 📷\n\nمدونة Android Developers بتحكي قصة SmileID، SDK للتحقق من الهوية في أفريقيا، و Android هي ٨٥٪ من الأجهزة المستهدفة عندهم. قبل CameraX كانت المشاكل مألوفة: preview ممطوط، واتجاه sensor مقلوب، و out-of-memory crashes، وعيوب خاصة بكل OEM.\n\nتخيّل موبايل بذاكرة ١ جيجا أو أقل. معالجة صورة عالية الدقة خام عليه كانت بتوقعه. وعلى جهاز تاني الـ aspect ratio كان بيمط الوش فتبقى الـ biometric verification ملهاش لازمة.\n\nخد بالك إن الأرقام دي بتنسبها المقالة لـ SmileID نفسها، فاعتبرها شهادة استخدام مش benchmark مستقل. والمقال مدونة رسمية من جوجل بتعرض قصة نجاح، فالتحديات على تطبيقك هتختلف حسب الأجهزة اللي بتستهدفها.\n\nبتختبر الكاميرا في تطبيقك على أضعف جهاز يستخدمه عملاؤك؟",
+    "summary_en": "Android Developers' blog tells how SmileID rebuilt its identity-verification SDKs on CameraX to handle stretched previews, wrong sensor orientation, out-of-memory crashes and OEM quirks on low-end devices. It combines Preview with ImageAnalysis for on-device liveness and face detection. SmileID reports 20x adoption growth, a 20% rise in pass rates, 4x capture resolution and 18,000+ supported device types; these are the company's own figures.",
+    "url": "https://developer.android.com/blog/posts/smileid-camerax-android-identity-verification",
+    "image": "assets/images/articles/kw537-aw753-smileid-and-camerax-identity-verification-across-18-000-android-device-types.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-smileid-and-camerax-identity-verification-across-18-000-android-device-types.svg"
+    ],
+    "explainers": [
+      {
+        "term": "CameraX",
+        "explanation": "مكتبة Jetpack بتبسّط الكاميرا وبتوحّد السلوك بين الأجهزة."
+      },
+      {
+        "term": "liveness check",
+        "explanation": "فحص بيتأكد إن اللي قدام الكاميرا شخص حي مش صورة أو فيديو."
+      },
+      {
+        "term": "deepfake",
+        "explanation": "محتوى مزيف مولّد بالـ AI بيقلّد وش أو صوت حقيقي."
+      },
+      {
+        "term": "ImageAnalysis",
+        "explanation": "use case في CameraX لمعالجة frames الكاميرا في الوقت الفعلي."
+      },
+      {
+        "term": "OEM",
+        "explanation": "الشركة المصنّعة للجهاز، وبتضيف أحيانًا سلوكيات خاصة بيها."
+      },
+      {
+        "term": "OOM",
+        "explanation": "نفاد الذاكرة، بيوقع التطبيق."
+      },
+      {
+        "term": "aspect ratio",
+        "explanation": "النسبة بين عرض الصورة وارتفاعها."
+      },
+      {
+        "term": "POS terminal",
+        "explanation": "جهاز نقطة بيع، بعضه شغال بـ Android."
+      }
+    ],
+    "linkedin_body": "تطبيقات البنوك وتسجيل الـ SIM محتاجة صورة وش واضحة عشان تكتشف التزييف والـ deepfakes. بس إزاي تضمن صورة بالجودة دي على موبايلات رخيصة وأجهزة POS ومعالجات ضعيفة؟ 📷\n\nمدونة Android Developers بتحكي قصة SmileID، SDK للتحقق من الهوية في أفريقيا، و Android هي ٨٥٪ من الأجهزة المستهدفة عندهم. قبل CameraX كانت المشاكل مألوفة: preview ممطوط، واتجاه sensor مقلوب، و out-of-memory crashes، وعيوب خاصة بكل OEM.\n\nتخيّل موبايل بذاكرة ١ جيجا أو أقل. معالجة صورة عالية الدقة خام عليه كانت بتوقعه. وعلى جهاز تاني الـ aspect ratio كان بيمط الوش فتبقى الـ biometric verification ملهاش لازمة.\n\nSmileID أعادت بناء الـ SDKs بـ CameraX واستخدمت Preview و ImageAnalysis في pipeline واحد: الأول بيعرض الـ feed بنسبة صح للمستخدم، والتاني بيعالج الـ frames محليًا لـ liveness وتحديد الوش واستخراج السيلفي. ووفقًا لهم: نمو الـ adoption وصل ٢٠ ضعف في السنة التانية بدل ٢ لـ ٣، ونسب النجاح زادت ٢٠٪، ودقة الالتقاط زادت ٤ أضعاف، و ١٨٫٠٠٠+ نوع جهاز مدعوم، و ١٦٠ مليون+ عملية تحقق.\n\nخد بالك إن الأرقام دي بتنسبها المقالة لـ SmileID نفسها، فاعتبرها شهادة استخدام مش benchmark مستقل. والمقال مدونة رسمية من جوجل بتعرض قصة نجاح، فالتحديات على تطبيقك هتختلف حسب الأجهزة اللي بتستهدفها.\n\nلو تطبيقك بيستخدم الكاميرا، جرّب الـ pipeline على أضعف جهاز عندك مش على الـ flagship. راقب الذاكرة وقت معالجة الصور وتأكد إن الـ preview مش ممطوط. ولو لسه على Camera1 أو Camera2 خام، قيّم تكلفة الانتقال لـ CameraX بالأجهزة اللي بتخدمها فعلًا.\n\nبتختبر الكاميرا في تطبيقك على أضعف جهاز يستخدمه عملاؤك؟\n\nزكاة العلم نشره.\n\n#Android #CameraX #IdentityVerification #Camera #mo3talogy"
+  },
+  {
+    "title": "الـ mutation testing بيكشف اختباراتك الناقصة: أداة Jev بتنضّف تقرير PIT لمشاريع Kotlin",
+    "date": "2026-11-19T23:35:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "Testing",
+      "Mutation Testing",
+      "PIT"
+    ],
+    "content": "كل الاختبارات عدّت وكله أخضر… بس هل الاختبارات فعلًا بتغطي كل الحالات؟ الـ mutation testing بيجاوب على السؤال ده بشكل مباشر 🧬\n\nLeonidas Partsas بيشرح إن الفكرة إنك تغيّر كود الإنتاج (تحذف سطر أو تعدّل شرط) وتشغّل الاختبارات. لو ما فشلش ولا اختبار، يبقى اختباراتك ما كانتش بتغطي الحالة دي، والـ mutation اللي نجا ده ثغرة. ولما الـ agents بقت بتكتب الاختبارات، الموضوع بقى أهم عشان تتأكد إنها كاملة.\n\nتخيّل دالة canEnter(age) = age >= 18 واختبار على ١٧ و ١٩ بس. لو غيّرت الشرط لـ age > 18، كل الاختبارات تعدّي. الحل إنك تضيف حالة ١٨ في الـ CSV. المثال بسيط بس بيوضح إزاي mutant ينجو.\n\nفي الـ JVM الأداة المفضلة هي PIT، وهي بتغيّر الـ bytecode مش الكود، فبتبقى أسرع. بس مع Kotlin ده عيب كمان: المترجم بيضيف كود زيادة على الملف الأصلي، فتقرير PIT بيتملي بـ mutants مش مفيدة. هنا بتيجي Jev: بتنضّف تقرير الـ mutation لمشاريع Kotlin عشان تركّز على اللي يهم.\n\nخد بالك إن المقال بيعرض الفكرة والأداة في ٤ دقايق، فراجع توثيق Jev قبل ما تعتمد على نتايجها. والـ mutation testing بطيء بطبيعته لأنه بيشغّل الاختبارات كذا مرة، فشغّله على الأجزاء الحساسة مش المشروع كله دايمًا.\n\nلو شغّلت mutation testing على اختباراتك، تتوقع تلاقي كام ثغرة؟\n\nزكاة العلم نشره.\n\n#Kotlin #Testing #MutationTesting #PIT #mo3talogy",
+    "summary_ar": "كل الاختبارات عدّت وكله أخضر… بس هل الاختبارات فعلًا بتغطي كل الحالات؟ الـ mutation testing بيجاوب على السؤال ده بشكل مباشر 🧬\n\nLeonidas Partsas بيشرح إن الفكرة إنك تغيّر كود الإنتاج (تحذف سطر أو تعدّل شرط) وتشغّل الاختبارات. لو ما فشلش ولا اختبار، يبقى اختباراتك ما كانتش بتغطي الحالة دي، والـ mutation اللي نجا ده ثغرة. ولما الـ agents بقت بتكتب الاختبارات، الموضوع بقى أهم عشان تتأكد إنها كاملة.\n\nتخيّل دالة canEnter(age) = age >= 18 واختبار على ١٧ و ١٩ بس. لو غيّرت الشرط لـ age > 18، كل الاختبارات تعدّي. الحل إنك تضيف حالة ١٨ في الـ CSV. المثال بسيط بس بيوضح إزاي mutant ينجو.\n\nخد بالك إن المقال بيعرض الفكرة والأداة في ٤ دقايق، فراجع توثيق Jev قبل ما تعتمد على نتايجها. والـ mutation testing بطيء بطبيعته لأنه بيشغّل الاختبارات كذا مرة، فشغّله على الأجزاء الحساسة مش المشروع كله دايمًا.\n\nلو شغّلت mutation testing على اختباراتك، تتوقع تلاقي كام ثغرة؟",
+    "summary_en": "Mutation testing alters production code (for example changing >= to >) and checks whether any test fails; a mutant that survives reveals a missing test. Leonidas Partsas notes this matters more now that agents write tests. PIT mutates bytecode, which is fast but noisy for Kotlin because the compiler adds extra bytecode, so the author uses Jev to triage and clear the PIT report for Kotlin projects.",
+    "url": "https://le0nidas.gr/2026/11/08/clear-your-kotlins-code-mutation-report-using-jev",
+    "image": "assets/images/articles/kw537-aw753-mutation-testing-in-kotlin-clearing-the-pit-report-with-jev.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-mutation-testing-in-kotlin-clearing-the-pit-report-with-jev.svg"
+    ],
+    "explainers": [
+      {
+        "term": "mutation testing",
+        "explanation": "تغيير مقصود في الكود لقياس قدرة الاختبارات على اكتشافه."
+      },
+      {
+        "term": "mutant",
+        "explanation": "نسخة معدّلة من الكود بتتعمل عشان تتجرّب."
+      },
+      {
+        "term": "survived mutant",
+        "explanation": "mutant عدّى من غير ما أي اختبار يفشل، يعني ثغرة في الاختبارات."
+      },
+      {
+        "term": "PIT",
+        "explanation": "أداة mutation testing لـ JVM بتعدّل الـ bytecode."
+      },
+      {
+        "term": "bytecode",
+        "explanation": "الكود الوسيط اللي بيتولد من Java و Kotlin وبيشتغل على JVM."
+      },
+      {
+        "term": "boundary condition",
+        "explanation": "حالة على حدّ الشرط زي ١٨ في age >= 18."
+      },
+      {
+        "term": "Jev",
+        "explanation": "أداة بتنضّف وتصنّف تقرير PIT لمشاريع Kotlin."
+      },
+      {
+        "term": "parameterized test",
+        "explanation": "اختبار واحد بيتشغّل على مجموعة قيم مدخلات."
+      }
+    ],
+    "linkedin_body": "كل الاختبارات عدّت وكله أخضر… بس هل الاختبارات فعلًا بتغطي كل الحالات؟ الـ mutation testing بيجاوب على السؤال ده بشكل مباشر 🧬\n\nLeonidas Partsas بيشرح إن الفكرة إنك تغيّر كود الإنتاج (تحذف سطر أو تعدّل شرط) وتشغّل الاختبارات. لو ما فشلش ولا اختبار، يبقى اختباراتك ما كانتش بتغطي الحالة دي، والـ mutation اللي نجا ده ثغرة. ولما الـ agents بقت بتكتب الاختبارات، الموضوع بقى أهم عشان تتأكد إنها كاملة.\n\nتخيّل دالة canEnter(age) = age >= 18 واختبار على ١٧ و ١٩ بس. لو غيّرت الشرط لـ age > 18، كل الاختبارات تعدّي. الحل إنك تضيف حالة ١٨ في الـ CSV. المثال بسيط بس بيوضح إزاي mutant ينجو.\n\nفي الـ JVM الأداة المفضلة هي PIT، وهي بتغيّر الـ bytecode مش الكود، فبتبقى أسرع. بس مع Kotlin ده عيب كمان: المترجم بيضيف كود زيادة على الملف الأصلي، فتقرير PIT بيتملي بـ mutants مش مفيدة. هنا بتيجي Jev: بتنضّف تقرير الـ mutation لمشاريع Kotlin عشان تركّز على اللي يهم.\n\nخد بالك إن المقال بيعرض الفكرة والأداة في ٤ دقايق، فراجع توثيق Jev قبل ما تعتمد على نتايجها. والـ mutation testing بطيء بطبيعته لأنه بيشغّل الاختبارات كذا مرة، فشغّله على الأجزاء الحساسة مش المشروع كله دايمًا.\n\nجرّب PIT على module صغير فيه منطق حساب أو شروط. بعد التقرير، ركّز على الـ mutants الباقية في الشروط الحدّية زي >= و >. وكل ثغرة تلاقيها، أضف لها اختبار وأعد التشغيل عشان تتأكد إنها اتقفلت.\n\nلو شغّلت mutation testing على اختباراتك، تتوقع تلاقي كام ثغرة؟\n\nزكاة العلم نشره.\n\n#Kotlin #Testing #MutationTesting #PIT #mo3talogy"
+  },
+  {
+    "title": "نقل تطبيق Android حقيقي لـ KMP (٣/٤): الـ UI اتنقل بسهولة، بس الـ tooling حوالين الـ UI لأ",
+    "date": "2026-11-19T23:34:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "KMP",
+      "Compose Multiplatform",
+      "Screenshot Testing"
+    ],
+    "content": "كنت متوقع إن الـ UI هيكون أصعب جزء في نقل التطبيق لـ KMP لأنه ملمّس للشاشة والـ system bars والـ back gesture. والمفاجأة إن الـ composables اتنقلت تقريبًا زي الـ domain models 🤯\n\nDaniel Voko في الجزء التالت بيقول إن اللي ما اتنقلش بسهولة هو اللي حوالين الـ UI: نظام الـ resources والـ build plugins وأدوات الـ preview والـ screenshot tests، كلها مبنية على إن Compose module هو Android library. التطبيق BikeHub والـ UDF layer اتنقل الأول، فمفيش اعتماد على androidx.lifecycle في ٣٨ feature module.\n\nتخيّل تعدّ ملفات androidMain: ١٣٫٨٤٣ سطر، منهم ٩٫٦٥٣ (٧٠٪) دوال @Preview. والكود الخاص بـ Android فعلًا حوالي ٤٫١٩٠ سطر، أقل من ٤٪ من المشروع. يعني اللي كان بيتسمى «platform code» أغلبه scaffolding للأدوات.\n\nالحدود الحقيقية في core:designsystem و core:ui خلف expect/actual: BackHandler و FullScreenDialog و ContainerSize و PhotoPager و PlatformWebView. والـ resources كلها في module واحد core:res، واحتاج workaround بالـ reflection. وشبكة الأمان Roborazzi تحت Robolectric في androidHostTest بـ convention plugin على ٤٠ module، مع Sync task بتنقل الـ resources للـ test assets. و Compose Preview Screenshot Testing ما اشتغلش في KMP module.\n\nخد بالك من ٢ trade-offs ذكرهم الكاتب: الـ screenshot suite بتغطي Android بس، مش iOS والويب اللي بيرسموا بـ Skia. و ٥٥ ميجا PNG في الـ repo، والـ CI بيعيد التسجيل وبيعمل commit لو فشل التحقق، فممكن تغيير بصري غير مقصود يتقبل بدون ما حد ينتبه. وده تجربة تطبيق واحد.\n\nلو نقلت UI تطبيقك لـ KMP، إيه الأداة اللي تتوقع إنها هتتكسر الأول؟\n\nزكاة العلم نشره.\n\n#Kotlin #KMP #ComposeMultiplatform #Roborazzi #mo3talogy",
+    "summary_ar": "كنت متوقع إن الـ UI هيكون أصعب جزء في نقل التطبيق لـ KMP لأنه ملمّس للشاشة والـ system bars والـ back gesture. والمفاجأة إن الـ composables اتنقلت تقريبًا زي الـ domain models 🤯\n\nDaniel Voko في الجزء التالت بيقول إن اللي ما اتنقلش بسهولة هو اللي حوالين الـ UI: نظام الـ resources والـ build plugins وأدوات الـ preview والـ screenshot tests، كلها مبنية على إن Compose module هو Android library. التطبيق BikeHub والـ UDF layer اتنقل الأول، فمفيش اعتماد على androidx.lifecycle في ٣٨ feature module.\n\nتخيّل تعدّ ملفات androidMain: ١٣٫٨٤٣ سطر، منهم ٩٫٦٥٣ (٧٠٪) دوال @Preview. والكود الخاص بـ Android فعلًا حوالي ٤٫١٩٠ سطر، أقل من ٤٪ من المشروع. يعني اللي كان بيتسمى «platform code» أغلبه scaffolding للأدوات.\n\nخد بالك من ٢ trade-offs ذكرهم الكاتب: الـ screenshot suite بتغطي Android بس، مش iOS والويب اللي بيرسموا بـ Skia. و ٥٥ ميجا PNG في الـ repo، والـ CI بيعيد التسجيل وبيعمل commit لو فشل التحقق، فممكن تغيير بصري غير مقصود يتقبل بدون ما حد ينتبه. وده تجربة تطبيق واحد.\n\nلو نقلت UI تطبيقك لـ KMP، إيه الأداة اللي تتوقع إنها هتتكسر الأول؟",
+    "summary_en": "Part 3 of a real-app KMP migration: composables moved almost as easily as domain models, but the tooling around them did not. Of 13,843 lines in androidMain, 70% were @Preview functions, so true Android-specific code was under 4%. The UI's real seams (BackHandler, FullScreenDialog, PlatformWebView) sit behind expect/actual, and Roborazzi under Robolectric needed resource-sync workarounds. Screenshot tests cover Android only, and 55 MB of PNGs live in the repo.",
+    "url": "https://proandroiddev.com/migrating-a-real-android-app-to-kotlin-multiplatform-3-4-sharing-the-ui-without-losing-safety-net-f74a6bf408ae",
+    "image": "assets/images/articles/kw537-aw753-migrating-a-real-android-app-to-kmp-part-3-sharing-the-ui-without-losing-the-safety-net.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-migrating-a-real-android-app-to-kmp-part-3-sharing-the-ui-without-losing-the-safety-net.svg"
+    ],
+    "explainers": [
+      {
+        "term": "KMP",
+        "explanation": "Kotlin Multiplatform: كود Kotlin مشترك بين منصات."
+      },
+      {
+        "term": "expect/actual",
+        "explanation": "آلية بتعرّف واجهة مشتركة وتنفيذ مختلف لكل منصة."
+      },
+      {
+        "term": "androidMain",
+        "explanation": "source set فيه الكود الخاص بـ Android في مشروع KMP."
+      },
+      {
+        "term": "UDF",
+        "explanation": "Unidirectional Data Flow: الحالة بتنزل والأحداث بتطلع في اتجاه واحد."
+      },
+      {
+        "term": "Roborazzi",
+        "explanation": "مكتبة screenshot tests بتشتغل على JVM بـ Robolectric."
+      },
+      {
+        "term": "Robolectric",
+        "explanation": "إطار بيشغّل اختبارات Android على JVM من غير جهاز."
+      },
+      {
+        "term": "composeResources",
+        "explanation": "نظام الـ resources في Compose Multiplatform لتحميل strings وصور مشتركة."
+      },
+      {
+        "term": "convention plugin",
+        "explanation": "Gradle plugin بيوحّد إعدادات البناء بين modules."
+      }
+    ],
+    "linkedin_body": "كنت متوقع إن الـ UI هيكون أصعب جزء في نقل التطبيق لـ KMP لأنه ملمّس للشاشة والـ system bars والـ back gesture. والمفاجأة إن الـ composables اتنقلت تقريبًا زي الـ domain models 🤯\n\nDaniel Voko في الجزء التالت بيقول إن اللي ما اتنقلش بسهولة هو اللي حوالين الـ UI: نظام الـ resources والـ build plugins وأدوات الـ preview والـ screenshot tests، كلها مبنية على إن Compose module هو Android library. التطبيق BikeHub والـ UDF layer اتنقل الأول، فمفيش اعتماد على androidx.lifecycle في ٣٨ feature module.\n\nتخيّل تعدّ ملفات androidMain: ١٣٫٨٤٣ سطر، منهم ٩٫٦٥٣ (٧٠٪) دوال @Preview. والكود الخاص بـ Android فعلًا حوالي ٤٫١٩٠ سطر، أقل من ٤٪ من المشروع. يعني اللي كان بيتسمى «platform code» أغلبه scaffolding للأدوات.\n\nالحدود الحقيقية في core:designsystem و core:ui خلف expect/actual: BackHandler و FullScreenDialog و ContainerSize و PhotoPager و PlatformWebView. والـ resources كلها في module واحد core:res، واحتاج workaround بالـ reflection. وشبكة الأمان Roborazzi تحت Robolectric في androidHostTest بـ convention plugin على ٤٠ module، مع Sync task بتنقل الـ resources للـ test assets. و Compose Preview Screenshot Testing ما اشتغلش في KMP module.\n\nخد بالك من ٢ trade-offs ذكرهم الكاتب: الـ screenshot suite بتغطي Android بس، مش iOS والويب اللي بيرسموا بـ Skia. و ٥٥ ميجا PNG في الـ repo، والـ CI بيعيد التسجيل وبيعمل commit لو فشل التحقق، فممكن تغيير بصري غير مقصود يتقبل بدون ما حد ينتبه. وده تجربة تطبيق واحد.\n\nقبل ما تغيّر نوع الـ module لـ KMP، اعمل جرد سريع: كام سطر من كود الـ UI بيلمس Android غير Compose نفسه؟ ومين من أدوات الـ preview والـ screenshot والـ resources معتمد على إن الـ module هو Android library؟ ورتّب خطة للأدوات قبل ما تنقل الكود.\n\nلو نقلت UI تطبيقك لـ KMP، إيه الأداة اللي تتوقع إنها هتتكسر الأول؟\n\nزكاة العلم نشره.\n\n#Kotlin #KMP #ComposeMultiplatform #Roborazzi #mo3talogy"
+  },
+  {
+    "title": "ليه Compose بتبعد عن value و onValueChange: TextFieldState و TextFieldBuffer",
+    "date": "2026-11-19T23:33:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "TextField",
+      "IME"
+    ],
+    "content": "بتكتب بسرعة في TextField، والحروف بتنزل ناقصة أو مكررة والـ cursor بيقفز؟ المشكلة غالبًا في الـ round trip بين الكيبورد والـ ViewModel 🔤\n\nArda Kazancı بيشرح إن من Compose 1.13 overloads بتاعت value و onValueChange في BasicTextField و TextField و OutlinedTextField بقت soft-deprecated: مش هتاخد features ولا إصلاحات غير الأمان والـ accessibility. والبديل TextFieldState، المستقر من Compose 1.7.\n\nتخيّل TextField مربوط بـ StateFlow. المستخدم يكتب بسرعة، والكيبورد (IME) بيبعت تعديل، والـ ViewModel بيرد بقيمة متأخرة، فالـ UI والـ buffer بتوع الكيبورد بيفقدوا التزامن، وده بيعمل حروف ضايعة أو متكررة وقفزات cursor.\n\nالـ TextFieldState بيتحدّث بشكل synchronous على الـ main thread وفيه النص والـ selection وعلامات composition وتاريخ undo/redo والـ styles. وبما إنه مبني على Snapshot System، فـ BasicTextField بيقرأه في layout و draw بس، فمفيش recomposition مع كل ضغطة. والتعديل البرمجي بيعدي على TextFieldBuffer جوه state.edit مرة واحدة (insert و delete و replace)، وفيه InputTransformation لتصفية الإدخال زي digits only. والمقال بيغطي كمان التنسيق في Compose 1.12.\n\nخد بالك إن النص في state.text read-only، فكل التعديل لازم يمر على edit. وكمان لو عندك كود قديم بيعتمد على value و onValueChange فالانتقال محتاج إعادة تصميم المعمارية مش بس تغيير الـ overload. والمقال بيتكلم عن إصدارات Compose معينة، فتأكد من الإصدار عندك.\n\nعندك TextFields لسه شغالة بـ value و onValueChange؟ هتنقلها إمتى؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #TextField #Compose113 #mo3talogy",
+    "summary_ar": "بتكتب بسرعة في TextField، والحروف بتنزل ناقصة أو مكررة والـ cursor بيقفز؟ المشكلة غالبًا في الـ round trip بين الكيبورد والـ ViewModel 🔤\n\nArda Kazancı بيشرح إن من Compose 1.13 overloads بتاعت value و onValueChange في BasicTextField و TextField و OutlinedTextField بقت soft-deprecated: مش هتاخد features ولا إصلاحات غير الأمان والـ accessibility. والبديل TextFieldState، المستقر من Compose 1.7.\n\nتخيّل TextField مربوط بـ StateFlow. المستخدم يكتب بسرعة، والكيبورد (IME) بيبعت تعديل، والـ ViewModel بيرد بقيمة متأخرة، فالـ UI والـ buffer بتوع الكيبورد بيفقدوا التزامن، وده بيعمل حروف ضايعة أو متكررة وقفزات cursor.\n\nخد بالك إن النص في state.text read-only، فكل التعديل لازم يمر على edit. وكمان لو عندك كود قديم بيعتمد على value و onValueChange فالانتقال محتاج إعادة تصميم المعمارية مش بس تغيير الـ overload. والمقال بيتكلم عن إصدارات Compose معينة، فتأكد من الإصدار عندك.\n\nعندك TextFields لسه شغالة بـ value و onValueChange؟ هتنقلها إمتى؟",
+    "summary_en": "From Compose 1.13 the value/onValueChange text field overloads are soft-deprecated in favour of TextFieldState. Round trips through StateFlow and the IME can desynchronise, causing dropped or duplicated characters and cursor jumps. TextFieldState updates synchronously and is backed by the snapshot system, so typing avoids recomposition; programmatic changes go through TextFieldBuffer inside a single state.edit, and InputTransformation filters input. Compose 1.12 adds formatted-text styling.",
+    "url": "https://ardakazanci.com/posts/building-reliable-text-editing-in-compose/",
+    "image": "assets/images/articles/kw537-aw753-reliable-text-editing-in-compose-textfieldstate-and-textfieldbuffer.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-reliable-text-editing-in-compose-textfieldstate-and-textfieldbuffer.svg"
+    ],
+    "explainers": [
+      {
+        "term": "TextFieldState",
+        "explanation": "كائن بيمسك حالة حقل النص: النص والـ selection والـ undo."
+      },
+      {
+        "term": "onValueChange",
+        "explanation": "callback قديم بيبلغك بكل تغيير في النص عشان تحدّث state بنفسك."
+      },
+      {
+        "term": "soft-deprecated",
+        "explanation": "API مش هيتحذف دلوقتي بس مش هيتطور ولا هتتصلح فيه مشاكل."
+      },
+      {
+        "term": "IME",
+        "explanation": "محرر الإدخال، يعني الكيبورد على الشاشة."
+      },
+      {
+        "term": "TextFieldBuffer",
+        "explanation": "مخزن مؤقت لتعديل النص بشكل ذري جوه edit."
+      },
+      {
+        "term": "InputTransformation",
+        "explanation": "تحويل أو رفض للإدخال قبل ما يتثبت في state."
+      },
+      {
+        "term": "Snapshot System",
+        "explanation": "نظام Compose اللي بيتتبع قراءات وكتابات الـ state."
+      },
+      {
+        "term": "recomposition",
+        "explanation": "إعادة تشغيل composables اللي اتأثرت بتغيّر state."
+      }
+    ],
+    "linkedin_body": "بتكتب بسرعة في TextField، والحروف بتنزل ناقصة أو مكررة والـ cursor بيقفز؟ المشكلة غالبًا في الـ round trip بين الكيبورد والـ ViewModel 🔤\n\nArda Kazancı بيشرح إن من Compose 1.13 overloads بتاعت value و onValueChange في BasicTextField و TextField و OutlinedTextField بقت soft-deprecated: مش هتاخد features ولا إصلاحات غير الأمان والـ accessibility. والبديل TextFieldState، المستقر من Compose 1.7.\n\nتخيّل TextField مربوط بـ StateFlow. المستخدم يكتب بسرعة، والكيبورد (IME) بيبعت تعديل، والـ ViewModel بيرد بقيمة متأخرة، فالـ UI والـ buffer بتوع الكيبورد بيفقدوا التزامن، وده بيعمل حروف ضايعة أو متكررة وقفزات cursor.\n\nالـ TextFieldState بيتحدّث بشكل synchronous على الـ main thread وفيه النص والـ selection وعلامات composition وتاريخ undo/redo والـ styles. وبما إنه مبني على Snapshot System، فـ BasicTextField بيقرأه في layout و draw بس، فمفيش recomposition مع كل ضغطة. والتعديل البرمجي بيعدي على TextFieldBuffer جوه state.edit مرة واحدة (insert و delete و replace)، وفيه InputTransformation لتصفية الإدخال زي digits only. والمقال بيغطي كمان التنسيق في Compose 1.12.\n\nخد بالك إن النص في state.text read-only، فكل التعديل لازم يمر على edit. وكمان لو عندك كود قديم بيعتمد على value و onValueChange فالانتقال محتاج إعادة تصميم المعمارية مش بس تغيير الـ overload. والمقال بيتكلم عن إصدارات Compose معينة، فتأكد من الإصدار عندك.\n\nابدأ بشاشة فيها TextField واحد مربوط بـ StateFlow، وانقله لـ rememberTextFieldState. وبعدين اكتب التعديلات البرمجية جوه state.edit مرة واحدة مش edit بعد edit. ولو عندك تصفية إدخال، جرب InputTransformation بدل ما تفلتر في onValueChange.\n\nعندك TextFields لسه شغالة بـ value و onValueChange؟ هتنقلها إمتى؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #TextField #Compose113 #mo3talogy"
+  },
+  {
+    "title": "ليه ضغطة واحدة على paywall بتاخد ٠٫٤ ثانية؟ كل component بيقرا الـ selection",
+    "date": "2026-11-19T23:32:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "Performance",
+      "derivedStateOf"
+    ],
+    "content": "المستخدم بيضغط على الخطة التانية في الـ paywall، والـ ripple بيبدأ، وبعدين الشاشة بتقف حوالي ٠٫٤ ثانية قبل ما الاختيار يتغير. والغريب إن مفيش حاجة اتعاد رسمها تقريبًا 🤔\n\nJaewoong Eum من RevenueCat بيبدأ من تقرير مشكلة مع تسجيل شاشة لـ paywall في الـ Android SDK. الـ paywall بتتبني من dashboard وبتوصل كشجرة components، وأي component ممكن يكون عليه overrides (خصائص جزئية بتتطبق لما شرط يتحقق، زي Selected). كل component كان عنده state holder بيحل الـ overrides جوه derivedStateOf.\n\nتخيّل ٣٠٠ component كلهم بيقروا isSelected و offerEligibility ومعرّف الباكيدج المختار قبل ما حتى يبصوا على شروطهم. لما المستخدم يختار باكيدج، كلهم يعيدوا الحساب، حتى اللي overrides بتاعتهم ما بتذكرش الاختيار. وده نفس شكل قايمة selectable ممكن تكون كتبتها.\n\nالمقال بيمشي خطوة خطوة: قياس بـ instrumented test وـ kill switches، و derivedStateOf بيتخطى الـ recomposition مش الـ recalculation، وإن الشروط تتبعت كـ lambdas عشان تتقرا متأخر، و ٣٫٠٠٠ تجميع regex لكل ضغطة اتحلوا بـ cache، وخطوط من غير equals بتخلي derivedStateOf مش قادر يفرّق، ونقل شغل لـ draw phase، وspinner مش مرئي. والخلاصة إن اللي بطّأ الضغطة مئات components كل واحد بيسأل «أعمل حاجة ولا لأ؟» وده سؤال صح بس بتكلفة.\n\nخد بالك من نصيحة الكاتب: احتفظ بطريقة تطفي بيها الإصلاح في build القياس، لأن «الإصلاح حل عيب» غير «العيب كان السبب»، والـ A/B بس هو اللي يفرّق. والنتيجة دي لـ paywall بتتبني من server، فطبّق المبدأ على قوايمك مش الأرقام نفسها.\n\nعندك قايمة أو مكوّن مشترك بيقرا state عام، وكل عنصر فيه بيعيد الحساب مع كل ضغطة؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #Performance #derivedStateOf #mo3talogy",
+    "summary_ar": "المستخدم بيضغط على الخطة التانية في الـ paywall، والـ ripple بيبدأ، وبعدين الشاشة بتقف حوالي ٠٫٤ ثانية قبل ما الاختيار يتغير. والغريب إن مفيش حاجة اتعاد رسمها تقريبًا 🤔\n\nJaewoong Eum من RevenueCat بيبدأ من تقرير مشكلة مع تسجيل شاشة لـ paywall في الـ Android SDK. الـ paywall بتتبني من dashboard وبتوصل كشجرة components، وأي component ممكن يكون عليه overrides (خصائص جزئية بتتطبق لما شرط يتحقق، زي Selected). كل component كان عنده state holder بيحل الـ overrides جوه derivedStateOf.\n\nتخيّل ٣٠٠ component كلهم بيقروا isSelected و offerEligibility ومعرّف الباكيدج المختار قبل ما حتى يبصوا على شروطهم. لما المستخدم يختار باكيدج، كلهم يعيدوا الحساب، حتى اللي overrides بتاعتهم ما بتذكرش الاختيار. وده نفس شكل قايمة selectable ممكن تكون كتبتها.\n\nخد بالك من نصيحة الكاتب: احتفظ بطريقة تطفي بيها الإصلاح في build القياس، لأن «الإصلاح حل عيب» غير «العيب كان السبب»، والـ A/B بس هو اللي يفرّق. والنتيجة دي لـ paywall بتتبني من server، فطبّق المبدأ على قوايمك مش الأرقام نفسها.\n\nعندك قايمة أو مكوّن مشترك بيقرا state عام، وكل عنصر فيه بيعيد الحساب مع كل ضغطة؟",
+    "summary_en": "A RevenueCat paywall paused about 0.4 seconds after tapping a plan even though almost nothing changed on screen. The cause: every component's derivedStateOf read the shared selection before looking at its own override conditions, so hundreds of components recalculated on each tap. The fixes include lazy condition inputs as lambdas, a regex cache, giving fonts equals, and moving work to the draw phase. The author advises keeping a switch to turn a fix off, so an A/B can separate fixing a defect from finding the cause.",
+    "url": "https://www.revenuecat.com/blog/engineering/android-paywall-improve",
+    "image": "assets/images/articles/kw537-aw753-recalculated-not-recomposed-what-one-tap-costs-in-a-compose-paywall.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-recalculated-not-recomposed-what-one-tap-costs-in-a-compose-paywall.svg"
+    ],
+    "explainers": [
+      {
+        "term": "paywall",
+        "explanation": "شاشة اشتراك بتعرض الخطط والأسعار."
+      },
+      {
+        "term": "derivedStateOf",
+        "explanation": "بيحسب state من states تانية وبيعيد الحساب بس لما اللي قرأه يتغير."
+      },
+      {
+        "term": "override",
+        "explanation": "خصائص جزئية بتتطبق على component لما شرط معين يتحقق."
+      },
+      {
+        "term": "recomposition",
+        "explanation": "إعادة تشغيل composables اللي state بتاعها اتغيّر."
+      },
+      {
+        "term": "recalculation",
+        "explanation": "إعادة حساب قيمة، حتى لو الـ UI مش هيتغير."
+      },
+      {
+        "term": "draw phase",
+        "explanation": "مرحلة الرسم في Compose، بعد composition و layout."
+      },
+      {
+        "term": "regex cache",
+        "explanation": "تخزين الـ regex المترجمة عشان ما تتجمّعش من جديد كل مرة."
+      },
+      {
+        "term": "kill switch",
+        "explanation": "مفتاح بيطفي ميزة أو إصلاح عشان تقارن A/B."
+      }
+    ],
+    "linkedin_body": "المستخدم بيضغط على الخطة التانية في الـ paywall، والـ ripple بيبدأ، وبعدين الشاشة بتقف حوالي ٠٫٤ ثانية قبل ما الاختيار يتغير. والغريب إن مفيش حاجة اتعاد رسمها تقريبًا 🤔\n\nJaewoong Eum من RevenueCat بيبدأ من تقرير مشكلة مع تسجيل شاشة لـ paywall في الـ Android SDK. الـ paywall بتتبني من dashboard وبتوصل كشجرة components، وأي component ممكن يكون عليه overrides (خصائص جزئية بتتطبق لما شرط يتحقق، زي Selected). كل component كان عنده state holder بيحل الـ overrides جوه derivedStateOf.\n\nتخيّل ٣٠٠ component كلهم بيقروا isSelected و offerEligibility ومعرّف الباكيدج المختار قبل ما حتى يبصوا على شروطهم. لما المستخدم يختار باكيدج، كلهم يعيدوا الحساب، حتى اللي overrides بتاعتهم ما بتذكرش الاختيار. وده نفس شكل قايمة selectable ممكن تكون كتبتها.\n\nالمقال بيمشي خطوة خطوة: قياس بـ instrumented test وـ kill switches، و derivedStateOf بيتخطى الـ recomposition مش الـ recalculation، وإن الشروط تتبعت كـ lambdas عشان تتقرا متأخر، و ٣٫٠٠٠ تجميع regex لكل ضغطة اتحلوا بـ cache، وخطوط من غير equals بتخلي derivedStateOf مش قادر يفرّق، ونقل شغل لـ draw phase، وspinner مش مرئي. والخلاصة إن اللي بطّأ الضغطة مئات components كل واحد بيسأل «أعمل حاجة ولا لأ؟» وده سؤال صح بس بتكلفة.\n\nخد بالك من نصيحة الكاتب: احتفظ بطريقة تطفي بيها الإصلاح في build القياس، لأن «الإصلاح حل عيب» غير «العيب كان السبب»، والـ A/B بس هو اللي يفرّق. والنتيجة دي لـ paywall بتتبني من server، فطبّق المبدأ على قوايمك مش الأرقام نفسها.\n\nراجع عندك أي derivedStateOf بيقرا state مشترك زي selectedId قبل ما يبص على شروطه. جرّب تحوّل الـ condition inputs لـ lambdas، وقيس قبل وبعد بـ trace. وأي class بيتحط في state، اتأكد إن له equals مفهوم عشان الـ skipping يشتغل.\n\nعندك قايمة أو مكوّن مشترك بيقرا state عام، وكل عنصر فيه بيعيد الحساب مع كل ضغطة؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #Performance #derivedStateOf #mo3talogy"
+  },
+  {
+    "title": "الـ UI thread مقابل RenderThread: إيه اللي بيحصل بعد ما onDraw يخلص؟",
+    "date": "2026-11-19T23:31:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Rendering",
+      "Performance",
+      "Perfetto"
+    ],
+    "content": "الـ main thread بتاعك مش بيتقفل، ومع ذلك فيه frames بتقع. غريبة؟ لأن الـ frame بيعدي على أكتر من مكوّن، وكودك بيشتغل في أول واحد بس 🎞️\n\nRavi Rawal بيقسّم الرحلة: الـ UI thread بيعمل measure و layout وبيسجّل أوامر الرسم في display list لكل View (RenderNode). بعدين RenderThread بيعيد تشغيل التسجيل عبر HWUI ويبعت أوامر للـ GPU، والـ GPU بينفذ، و SurfaceFlinger بيدمج buffer التطبيق مع باقي الشاشة.\n\nتخيّل onDraw فيه generateComplexGeometry() بطيئة. بتشتغل على الـ UI thread كل frame، والـ RenderThread مستني display list جاي متأخر، والـ GPU شبه فاضي، والـ frame بيفوت الميعاد. ولو الـ commands نفسها تقيلة (clipPath كبير مثلًا) فالتسجيل بيخلص بسرعة والـ DrawFrame هو اللي بيطوّل، ونقل كودك لـ thread تاني ما بيغيّرش حاجة.\n\nفي الـ trace هتشوف Record View#draw() على الـ main و DrawFrame على RenderThread، و syncFrameState وقت ما الـ main بيستنى RenderThread ينسخ الـ state. الترتيب المقترح: سجّل الـ trace، دوّر على الـ frame المتأخر في Janky Frames (Android ١٢+)، وبعدين Choreographer#doFrame الطويل، و DrawFrame، ووقت انتهاء الـ GPU. وفي Compose نفس الـ pipeline، وقراءة state جوه graphicsLayer lambda بتعيد مرحلة الرسم بس مش الـ composition.\n\nخد بالك إن RenderThread طويل مش معناه GPU بطيء، والعكس بالعكس. وفترة الـ frame (١٦٫٧ms على ٦٠Hz) مش ميزانية كودك لوحده لأن الـ frames بتتعمل pipelined. والمقال بيوصي بـ Macrobenchmark FrameTimingMetric و JankStats لاكتشاف regressions من غير trace يدوي.\n\nآخر jank حلّيته، كان في الـ UI thread ولا في الـ RenderThread ولا في الـ GPU؟\n\nزكاة العلم نشره.\n\n#Android #Rendering #Performance #Perfetto #mo3talogy",
+    "summary_ar": "الـ main thread بتاعك مش بيتقفل، ومع ذلك فيه frames بتقع. غريبة؟ لأن الـ frame بيعدي على أكتر من مكوّن، وكودك بيشتغل في أول واحد بس 🎞️\n\nRavi Rawal بيقسّم الرحلة: الـ UI thread بيعمل measure و layout وبيسجّل أوامر الرسم في display list لكل View (RenderNode). بعدين RenderThread بيعيد تشغيل التسجيل عبر HWUI ويبعت أوامر للـ GPU، والـ GPU بينفذ، و SurfaceFlinger بيدمج buffer التطبيق مع باقي الشاشة.\n\nتخيّل onDraw فيه generateComplexGeometry() بطيئة. بتشتغل على الـ UI thread كل frame، والـ RenderThread مستني display list جاي متأخر، والـ GPU شبه فاضي، والـ frame بيفوت الميعاد. ولو الـ commands نفسها تقيلة (clipPath كبير مثلًا) فالتسجيل بيخلص بسرعة والـ DrawFrame هو اللي بيطوّل، ونقل كودك لـ thread تاني ما بيغيّرش حاجة.\n\nخد بالك إن RenderThread طويل مش معناه GPU بطيء، والعكس بالعكس. وفترة الـ frame (١٦٫٧ms على ٦٠Hz) مش ميزانية كودك لوحده لأن الـ frames بتتعمل pipelined. والمقال بيوصي بـ Macrobenchmark FrameTimingMetric و JankStats لاكتشاف regressions من غير trace يدوي.\n\nآخر jank حلّيته، كان في الـ UI thread ولا في الـ RenderThread ولا في الـ GPU؟",
+    "summary_en": "An app can drop frames even with a free main thread, because drawing spans the UI thread, RenderThread, GPU and SurfaceFlinger. The UI thread records draw commands into display lists; RenderThread replays them through HWUI. Slow onDraw, expensive draw commands (large paths, clipPath) and a saturated GPU look identical to users but need different fixes, and moving code off the main thread only helps the first. The author recommends system traces, FrameTimeline, Macrobenchmark and JankStats.",
+    "url": "https://ravirawal13.medium.com/android-ui-thread-vs-renderthread-3f54bb74340f",
+    "image": "assets/images/articles/kw537-aw753-android-ui-thread-vs-renderthread-what-happens-when-a-frame-is-drawn.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-android-ui-thread-vs-renderthread-what-happens-when-a-frame-is-drawn.svg"
+    ],
+    "explainers": [
+      {
+        "term": "UI thread",
+        "explanation": "الـ thread الرئيسي اللي بيشغّل الـ lifecycle والـ input والـ layout وبيسجّل أوامر الرسم."
+      },
+      {
+        "term": "RenderThread",
+        "explanation": "thread native بيعيد تشغيل display lists ويبعت أوامر الرسم للـ GPU."
+      },
+      {
+        "term": "display list",
+        "explanation": "تسجيل لأوامر الرسم بيتعاد تشغيله بعدين بدل ما تترسم فورًا."
+      },
+      {
+        "term": "HWUI",
+        "explanation": "محرك الرسم المبني على Skia اللي بيستخدمه Android."
+      },
+      {
+        "term": "SurfaceFlinger",
+        "explanation": "خدمة النظام اللي بتدمج buffers التطبيقات وتعرضها."
+      },
+      {
+        "term": "Choreographer",
+        "explanation": "بينسّق شغل الـ frame مع إشارة VSync."
+      },
+      {
+        "term": "FrameTimelines",
+        "explanation": "أداة في Perfetto بتقارن وقت العرض المتوقع بالفعلي."
+      },
+      {
+        "term": "JankStats",
+        "explanation": "مكتبة بتقيس وتبلغ عن الـ frames اللي اتأخرت."
+      }
+    ],
+    "linkedin_body": "الـ main thread بتاعك مش بيتقفل، ومع ذلك فيه frames بتقع. غريبة؟ لأن الـ frame بيعدي على أكتر من مكوّن، وكودك بيشتغل في أول واحد بس 🎞️\n\nRavi Rawal بيقسّم الرحلة: الـ UI thread بيعمل measure و layout وبيسجّل أوامر الرسم في display list لكل View (RenderNode). بعدين RenderThread بيعيد تشغيل التسجيل عبر HWUI ويبعت أوامر للـ GPU، والـ GPU بينفذ، و SurfaceFlinger بيدمج buffer التطبيق مع باقي الشاشة.\n\nتخيّل onDraw فيه generateComplexGeometry() بطيئة. بتشتغل على الـ UI thread كل frame، والـ RenderThread مستني display list جاي متأخر، والـ GPU شبه فاضي، والـ frame بيفوت الميعاد. ولو الـ commands نفسها تقيلة (clipPath كبير مثلًا) فالتسجيل بيخلص بسرعة والـ DrawFrame هو اللي بيطوّل، ونقل كودك لـ thread تاني ما بيغيّرش حاجة.\n\nفي الـ trace هتشوف Record View#draw() على الـ main و DrawFrame على RenderThread، و syncFrameState وقت ما الـ main بيستنى RenderThread ينسخ الـ state. الترتيب المقترح: سجّل الـ trace، دوّر على الـ frame المتأخر في Janky Frames (Android ١٢+)، وبعدين Choreographer#doFrame الطويل، و DrawFrame، ووقت انتهاء الـ GPU. وفي Compose نفس الـ pipeline، وقراءة state جوه graphicsLayer lambda بتعيد مرحلة الرسم بس مش الـ composition.\n\nخد بالك إن RenderThread طويل مش معناه GPU بطيء، والعكس بالعكس. وفترة الـ frame (١٦٫٧ms على ٦٠Hz) مش ميزانية كودك لوحده لأن الـ frames بتتعمل pipelined. والمقال بيوصي بـ Macrobenchmark FrameTimingMetric و JankStats لاكتشاف regressions من غير trace يدوي.\n\nالمرة الجاية اللي تلاقي jank، اسأل الأول: الوقت في الـ UI thread ولا RenderThread ولا GPU؟ سجّل trace واحد وقارن بين Choreographer#doFrame و DrawFrame قبل ما تنقل أي شغل لـ thread تاني. ولو عندك animation بيغيّر margin، جرّب translationX لأنها أرخص.\n\nآخر jank حلّيته، كان في الـ UI thread ولا في الـ RenderThread ولا في الـ GPU؟\n\nزكاة العلم نشره.\n\n#Android #Rendering #Performance #Perfetto #mo3talogy"
+  },
+  {
+    "title": "Deep links بـ Navigation 3: من الـ URI للـ back stack بـ APIs رسمية",
+    "date": "2026-11-19T23:30:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Navigation 3",
+      "DeepLinks",
+      "Serialization"
+    ],
+    "content": "لما Navigation 3 اتشحن في نوفمبر ٢٠٢٥، الـ deep linking كان مجرد helpers تنسخها من repo اسمه nav3-recipes. من navigation3-runtime 1.2.0 بقى فيه APIs رسمية 🔗\n\nArda Kazancı بيلخص جلسة Android Dev Summit لـ Ian Lake و Clara Fok. القاعدة الأساسية في Navigation 3 إنك إنت اللي بتملك الـ back stack (List<NavKey>)، فالـ API ليها وظيفة واحدة: تحوّل deep link داخل لقايمة NavKey ابتدائية يرسمها NavDisplay.\n\nتخيّل لينك فيه معرّف منتج. بتحدّد pattern DeepLinkUri مع KSerializer للـ key، وUriDeepLinkMatcher بيطابق الـ DeepLinkRequest ويبني الـ key بنوعه الصح. و DeepLinkSerializer بيتولى تحويل الـ arguments. وwithBackStack بيبني back stack اصطناعي، فلما المستخدم يدوس back من شاشة المنتج يرجع لشاشة منطقية مش يخرج من التطبيق.\n\nلازم تفضل تعلن الـ intent-filter في AndroidManifest.xml عشان النظام يعرف مين يفتح، وبعدها على Android الـ DeepLinkRequest(intent) بيقرا intent.data والـ action والـ MIME type والـ extras. وفي كود KMP أو الاختبارات تبني DeepLinkRequest من DeepLinkUri أو String من غير mock لـ Intent. وبتحتاج Kotlin Serialization plugin.\n\nخد بالك إن النسخ في المقال (1.2.1 و kotlinx-serialization 1.9.0) لحظة كتابته، فراجع الإصدارات عندك. وفكرة إنك إنت اللي بتملك الـ back stack معناها إن مسؤولية الـ synthetic back stack عليك، فاختبرها بنفسك.\n\ndeep links تطبيقك بتجيب المستخدم لشاشة منطقية لما يدوس back؟\n\nزكاة العلم نشره.\n\n#Android #Navigation3 #DeepLinks #KotlinSerialization #mo3talogy",
+    "summary_ar": "لما Navigation 3 اتشحن في نوفمبر ٢٠٢٥، الـ deep linking كان مجرد helpers تنسخها من repo اسمه nav3-recipes. من navigation3-runtime 1.2.0 بقى فيه APIs رسمية 🔗\n\nArda Kazancı بيلخص جلسة Android Dev Summit لـ Ian Lake و Clara Fok. القاعدة الأساسية في Navigation 3 إنك إنت اللي بتملك الـ back stack (List<NavKey>)، فالـ API ليها وظيفة واحدة: تحوّل deep link داخل لقايمة NavKey ابتدائية يرسمها NavDisplay.\n\nتخيّل لينك فيه معرّف منتج. بتحدّد pattern DeepLinkUri مع KSerializer للـ key، وUriDeepLinkMatcher بيطابق الـ DeepLinkRequest ويبني الـ key بنوعه الصح. و DeepLinkSerializer بيتولى تحويل الـ arguments. وwithBackStack بيبني back stack اصطناعي، فلما المستخدم يدوس back من شاشة المنتج يرجع لشاشة منطقية مش يخرج من التطبيق.\n\nخد بالك إن النسخ في المقال (1.2.1 و kotlinx-serialization 1.9.0) لحظة كتابته، فراجع الإصدارات عندك. وفكرة إنك إنت اللي بتملك الـ back stack معناها إن مسؤولية الـ synthetic back stack عليك، فاختبرها بنفسك.\n\ndeep links تطبيقك بتجيب المستخدم لشاشة منطقية لما يدوس back؟",
+    "summary_en": "Navigation 3 deep linking moved from copy-paste helpers into first-party APIs in navigation3-runtime 1.2.0. Because your app owns a List<NavKey> back stack, the API's job is to turn an incoming link into the initial list of keys: DeepLinkRequest wraps the input, UriDeepLinkMatcher maps a URI pattern to a key serializer, DeepLinkSerializer handles arguments, and withBackStack builds a synthetic back stack. Intent filters in the manifest are still required on Android.",
+    "url": "https://ardakazanci.com/posts/type-safe-deep-links-jetpack-navigation-3/",
+    "image": "assets/images/articles/kw537-aw753-type-safe-deep-links-in-jetpack-navigation-3.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-type-safe-deep-links-in-jetpack-navigation-3.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Navigation 3",
+        "explanation": "نسخة جديدة من مكتبة التنقل في Jetpack، فيها back stack بتملكه إنت."
+      },
+      {
+        "term": "NavKey",
+        "explanation": "نوع مفتاح بيمثل وجهة في Navigation 3."
+      },
+      {
+        "term": "NavDisplay",
+        "explanation": "composable بيعرض الشاشة الحالية حسب الـ back stack."
+      },
+      {
+        "term": "DeepLinkRequest",
+        "explanation": "كائن بيمثل لينك داخل، وبيشتغل في KMP كمان."
+      },
+      {
+        "term": "UriDeepLinkMatcher",
+        "explanation": "بيطابق URI مع pattern ويبني الـ key."
+      },
+      {
+        "term": "DeepLinkSerializer",
+        "explanation": "بيحوّل arguments اللينك لقيم مكتوبة النوع."
+      },
+      {
+        "term": "synthetic back stack",
+        "explanation": "back stack بيتبني تلقائيًا عشان back يرجّع لشاشة منطقية."
+      },
+      {
+        "term": "intent-filter",
+        "explanation": "إعلان في الـ manifest بيقول للنظام أنهي روابط تفتح الـ Activity."
+      }
+    ],
+    "linkedin_body": "لما Navigation 3 اتشحن في نوفمبر ٢٠٢٥، الـ deep linking كان مجرد helpers تنسخها من repo اسمه nav3-recipes. من navigation3-runtime 1.2.0 بقى فيه APIs رسمية 🔗\n\nArda Kazancı بيلخص جلسة Android Dev Summit لـ Ian Lake و Clara Fok. القاعدة الأساسية في Navigation 3 إنك إنت اللي بتملك الـ back stack (List<NavKey>)، فالـ API ليها وظيفة واحدة: تحوّل deep link داخل لقايمة NavKey ابتدائية يرسمها NavDisplay.\n\nتخيّل لينك فيه معرّف منتج. بتحدّد pattern DeepLinkUri مع KSerializer للـ key، وUriDeepLinkMatcher بيطابق الـ DeepLinkRequest ويبني الـ key بنوعه الصح. و DeepLinkSerializer بيتولى تحويل الـ arguments. وwithBackStack بيبني back stack اصطناعي، فلما المستخدم يدوس back من شاشة المنتج يرجع لشاشة منطقية مش يخرج من التطبيق.\n\nلازم تفضل تعلن الـ intent-filter في AndroidManifest.xml عشان النظام يعرف مين يفتح، وبعدها على Android الـ DeepLinkRequest(intent) بيقرا intent.data والـ action والـ MIME type والـ extras. وفي كود KMP أو الاختبارات تبني DeepLinkRequest من DeepLinkUri أو String من غير mock لـ Intent. وبتحتاج Kotlin Serialization plugin.\n\nخد بالك إن النسخ في المقال (1.2.1 و kotlinx-serialization 1.9.0) لحظة كتابته، فراجع الإصدارات عندك. وفكرة إنك إنت اللي بتملك الـ back stack معناها إن مسؤولية الـ synthetic back stack عليك، فاختبرها بنفسك.\n\nجرّب deep link واحد بس في تطبيقك بالـ APIs الجديدة: pattern، و serializer، و synthetic back stack. وبعدين اختبر بـ adb مرتين: التطبيق مقفول، والتطبيق مفتوح على شاشة تانية. الفرق بين الحالتين هو اللي بيكشف مشاكل الـ back stack.\n\ndeep links تطبيقك بتجيب المستخدم لشاشة منطقية لما يدوس back؟\n\nزكاة العلم نشره.\n\n#Android #Navigation3 #DeepLinks #KotlinSerialization #mo3talogy"
+  },
+  {
+    "title": "رسمة أولية لـ Compose runtime: Composition و Recomposer و SlotTable في ٦ خطوات",
+    "date": "2026-11-19T23:29:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "Runtime",
+      "Internals"
+    ],
+    "content": "بتسمع Composition و Recomposer و SlotTable و Applier، وكل واحد بيتقال كأنك المفروض عارفه. Wolfram Rittmeyer بيرسم الصورة الكبيرة قبل ما يغوص في كل جزء 🧭\n\nالمقال بداية سلسلة عن الأجزاء الداخلية لـ Compose، وهو نظرة عامة. الـ Composition هو المدير: بتكوّنه وبتديله Applier، وبيمسك الـ Composer والـ CompositionContext، وبيتعمل لك لما تنادي setContent().\n\nتخيّل تطبيق قديم فيه ٣ fragments، كل واحد فيه ComposeView وبينادي setContent(). كل نداء بيعمل Composition جديد وComposer جديد. فلو فيه مشكلة في الـ state، اسأل أنهي Composition.\n\nالـ Recomposer هو اللي بيدير حلقة الـ composition، وعنده MonotonicFrameClock، وبيشتغل بس لما Snapshot System يبلغه بتغيّر state. والـ Composer هو اللي الكود المتولد من الـ compiler plugin بيتعامل معه، وبيدير شجرة الـ nodes. وبعدها SlotTable، وApplier مع LayoutNode، والـ Snapshot System.\n\nخد بالك إن الكاتب بيقول بنفسه إنها «رسمة أولية»، ومعظم أجزاء السلسلة لسه ما اتنشرتش. وبعض الكلاسات داخلية (CompositionImpl) والتفاصيل بتتغير بين الإصدارات، فاعتبرها خريطة ذهنية مش API تعتمد عليه.\n\nإيه أكتر جزء في Compose runtime لسه مش واضح عندك؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #ComposeRuntime #Internals #mo3talogy",
+    "summary_ar": "بتسمع Composition و Recomposer و SlotTable و Applier، وكل واحد بيتقال كأنك المفروض عارفه. Wolfram Rittmeyer بيرسم الصورة الكبيرة قبل ما يغوص في كل جزء 🧭\n\nالمقال بداية سلسلة عن الأجزاء الداخلية لـ Compose، وهو نظرة عامة. الـ Composition هو المدير: بتكوّنه وبتديله Applier، وبيمسك الـ Composer والـ CompositionContext، وبيتعمل لك لما تنادي setContent().\n\nتخيّل تطبيق قديم فيه ٣ fragments، كل واحد فيه ComposeView وبينادي setContent(). كل نداء بيعمل Composition جديد وComposer جديد. فلو فيه مشكلة في الـ state، اسأل أنهي Composition.\n\nخد بالك إن الكاتب بيقول بنفسه إنها «رسمة أولية»، ومعظم أجزاء السلسلة لسه ما اتنشرتش. وبعض الكلاسات داخلية (CompositionImpl) والتفاصيل بتتغير بين الإصدارات، فاعتبرها خريطة ذهنية مش API تعتمد عليه.\n\nإيه أكتر جزء في Compose runtime لسه مش واضح عندك؟",
+    "summary_en": "Wolfram Rittmeyer opens a series on Jetpack Compose internals with a high-level map of the runtime: Composition manages the UI tree and is created by setContent(); Recomposer drives the recomposition loop through a MonotonicFrameClock when snapshot state changes; Composer is what compiler-generated code talks to; SlotTable, Applier with LayoutNode and the Snapshot System complete the picture. Most detailed posts are not yet published, so treat it as a first sketch.",
+    "url": "https://www.grokkingandroid.com/a-rough-first-sketch-of-the-compose-runtime/",
+    "image": "assets/images/articles/kw537-aw753-a-rough-first-sketch-of-the-compose-runtime.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-a-rough-first-sketch-of-the-compose-runtime.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Composition",
+        "explanation": "الكائن اللي بيدير شجرة الـ UI ودورة حياتها وبيربط الـ composables بالـ runtime."
+      },
+      {
+        "term": "Recomposer",
+        "explanation": "بيدير حلقة الـ recomposition ويشغّلها لما state يتغير."
+      },
+      {
+        "term": "Composer",
+        "explanation": "الواجهة اللي الكود المتولد من الـ compiler plugin بيستخدمها."
+      },
+      {
+        "term": "SlotTable",
+        "explanation": "بنية بيخزّن فيها الـ runtime قيم الـ composition ومعلوماتها."
+      },
+      {
+        "term": "Applier",
+        "explanation": "بيطبّق تغييرات الـ composition على شجرة الـ nodes الفعلية."
+      },
+      {
+        "term": "LayoutNode",
+        "explanation": "node في شجرة Compose UI بتمثل عنصر في الـ layout."
+      },
+      {
+        "term": "Snapshot System",
+        "explanation": "نظام بيتتبع قراءات وكتابات الـ state."
+      },
+      {
+        "term": "MonotonicFrameClock",
+        "explanation": "ساعة بتصدر إشارات الـ frames للـ Recomposer."
+      }
+    ],
+    "linkedin_body": "بتسمع Composition و Recomposer و SlotTable و Applier، وكل واحد بيتقال كأنك المفروض عارفه. Wolfram Rittmeyer بيرسم الصورة الكبيرة قبل ما يغوص في كل جزء 🧭\n\nالمقال بداية سلسلة عن الأجزاء الداخلية لـ Compose، وهو نظرة عامة. الـ Composition هو المدير: بتكوّنه وبتديله Applier، وبيمسك الـ Composer والـ CompositionContext، وبيتعمل لك لما تنادي setContent().\n\nتخيّل تطبيق قديم فيه ٣ fragments، كل واحد فيه ComposeView وبينادي setContent(). كل نداء بيعمل Composition جديد وComposer جديد. فلو فيه مشكلة في الـ state، اسأل أنهي Composition.\n\nالـ Recomposer هو اللي بيدير حلقة الـ composition، وعنده MonotonicFrameClock، وبيشتغل بس لما Snapshot System يبلغه بتغيّر state. والـ Composer هو اللي الكود المتولد من الـ compiler plugin بيتعامل معه، وبيدير شجرة الـ nodes. وبعدها SlotTable، وApplier مع LayoutNode، والـ Snapshot System.\n\nخد بالك إن الكاتب بيقول بنفسه إنها «رسمة أولية»، ومعظم أجزاء السلسلة لسه ما اتنشرتش. وبعض الكلاسات داخلية (CompositionImpl) والتفاصيل بتتغير بين الإصدارات، فاعتبرها خريطة ذهنية مش API تعتمد عليه.\n\nلو بتدرس Compose من جوه، اكتب الكلاسات الستة على ورقة وحدد لكل واحد سؤال: مين بيحرّكه؟ ومين بيعتمد عليه؟ وبعدين لما تقرا الأجزاء التفصيلية هتعرف تحطها في مكانها.\n\nإيه أكتر جزء في Compose runtime لسه مش واضح عندك؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #ComposeRuntime #Internals #mo3talogy"
+  },
+  {
+    "title": "Data Safety في Google Play: skill بتملا الـ CSV من كود تطبيقك بدل الفورم اليدوي",
+    "date": "2026-11-19T23:28:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "Google Play",
+      "Agents",
+      "Privacy"
+    ],
+    "content": "لو نشرت تطبيق على Google Play، إنت عارف فورم الـ Data safety: أكتر من ١٠ شاشات وسبع أسئلة لكل نوع بيانات. وما حدش بيقولك إن فيه زرار Import from CSV 😅\n\nWajahat Karim بيحكي إن الملف حوالي ٧٨٠ صف من معرّفات زي PSL_DATA_USAGE_RESPONSES، وجوجل صارمة: أي إجابة على سؤال المفروض مخفي بتفشل الملف. فبنى أمر لتوليده جوه nowkit، واستخدمه في كل تطبيقاته وطلاب برنامج ShipKaro في ٣٠+ تطبيق، وبعدين فتحه كـ agent skill اسمها play-data-safety.\n\nتخيّل بتكتب لـ agent «املا الـ Play data safety form». الـ skill بتشغّل Gradle بتاع مشروعك وتلاقي كل المكتبات حتى اللي ما ضفتهاش، وتقرا الـ permissions وتدوّر في الكود على location و camera و audio والشبكة، وتطابق المكتبات مع جدول ٣٦ SDK من docs الشركات نفسها، وتسألك بس اللي الكود ما يقولوش، وتكتب الـ CSV.\n\nالـ README بيقول إنها مجانية MIT، ومش محتاجة حساب ولا API key، وتشتغل مع Claude Code و Gemini CLI و Codex و Cursor و OpenCode و Antigravity، وتحتاج JDK 17+ بس، وتتثبت بـ npx skills add. وكل SDK فيها بيستشهد بصفحة الشركة والتاريخ اللي اتراجعت فيه. وكاتبها لقى بيها غلطة في تطبيق قدّمه فعلًا.\n\nخد بالك من تحذير الـ README: الناتج مسودة تراجعها مش نصيحة قانونية. الفحص static ما يعرفش إيه اللي السيرفر بيخزّنه ولا هل الحقل اختياري ولا إزاي بيتم المسح، وعشان كده بتسألك. ومتنساش تراجع الـ CSV قبل الرفع.\n\nبتملا Data safety في Play بإيدك ولا فكرت تولّد الـ CSV من الكود؟\n\nزكاة العلم نشره.\n\n#Android #GooglePlay #DataSafety #AIAgents #mo3talogy",
+    "summary_ar": "لو نشرت تطبيق على Google Play، إنت عارف فورم الـ Data safety: أكتر من ١٠ شاشات وسبع أسئلة لكل نوع بيانات. وما حدش بيقولك إن فيه زرار Import from CSV 😅\n\nWajahat Karim بيحكي إن الملف حوالي ٧٨٠ صف من معرّفات زي PSL_DATA_USAGE_RESPONSES، وجوجل صارمة: أي إجابة على سؤال المفروض مخفي بتفشل الملف. فبنى أمر لتوليده جوه nowkit، واستخدمه في كل تطبيقاته وطلاب برنامج ShipKaro في ٣٠+ تطبيق، وبعدين فتحه كـ agent skill اسمها play-data-safety.\n\nتخيّل بتكتب لـ agent «املا الـ Play data safety form». الـ skill بتشغّل Gradle بتاع مشروعك وتلاقي كل المكتبات حتى اللي ما ضفتهاش، وتقرا الـ permissions وتدوّر في الكود على location و camera و audio والشبكة، وتطابق المكتبات مع جدول ٣٦ SDK من docs الشركات نفسها، وتسألك بس اللي الكود ما يقولوش، وتكتب الـ CSV.\n\nخد بالك من تحذير الـ README: الناتج مسودة تراجعها مش نصيحة قانونية. الفحص static ما يعرفش إيه اللي السيرفر بيخزّنه ولا هل الحقل اختياري ولا إزاي بيتم المسح، وعشان كده بتسألك. ومتنساش تراجع الـ CSV قبل الرفع.\n\nبتملا Data safety في Play بإيدك ولا فكرت تولّد الـ CSV من الكود؟",
+    "summary_en": "Play Console's Data safety form can be imported from a CSV of about 780 machine IDs that Google rejects over small formatting errors. Wajahat Karim open-sourced play-data-safety, a free MIT agent skill for Claude Code, Gemini CLI, Codex, Cursor and others: it runs your project's Gradle, finds libraries, scans permissions and code, matches 36 SDKs against vendor docs, asks only what code cannot tell, and writes the CSV. The output is a draft to confirm, not legal advice.",
+    "url": "https://www.wajahatkarim.com/2026/11/stop-filling-play-data-safety-manually",
+    "image": "assets/images/articles/kw537-aw753-play-data-safety-an-agent-skill-that-fills-the-csv-from-your-real-code.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-play-data-safety-an-agent-skill-that-fills-the-csv-from-your-real-code.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Data safety",
+        "explanation": "قسم في Google Play بتعلن فيه البيانات اللي تطبيقك بيجمعها."
+      },
+      {
+        "term": "Import from CSV",
+        "explanation": "خيار في Play Console بيرفع ملف إجابات بدل ملء الفورم يدويًا."
+      },
+      {
+        "term": "agent skill",
+        "explanation": "حزمة تعليمات وأدوات بتديها لـ AI agent لمهمة معينة."
+      },
+      {
+        "term": "nowkit",
+        "explanation": "أداة من الكاتب اتولدت فيها الفكرة أول مرة."
+      },
+      {
+        "term": "SDK",
+        "explanation": "حزمة كود من طرف تاني بتضيفها لتطبيقك، وممكن تجمع بيانات."
+      },
+      {
+        "term": "static analysis",
+        "explanation": "فحص الكود من غير تشغيله، فمش بيعرف إيه بيحصل على السيرفر."
+      },
+      {
+        "term": "MIT",
+        "explanation": "ترخيص open source متساهل."
+      },
+      {
+        "term": "npx",
+        "explanation": "أمر بيشغّل حزمة npm من غير تثبيت دائم."
+      }
+    ],
+    "linkedin_body": "لو نشرت تطبيق على Google Play، إنت عارف فورم الـ Data safety: أكتر من ١٠ شاشات وسبع أسئلة لكل نوع بيانات. وما حدش بيقولك إن فيه زرار Import from CSV 😅\n\nWajahat Karim بيحكي إن الملف حوالي ٧٨٠ صف من معرّفات زي PSL_DATA_USAGE_RESPONSES، وجوجل صارمة: أي إجابة على سؤال المفروض مخفي بتفشل الملف. فبنى أمر لتوليده جوه nowkit، واستخدمه في كل تطبيقاته وطلاب برنامج ShipKaro في ٣٠+ تطبيق، وبعدين فتحه كـ agent skill اسمها play-data-safety.\n\nتخيّل بتكتب لـ agent «املا الـ Play data safety form». الـ skill بتشغّل Gradle بتاع مشروعك وتلاقي كل المكتبات حتى اللي ما ضفتهاش، وتقرا الـ permissions وتدوّر في الكود على location و camera و audio والشبكة، وتطابق المكتبات مع جدول ٣٦ SDK من docs الشركات نفسها، وتسألك بس اللي الكود ما يقولوش، وتكتب الـ CSV.\n\nالـ README بيقول إنها مجانية MIT، ومش محتاجة حساب ولا API key، وتشتغل مع Claude Code و Gemini CLI و Codex و Cursor و OpenCode و Antigravity، وتحتاج JDK 17+ بس، وتتثبت بـ npx skills add. وكل SDK فيها بيستشهد بصفحة الشركة والتاريخ اللي اتراجعت فيه. وكاتبها لقى بيها غلطة في تطبيق قدّمه فعلًا.\n\nخد بالك من تحذير الـ README: الناتج مسودة تراجعها مش نصيحة قانونية. الفحص static ما يعرفش إيه اللي السيرفر بيخزّنه ولا هل الحقل اختياري ولا إزاي بيتم المسح، وعشان كده بتسألك. ومتنساش تراجع الـ CSV قبل الرفع.\n\nلو هتجرب الـ skill، شغّلها على تطبيق منشور فعلًا وقارن النتيجة بالفورم اللي قدّمته. أي اختلاف هو إما غلطة قديمة أو سؤال محتاج قرار. وراجع إجاباتها مع شخص مسؤول عن الخصوصية في فريقك قبل ما ترفع.\n\nبتملا Data safety في Play بإيدك ولا فكرت تولّد الـ CSV من الكود؟\n\nزكاة العلم نشره.\n\n#Android #GooglePlay #DataSafety #AIAgents #mo3talogy"
+  },
+  {
+    "title": "الـ data class: ليه copy() مع MutableList بيخلّي الـ StateFlow ما يبعتش حاجة؟",
+    "date": "2026-11-19T23:26:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Kotlin",
+    "tags": [
+      "DataClass",
+      "StateFlow",
+      "Kotlin"
+    ],
+    "content": "بتضيف عنصر للسلة، الـ ViewModel بيحدّث الـ StateFlow، والشاشة ما بتتغيّرش. من غير crash ولا حاجة في Logcat. الـ state عبارة عن data class والتحديث بـ copy() 🛒\n\nMayank Kumar بيشرح إن الـ data class كلاس بيكتبلك فيه الـ compiler ٥ حاجات: equals() و hashCode() و toString() و copy() و componentN(). وكلهم بيعتمدوا على الـ properties في الـ primary constructor بس. وcopy() بينسخ القيم، مش الكائنات اللي جواها.\n\nتخيّل CartState فيه MutableList. بتضيف عنصر في الـ list القديمة وبعدين تنادي copy()، فالـ state الجديد كائن جديد بس بيشاور على نفس الـ list، فبيطلع مساوي للقديم. والـ StateFlow بيتخطى القيمة المساوية للحالية، فالشاشة ما بتسمعش بأي تحديث. الحل list للقراءة بس، و list جديدة مع كل تغيير: it.copy(items = it.items + item).\n\nالمقال بيذكر كمان إن property معرّفة في جسم الكلاس مش داخلة في أي دالة من الخمسة، فكائنين ليهم نفس الـ id يبقوا متساويين حتى لو واحد فيهم isSeen = true، والـ copy() بيرجّعها لقيمتها الابتدائية. ولو الـ constructor private عشان تتحقق من القيم الأول، copy() المتولدة public وبتتخطى التحقق، والـ compiler بيحذّر من Kotlin 2.0.20، ومعاه @ConsistentCopyVisibility و @ExposedCopyVisibility. وفيه قواعد زي إن الـ data class ما ينفعش تبقى open أو sealed أو abstract.\n\nخد بالك إن المقال بيعرض تجربة تقدر تعملها بنفسك: اعمل collect للـ state وطبع كل قيمة، وهتشوف إن النسخة الأولى بتطبع الحالة الابتدائية بس. والـ data class ممتاز للقيم، لكن مش مناسب لكل كلاس. وتحذير الـ copy مع private constructor لسه warning في Kotlin 2.4.21 حسب المقال، فراجع نسختك.\n\nمرّ عليك bug سببه copy() على data class فيه list قابلة للتعديل؟\n\nزكاة العلم نشره.\n\n#Kotlin #DataClass #StateFlow #Android #mo3talogy",
+    "summary_ar": "بتضيف عنصر للسلة، الـ ViewModel بيحدّث الـ StateFlow، والشاشة ما بتتغيّرش. من غير crash ولا حاجة في Logcat. الـ state عبارة عن data class والتحديث بـ copy() 🛒\n\nMayank Kumar بيشرح إن الـ data class كلاس بيكتبلك فيه الـ compiler ٥ حاجات: equals() و hashCode() و toString() و copy() و componentN(). وكلهم بيعتمدوا على الـ properties في الـ primary constructor بس. وcopy() بينسخ القيم، مش الكائنات اللي جواها.\n\nتخيّل CartState فيه MutableList. بتضيف عنصر في الـ list القديمة وبعدين تنادي copy()، فالـ state الجديد كائن جديد بس بيشاور على نفس الـ list، فبيطلع مساوي للقديم. والـ StateFlow بيتخطى القيمة المساوية للحالية، فالشاشة ما بتسمعش بأي تحديث. الحل list للقراءة بس، و list جديدة مع كل تغيير: it.copy(items = it.items + item).\n\nخد بالك إن المقال بيعرض تجربة تقدر تعملها بنفسك: اعمل collect للـ state وطبع كل قيمة، وهتشوف إن النسخة الأولى بتطبع الحالة الابتدائية بس. والـ data class ممتاز للقيم، لكن مش مناسب لكل كلاس. وتحذير الـ copy مع private constructor لسه warning في Kotlin 2.4.21 حسب المقال، فراجع نسختك.\n\nمرّ عليك bug سببه copy() على data class فيه list قابلة للتعديل؟",
+    "summary_en": "A Kotlin data class gets five compiler-generated members: equals(), hashCode(), toString(), copy() and componentN(), all based only on primary-constructor properties, and copy() is shallow. The article's bug: with a MutableList in a StateFlow state, adding to the old list and calling copy() yields a new object that equals the old one, so StateFlow skips it and the screen never updates. Use read-only lists and a new list per change. It also covers body properties being ignored, and copy() visibility with private constructors.",
+    "url": "https://imayankkumar.com/blog/kotlin-data-class/",
+    "image": "assets/images/articles/kw537-aw753-kotlin-data-class-vs-class-equals-copy-componentn-and-where-they-break.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-kotlin-data-class-vs-class-equals-copy-componentn-and-where-they-break.svg"
+    ],
+    "explainers": [
+      {
+        "term": "data class",
+        "explanation": "كلاس هدفه حمل القيم، والـ compiler بيولّد له equals و copy وغيرهم."
+      },
+      {
+        "term": "equals",
+        "explanation": "دالة بتحدد هل كائنين متساويين."
+      },
+      {
+        "term": "hashCode",
+        "explanation": "رقم بيمثل الكائن، لازم يتطابق مع equals."
+      },
+      {
+        "term": "copy()",
+        "explanation": "بتعمل نسخة من الكائن مع تغيير بعض الـ properties."
+      },
+      {
+        "term": "componentN",
+        "explanation": "دوال بتسمح بالـ destructuring: component1 و component2."
+      },
+      {
+        "term": "shallow copy",
+        "explanation": "نسخة بتنسخ المراجع مش الكائنات اللي جوه."
+      },
+      {
+        "term": "StateFlow",
+        "explanation": "Flow بيحتفظ بآخر قيمة وبيتخطى القيمة المساوية للحالية."
+      },
+      {
+        "term": "ConsistentCopyVisibility",
+        "explanation": "annotation بتخلي copy() بنفس visibility الـ constructor."
+      }
+    ],
+    "linkedin_body": "بتضيف عنصر للسلة، الـ ViewModel بيحدّث الـ StateFlow، والشاشة ما بتتغيّرش. من غير crash ولا حاجة في Logcat. الـ state عبارة عن data class والتحديث بـ copy() 🛒\n\nMayank Kumar بيشرح إن الـ data class كلاس بيكتبلك فيه الـ compiler ٥ حاجات: equals() و hashCode() و toString() و copy() و componentN(). وكلهم بيعتمدوا على الـ properties في الـ primary constructor بس. وcopy() بينسخ القيم، مش الكائنات اللي جواها.\n\nتخيّل CartState فيه MutableList. بتضيف عنصر في الـ list القديمة وبعدين تنادي copy()، فالـ state الجديد كائن جديد بس بيشاور على نفس الـ list، فبيطلع مساوي للقديم. والـ StateFlow بيتخطى القيمة المساوية للحالية، فالشاشة ما بتسمعش بأي تحديث. الحل list للقراءة بس، و list جديدة مع كل تغيير: it.copy(items = it.items + item).\n\nالمقال بيذكر كمان إن property معرّفة في جسم الكلاس مش داخلة في أي دالة من الخمسة، فكائنين ليهم نفس الـ id يبقوا متساويين حتى لو واحد فيهم isSeen = true، والـ copy() بيرجّعها لقيمتها الابتدائية. ولو الـ constructor private عشان تتحقق من القيم الأول، copy() المتولدة public وبتتخطى التحقق، والـ compiler بيحذّر من Kotlin 2.0.20، ومعاه @ConsistentCopyVisibility و @ExposedCopyVisibility. وفيه قواعد زي إن الـ data class ما ينفعش تبقى open أو sealed أو abstract.\n\nخد بالك إن المقال بيعرض تجربة تقدر تعملها بنفسك: اعمل collect للـ state وطبع كل قيمة، وهتشوف إن النسخة الأولى بتطبع الحالة الابتدائية بس. والـ data class ممتاز للقيم، لكن مش مناسب لكل كلاس. وتحذير الـ copy مع private constructor لسه warning في Kotlin 2.4.21 حسب المقال، فراجع نسختك.\n\nراجع الـ UI states عندك: فيه MutableList أو MutableMap جوه data class بيتنسخ بـ copy()؟ جرّب اختبار صغير يعمل collect للـ StateFlow وبعدين يضيف عنصر، وشوف هل القيمة الجديدة وصلت. وأي class عنده private constructor مع تحقق من القيم، ضيف له @ConsistentCopyVisibility.\n\nمرّ عليك bug سببه copy() على data class فيه list قابلة للتعديل؟\n\nزكاة العلم نشره.\n\n#Kotlin #DataClass #StateFlow #Android #mo3talogy"
+  },
+  {
+    "title": "رسوميات Compose 1.13: Mesh gradient و Morph polygon و Progressive blur",
+    "date": "2026-11-19T23:25:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Compose",
+      "Graphics",
+      "AGSL"
+    ],
+    "content": "كتير من التأثيرات اللي كانت محتاجة OpenGL pipelines أو حسابات Path تقيلة بقت دلوقتي APIs صغيرة في Compose. بس إزاي تستخدمها من غير ما تخرّب الـ scroll؟ 🎨\n\nArda Kazancı بيلخص جلسة Android Dev Summit لـ Rebecca Franks وAayush Chaudhary وRahul Ray، اللي قسّمت رسوميات Android لـ ٣ طبقات. الأولى high-level: MeshGradientPainter و PolygonShape و MorphPolygonShape و Modifier.blur التدريجي. التانية مستوى وسيط: DrawScope و DrawModifierNode و AGSL shaders (RuntimeShader و RuntimeColorFilter). والتالتة primitives المنصة: nativeCanvas.drawMesh و RenderNode.setBackdropRenderEffect و SurfaceView.setBlurRegions.\n\nتخيّل بطاقة منتج عايز لها خلفية gradient معقدة من أكتر من لون، أو زرار بيتحول شكله من شكل لشكل. بدل ما تكتب shader أو تحسب Path، تستخدم MeshGradientPainter أو MorphPolygonShape مباشرة.\n\nالإصدارات المذكورة: androidx.compose.ui:ui-graphics:1.12.0 و androidx.compose.foundation:foundation:1.13.0-rc01. والمقال بيشرح كل ميزة بنموذج ذهني بسيط ومعاه demos صغيرة وقواعد أداء بتخلي معدل الـ frames ثابت في الـ scroll، وبيذكر wide color gamut.\n\nخد بالك إن الإصدار المذكور للـ foundation release candidate وقت كتابة المقال، فراجع الاستقرار قبل الاعتماد. والتأثيرات دي تقيلة بطبيعتها على الـ GPU، فاختبرها على أجهزة متوسطة وقيس الـ jank قبل ما تحطها في قايمة طويلة.\n\nأنهي تأثير رسومي من دول كنت هتجرّبه الأول في تطبيقك؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #Graphics #AGSL #mo3talogy",
+    "summary_ar": "كتير من التأثيرات اللي كانت محتاجة OpenGL pipelines أو حسابات Path تقيلة بقت دلوقتي APIs صغيرة في Compose. بس إزاي تستخدمها من غير ما تخرّب الـ scroll؟ 🎨\n\nArda Kazancı بيلخص جلسة Android Dev Summit لـ Rebecca Franks وAayush Chaudhary وRahul Ray، اللي قسّمت رسوميات Android لـ ٣ طبقات. الأولى high-level: MeshGradientPainter و PolygonShape و MorphPolygonShape و Modifier.blur التدريجي. التانية مستوى وسيط: DrawScope و DrawModifierNode و AGSL shaders (RuntimeShader و RuntimeColorFilter). والتالتة primitives المنصة: nativeCanvas.drawMesh و RenderNode.setBackdropRenderEffect و SurfaceView.setBlurRegions.\n\nتخيّل بطاقة منتج عايز لها خلفية gradient معقدة من أكتر من لون، أو زرار بيتحول شكله من شكل لشكل. بدل ما تكتب shader أو تحسب Path، تستخدم MeshGradientPainter أو MorphPolygonShape مباشرة.\n\nخد بالك إن الإصدار المذكور للـ foundation release candidate وقت كتابة المقال، فراجع الاستقرار قبل الاعتماد. والتأثيرات دي تقيلة بطبيعتها على الـ GPU، فاختبرها على أجهزة متوسطة وقيس الـ jank قبل ما تحطها في قايمة طويلة.\n\nأنهي تأثير رسومي من دول كنت هتجرّبه الأول في تطبيقك؟",
+    "summary_en": "Starting in ui-graphics 1.12.0 and foundation 1.13.0-rc01, effects that once needed custom OpenGL or heavy Path math ship as composable APIs. Summarising an Android Dev Summit talk, the article organises graphics into three layers: high-level APIs (MeshGradientPainter, PolygonShape, MorphPolygonShape, progressive Modifier.blur), intermediate hooks (DrawScope, DrawModifierNode, AGSL RuntimeShader and RuntimeColorFilter) and platform primitives (drawMesh, backdrop render effects, blur regions), with performance rules for steady scroll.",
+    "url": "https://ardakazanci.com/posts/new-graphics-features-in-jetpack-compose-and-android/",
+    "image": "assets/images/articles/kw537-aw753-compose-1-13-graphics-meshgradientpainter-morphpolygonshape-progressive-blur.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-compose-1-13-graphics-meshgradientpainter-morphpolygonshape-progressive-blur.svg"
+    ],
+    "explainers": [
+      {
+        "term": "MeshGradientPainter",
+        "explanation": "painter بيرسم gradient من شبكة نقاط ألوان بدل اتجاه واحد."
+      },
+      {
+        "term": "MorphPolygonShape",
+        "explanation": "شكل بيتحوّل تدريجيًا من مضلع لمضلع تاني."
+      },
+      {
+        "term": "progressive blur",
+        "explanation": "غباش بتزيد شدته تدريجيًا على مساحة بدل ما يبقى ثابت."
+      },
+      {
+        "term": "AGSL",
+        "explanation": "لغة shaders في Android لكتابة تأثيرات بكسل مخصصة."
+      },
+      {
+        "term": "RuntimeShader",
+        "explanation": "كائن بيشغّل AGSL shader على الرسم."
+      },
+      {
+        "term": "DrawModifierNode",
+        "explanation": "node بيسمح بكتابة Modifier رسم مخصص بكفاءة."
+      },
+      {
+        "term": "wide color gamut",
+        "explanation": "نطاق ألوان أوسع من sRGB على الشاشات المدعومة."
+      },
+      {
+        "term": "release candidate",
+        "explanation": "نسخة مرشحة للإصدار الثابت وقد تتغير قبله."
+      }
+    ],
+    "linkedin_body": "كتير من التأثيرات اللي كانت محتاجة OpenGL pipelines أو حسابات Path تقيلة بقت دلوقتي APIs صغيرة في Compose. بس إزاي تستخدمها من غير ما تخرّب الـ scroll؟ 🎨\n\nArda Kazancı بيلخص جلسة Android Dev Summit لـ Rebecca Franks وAayush Chaudhary وRahul Ray، اللي قسّمت رسوميات Android لـ ٣ طبقات. الأولى high-level: MeshGradientPainter و PolygonShape و MorphPolygonShape و Modifier.blur التدريجي. التانية مستوى وسيط: DrawScope و DrawModifierNode و AGSL shaders (RuntimeShader و RuntimeColorFilter). والتالتة primitives المنصة: nativeCanvas.drawMesh و RenderNode.setBackdropRenderEffect و SurfaceView.setBlurRegions.\n\nتخيّل بطاقة منتج عايز لها خلفية gradient معقدة من أكتر من لون، أو زرار بيتحول شكله من شكل لشكل. بدل ما تكتب shader أو تحسب Path، تستخدم MeshGradientPainter أو MorphPolygonShape مباشرة.\n\nالإصدارات المذكورة: androidx.compose.ui:ui-graphics:1.12.0 و androidx.compose.foundation:foundation:1.13.0-rc01. والمقال بيشرح كل ميزة بنموذج ذهني بسيط ومعاه demos صغيرة وقواعد أداء بتخلي معدل الـ frames ثابت في الـ scroll، وبيذكر wide color gamut.\n\nخد بالك إن الإصدار المذكور للـ foundation release candidate وقت كتابة المقال، فراجع الاستقرار قبل الاعتماد. والتأثيرات دي تقيلة بطبيعتها على الـ GPU، فاختبرها على أجهزة متوسطة وقيس الـ jank قبل ما تحطها في قايمة طويلة.\n\nاختار تأثير واحد من التلاتة وجرّبه في شاشة مش حرجة. قيس الأداء في scroll بـ Macrobenchmark أو trace، واحتفظ بنسخة بسيطة كـ fallback للأجهزة الضعيفة. وبعدها قرر هل يستاهل التكلفة.\n\nأنهي تأثير رسومي من دول كنت هتجرّبه الأول في تطبيقك؟\n\nزكاة العلم نشره.\n\n#Android #JetpackCompose #Graphics #AGSL #mo3talogy"
+  },
+  {
+    "title": "Android 17 وحدود الذاكرة لكل تطبيق: التطبيق ممكن يتقتل من غير stack trace",
+    "date": "2026-11-19T23:24:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Android 17",
+      "Memory",
+      "Production"
+    ],
+    "content": "على موبايل Android 17 بذاكرة ٤ جيجا، الحد القياسي لتطبيقك ٢ جيجا في الـ foreground وجيجا في الـ background. لو عدّيته واستنفدت الـ swap، النظام بيقتل الـ process من غير exception ولا stack trace 💀\n\nSantiago Mattiauda بيفتتح سلسلة عن كفاءة الموارد. Android 17 (API 37) انتقل من نموذج متساهل لحدود ذاكرة لكل تطبيق بتتحسب حسب إجمالي RAM وبتتفرض بـ cgroups v2 في kernel. والمقال بيشرح المقياس: anonymous RSS + swap، يعني الـ Java/Kotlin heap والـ native allocations و Bitmap pixels وthread stacks.\n\nتخيّل تطبيق عنده memory leak بسيط. قبل Android 17 كان الـ LMK بيقتل تطبيقات تانية في الـ cache. دلوقتي التطبيق نفسه بيتخنق: throttling و reclaim و thrashing وبعدين بيتقتل، من غير أي أثر في Logcat.\n\nالمقال بيفرّق بين الـ LMK والـ Memory Limiter، وبين memory.high و memory.swap.max، ويشرح إزاي تكتشف الحالات دي في الإنتاج بـ ApplicationExitInfo و ProfilingManager (TRIGGER_TYPE_ANOMALY و TRIGGER_TYPE_OOM) وتعيدها محليًا بـ adb. والـ checklist: قيس baseline لـ anonymous RSS + swap حسب حالة الـ process، سجّل exits عند البداية، فعّل triggers للـ heap dump، نضّف الـ Bitmap caches في onTrimMemory، وقيّم app memory budgets من Android 17 QPR2.\n\nخد بالك إن الوثائق الرسمية بتتوقع أثر محدود في أغلب الجلسات، والمقصود بالحدود معالجة التسريبات والحالات الشاذة. والأرقام (٢ جيجا و ١ جيجا) لجهاز ٤ جيجا بالقيم الافتراضية، فهتختلف حسب الجهاز. المقال أول جزء، فاقرأ الوثائق الرسمية للتفاصيل.\n\nعندك طريقة تعرف بيها إن تطبيقك اتقتل بسبب الذاكرة في الإنتاج؟\n\nزكاة العلم نشره.\n\n#Android #Android17 #Memory #ApplicationExitInfo #mo3talogy",
+    "summary_ar": "على موبايل Android 17 بذاكرة ٤ جيجا، الحد القياسي لتطبيقك ٢ جيجا في الـ foreground وجيجا في الـ background. لو عدّيته واستنفدت الـ swap، النظام بيقتل الـ process من غير exception ولا stack trace 💀\n\nSantiago Mattiauda بيفتتح سلسلة عن كفاءة الموارد. Android 17 (API 37) انتقل من نموذج متساهل لحدود ذاكرة لكل تطبيق بتتحسب حسب إجمالي RAM وبتتفرض بـ cgroups v2 في kernel. والمقال بيشرح المقياس: anonymous RSS + swap، يعني الـ Java/Kotlin heap والـ native allocations و Bitmap pixels وthread stacks.\n\nتخيّل تطبيق عنده memory leak بسيط. قبل Android 17 كان الـ LMK بيقتل تطبيقات تانية في الـ cache. دلوقتي التطبيق نفسه بيتخنق: throttling و reclaim و thrashing وبعدين بيتقتل، من غير أي أثر في Logcat.\n\nخد بالك إن الوثائق الرسمية بتتوقع أثر محدود في أغلب الجلسات، والمقصود بالحدود معالجة التسريبات والحالات الشاذة. والأرقام (٢ جيجا و ١ جيجا) لجهاز ٤ جيجا بالقيم الافتراضية، فهتختلف حسب الجهاز. المقال أول جزء، فاقرأ الوثائق الرسمية للتفاصيل.\n\nعندك طريقة تعرف بيها إن تطبيقك اتقتل بسبب الذاكرة في الإنتاج؟",
+    "summary_en": "Android 17 (API 37) enforces per-app memory limits based on device RAM, using cgroups v2; on a 4 GB device the standard limit is about 2 GB foreground and 1 GB background. The metric is anonymous RSS plus swap, and an app over its limit is degraded and then killed with no stack trace. The article contrasts this with the Low Memory Killer and shows how to detect it with ApplicationExitInfo and ProfilingManager triggers, plus an action checklist.",
+    "url": "https://medium.com/@santimattius/the-new-android-17-standard-why-memory-budgeting-is-no-longer-optional-9e6601410581",
+    "image": "assets/images/articles/kw537-aw753-the-new-android-17-standard-memory-budgeting-is-no-longer-optional.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-the-new-android-17-standard-memory-budgeting-is-no-longer-optional.svg"
+    ],
+    "explainers": [
+      {
+        "term": "cgroups v2",
+        "explanation": "ميزة في Linux kernel بتحدد موارد زي الذاكرة لمجموعة processes."
+      },
+      {
+        "term": "anonymous RSS",
+        "explanation": "الذاكرة الفعلية بدون ملف: heap و native و Bitmaps و stacks."
+      },
+      {
+        "term": "swap",
+        "explanation": "مساحة على التخزين بتتحط فيها صفحات ذاكرة مؤقتًا."
+      },
+      {
+        "term": "Low Memory Killer",
+        "explanation": "daemon بيقتل processes في الخلفية لما الذاكرة تقل."
+      },
+      {
+        "term": "Memory Limiter",
+        "explanation": "آلية في Android 17 بتحدد سقف ذاكرة لكل تطبيق."
+      },
+      {
+        "term": "ApplicationExitInfo",
+        "explanation": "API بتقولك ليه الـ process بتاعك مات في آخر مرة."
+      },
+      {
+        "term": "ProfilingManager",
+        "explanation": "API بتسجّل profiles زي heap dump عند triggers معينة."
+      },
+      {
+        "term": "onTrimMemory",
+        "explanation": "callback بيبلغك إن النظام محتاج ذاكرة، فتحرّر اللي تقدر."
+      }
+    ],
+    "linkedin_body": "على موبايل Android 17 بذاكرة ٤ جيجا، الحد القياسي لتطبيقك ٢ جيجا في الـ foreground وجيجا في الـ background. لو عدّيته واستنفدت الـ swap، النظام بيقتل الـ process من غير exception ولا stack trace 💀\n\nSantiago Mattiauda بيفتتح سلسلة عن كفاءة الموارد. Android 17 (API 37) انتقل من نموذج متساهل لحدود ذاكرة لكل تطبيق بتتحسب حسب إجمالي RAM وبتتفرض بـ cgroups v2 في kernel. والمقال بيشرح المقياس: anonymous RSS + swap، يعني الـ Java/Kotlin heap والـ native allocations و Bitmap pixels وthread stacks.\n\nتخيّل تطبيق عنده memory leak بسيط. قبل Android 17 كان الـ LMK بيقتل تطبيقات تانية في الـ cache. دلوقتي التطبيق نفسه بيتخنق: throttling و reclaim و thrashing وبعدين بيتقتل، من غير أي أثر في Logcat.\n\nالمقال بيفرّق بين الـ LMK والـ Memory Limiter، وبين memory.high و memory.swap.max، ويشرح إزاي تكتشف الحالات دي في الإنتاج بـ ApplicationExitInfo و ProfilingManager (TRIGGER_TYPE_ANOMALY و TRIGGER_TYPE_OOM) وتعيدها محليًا بـ adb. والـ checklist: قيس baseline لـ anonymous RSS + swap حسب حالة الـ process، سجّل exits عند البداية، فعّل triggers للـ heap dump، نضّف الـ Bitmap caches في onTrimMemory، وقيّم app memory budgets من Android 17 QPR2.\n\nخد بالك إن الوثائق الرسمية بتتوقع أثر محدود في أغلب الجلسات، والمقصود بالحدود معالجة التسريبات والحالات الشاذة. والأرقام (٢ جيجا و ١ جيجا) لجهاز ٤ جيجا بالقيم الافتراضية، فهتختلف حسب الجهاز. المقال أول جزء، فاقرأ الوثائق الرسمية للتفاصيل.\n\nابدأ بخطوتين النهارده: سجّل ApplicationExitInfo في أول التطبيق وأرسل الأسباب لأدوات الـ monitoring، وراجع Android Vitals لـ anonymous RSS + swap. وبعدها اعمل heap dump على الجلسات اللي ذاكرتها عالية، لأن مفيش stack trace هيدلّك.\n\nعندك طريقة تعرف بيها إن تطبيقك اتقتل بسبب الذاكرة في الإنتاج؟\n\nزكاة العلم نشره.\n\n#Android #Android17 #Memory #ApplicationExitInfo #mo3talogy"
+  },
+  {
+    "title": "phonedriver: خلّي الـ AI agent يتحكم في موبايل Android أو iPhone من غير ما يدوس Pay لوحده",
+    "date": "2026-11-19T23:23:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "أدوات المطورين",
+    "tags": [
+      "MCP",
+      "Agents",
+      "Testing"
+    ],
+    "content": "عايز الـ AI agent يفتح تطبيقك ويجرّب الـ signup ويدوّرلك على الـ bug؟ محتاج يتحكم في موبايل فعلًا، مش بس يقرا كود 📱\n\nphonedriver من hridaya423 بيدّي الـ agent تحكم في موبايل Android أو iPhone، حقيقي أو افتراضي. بيقرا الشاشة ويدوس على زرار ويقولك إيه اللي اتغيّر، وبيسألك قبل ما يدوس Pay. بيشتغل عن طريق MCP مع Claude Code و Codex و Cursor، أو من الـ command line، والـ repo بيقول إنه بيستخدم توكنز أقل ٦٫٩ مرة من mobile-mcp على ٩ مهام.\n\nتخيّل تقول لـ agent: «افتح تطبيقي وجرّب الـ signup بمدخلات غلط وبلّغني بكل bug بخطوات إعادة إنتاجه». الـ agent بياخد الشاشة كقايمة قصيرة مرقّمة (@e1 button وهكذا) بدل screenshot كبير، ويتصرف عليها.\n\nالبداية بأمر npx -y phonedriver init، وبيضيف phonedriver للـ agents اللي يلاقيها عندك (Claude Code و Codex و Cursor و VS Code و Gemini CLI)، وبعدين يفحص adb و Xcode والأجهزة ويقولك إيه اللازم تصلحه. والـ plugin بيضم الـ MCP server والـ skill اللي بتعلّم الـ agent إزاي يستخدمه. وفي مثال الـ repo، Claude Code طلب بيتزا من Domino's على emulator ووقف عند Buy with GPay وسألك، ومفيش حاجة اتطلبت.\n\nخد بالك إن رقم الـ ٦٫٩x جاي من الـ repo نفسه على ٩ مهام، فاعتبره ادعاء الكاتب مش benchmark مستقل. والأداة بتتحكم في موبايل فعلي، فاديها صلاحيات على emulator أو جهاز اختبار مش جهازك الشخصي، وراجع كل خطوة بتتعلق بدفع أو بيانات حساسة.\n\nهتسيب AI agent يجرّب تطبيقك على موبايل فعلي؟ وإيه الحدود اللي هتحطها؟\n\nزكاة العلم نشره.\n\n#Android #MCP #AIAgents #MobileTesting #mo3talogy",
+    "summary_ar": "عايز الـ AI agent يفتح تطبيقك ويجرّب الـ signup ويدوّرلك على الـ bug؟ محتاج يتحكم في موبايل فعلًا، مش بس يقرا كود 📱\n\nphonedriver من hridaya423 بيدّي الـ agent تحكم في موبايل Android أو iPhone، حقيقي أو افتراضي. بيقرا الشاشة ويدوس على زرار ويقولك إيه اللي اتغيّر، وبيسألك قبل ما يدوس Pay. بيشتغل عن طريق MCP مع Claude Code و Codex و Cursor، أو من الـ command line، والـ repo بيقول إنه بيستخدم توكنز أقل ٦٫٩ مرة من mobile-mcp على ٩ مهام.\n\nتخيّل تقول لـ agent: «افتح تطبيقي وجرّب الـ signup بمدخلات غلط وبلّغني بكل bug بخطوات إعادة إنتاجه». الـ agent بياخد الشاشة كقايمة قصيرة مرقّمة (@e1 button وهكذا) بدل screenshot كبير، ويتصرف عليها.\n\nخد بالك إن رقم الـ ٦٫٩x جاي من الـ repo نفسه على ٩ مهام، فاعتبره ادعاء الكاتب مش benchmark مستقل. والأداة بتتحكم في موبايل فعلي، فاديها صلاحيات على emulator أو جهاز اختبار مش جهازك الشخصي، وراجع كل خطوة بتتعلق بدفع أو بيانات حساسة.\n\nهتسيب AI agent يجرّب تطبيقك على موبايل فعلي؟ وإيه الحدود اللي هتحطها؟",
+    "summary_en": "phonedriver is an MCP server and CLI that lets an AI agent control an Android phone or iPhone, real or virtual: it reads the screen as a short numbered list, taps, reports what changed, and asks before tapping Pay. It installs into Claude Code, Codex, Cursor, VS Code and Gemini CLI with npx -y phonedriver init. The repo claims 6.9x fewer tokens than mobile-mcp across nine jobs; that is the author's own figure, so test it on an emulator, not a personal phone.",
+    "url": "https://github.com/hridaya423/phonedriver",
+    "image": "assets/images/articles/kw537-aw753-phonedriver-give-your-ai-agent-a-phone.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-phonedriver-give-your-ai-agent-a-phone.svg"
+    ],
+    "explainers": [
+      {
+        "term": "MCP",
+        "explanation": "بروتوكول بيخلّي الـ AI agents تتصل بأدوات خارجية."
+      },
+      {
+        "term": "MCP server",
+        "explanation": "برنامج بيعرض أدوات للـ agent، هنا أدوات التحكم في الموبايل."
+      },
+      {
+        "term": "emulator",
+        "explanation": "موبايل افتراضي بيشتغل على الكمبيوتر."
+      },
+      {
+        "term": "adb",
+        "explanation": "أداة سطر أوامر للتواصل مع أجهزة Android."
+      },
+      {
+        "term": "snapshot",
+        "explanation": "وصف نصي مختصر لعناصر الشاشة الحالية."
+      },
+      {
+        "term": "token",
+        "explanation": "وحدة نص بيحسب بيها الـ LLM التكلفة والحد."
+      },
+      {
+        "term": "mobile-mcp",
+        "explanation": "مشروع MCP تاني للتحكم في موبايلات، بيتقارن بيه الـ repo."
+      },
+      {
+        "term": "skill",
+        "explanation": "حزمة تعليمات بتعلّم الـ agent طريقة استخدام أداة."
+      }
+    ],
+    "linkedin_body": "عايز الـ AI agent يفتح تطبيقك ويجرّب الـ signup ويدوّرلك على الـ bug؟ محتاج يتحكم في موبايل فعلًا، مش بس يقرا كود 📱\n\nphonedriver من hridaya423 بيدّي الـ agent تحكم في موبايل Android أو iPhone، حقيقي أو افتراضي. بيقرا الشاشة ويدوس على زرار ويقولك إيه اللي اتغيّر، وبيسألك قبل ما يدوس Pay. بيشتغل عن طريق MCP مع Claude Code و Codex و Cursor، أو من الـ command line، والـ repo بيقول إنه بيستخدم توكنز أقل ٦٫٩ مرة من mobile-mcp على ٩ مهام.\n\nتخيّل تقول لـ agent: «افتح تطبيقي وجرّب الـ signup بمدخلات غلط وبلّغني بكل bug بخطوات إعادة إنتاجه». الـ agent بياخد الشاشة كقايمة قصيرة مرقّمة (@e1 button وهكذا) بدل screenshot كبير، ويتصرف عليها.\n\nالبداية بأمر npx -y phonedriver init، وبيضيف phonedriver للـ agents اللي يلاقيها عندك (Claude Code و Codex و Cursor و VS Code و Gemini CLI)، وبعدين يفحص adb و Xcode والأجهزة ويقولك إيه اللازم تصلحه. والـ plugin بيضم الـ MCP server والـ skill اللي بتعلّم الـ agent إزاي يستخدمه. وفي مثال الـ repo، Claude Code طلب بيتزا من Domino's على emulator ووقف عند Buy with GPay وسألك، ومفيش حاجة اتطلبت.\n\nخد بالك إن رقم الـ ٦٫٩x جاي من الـ repo نفسه على ٩ مهام، فاعتبره ادعاء الكاتب مش benchmark مستقل. والأداة بتتحكم في موبايل فعلي، فاديها صلاحيات على emulator أو جهاز اختبار مش جهازك الشخصي، وراجع كل خطوة بتتعلق بدفع أو بيانات حساسة.\n\nجرّب phonedriver على emulator وتطبيق بتاعك مش على موبايلك الشخصي. ابدأ بمهمة واحدة واضحة زي اختبار signup، وراجع الـ report اللي بتطلع. وخلّي خطوات الدفع والحسابات الحقيقية خارج التجربة تمامًا.\n\nهتسيب AI agent يجرّب تطبيقك على موبايل فعلي؟ وإيه الحدود اللي هتحطها؟\n\nزكاة العلم نشره.\n\n#Android #MCP #AIAgents #MobileTesting #mo3talogy"
+  },
+  {
+    "title": "Hilt Trace: شوف كل binding بيتعمل في الـ startup وبياخد كام ملّي ثانية على Perfetto",
+    "date": "2026-11-19T23:22:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Hilt",
+      "Perfetto",
+      "Tracing"
+    ],
+    "content": "تطبيقك بيفتح بطيء، وعندك Hilt، وإنت مش عارف أنهي bindings بتتعمل في الـ startup وبأي ترتيب وبتاخد قد إيه. المشروع ده بيجاوبك على السؤال ده من الـ trace 🔎\n\nSantiago Mattiauda عمل Android Hilt Extension. جزء اسمه Hilt Trace بيضيف trace sections لـ Perfetto حوالين إنشاء كائنات Hilt (hilt.create) والـ injection (hilt.inject) في debug builds، ومبني على androidx.tracing. وجزء تاني فيه coroutine helpers: qualifiers لـ dispatchers و scopes، و adapters بتخلي Provider و Lazy suspending، و trace section بتمشي مع الـ coroutine.\n\nتخيّل بتسجّل trace لكولد ستارت وبتشوف في الـ timeline إن binding معين بيتعمل بدري وبياخد وقت كبير. دلوقتي تعرف تنقله أو تخليه lazy بناءً على رقم مش تخمين.\n\nالـ README بيحدد الضمانات: الـ sections بس في debug و benchmark variants، و release builds ما بتتعدّلش وبايتاتها متطابقة مع build من غير الـ plugin، ومفيش حاجة بتتسجل لو الـ tracing مقفول، والـ build ما بيفشلش بسبب الـ instrumentation. الـ requirements: minSdk 24 و compileSdk 35، مع KSP بس (من غير kapt)، وتوليفات AGP و Kotlin و Hilt اتجرّبت.\n\nخد بالك إن النسخة 1.0.0-alpha01 pre-release، فالـ APIs وسلوك الـ instrumentation ممكن يتغيروا قبل الإصدار الثابت. والـ README نفسه بيذكر حدود: bindings مش مغطاة، ومفيش إلغاء تلقائي للـ scope، والـ overhead مش مقاس.\n\nتعرف بالظبط أنهي Hilt bindings بتتعمل في startup تطبيقك؟\n\nزكاة العلم نشره.\n\n#Android #Hilt #Perfetto #Coroutines #mo3talogy",
+    "summary_ar": "تطبيقك بيفتح بطيء، وعندك Hilt، وإنت مش عارف أنهي bindings بتتعمل في الـ startup وبأي ترتيب وبتاخد قد إيه. المشروع ده بيجاوبك على السؤال ده من الـ trace 🔎\n\nSantiago Mattiauda عمل Android Hilt Extension. جزء اسمه Hilt Trace بيضيف trace sections لـ Perfetto حوالين إنشاء كائنات Hilt (hilt.create) والـ injection (hilt.inject) في debug builds، ومبني على androidx.tracing. وجزء تاني فيه coroutine helpers: qualifiers لـ dispatchers و scopes، و adapters بتخلي Provider و Lazy suspending، و trace section بتمشي مع الـ coroutine.\n\nتخيّل بتسجّل trace لكولد ستارت وبتشوف في الـ timeline إن binding معين بيتعمل بدري وبياخد وقت كبير. دلوقتي تعرف تنقله أو تخليه lazy بناءً على رقم مش تخمين.\n\nخد بالك إن النسخة 1.0.0-alpha01 pre-release، فالـ APIs وسلوك الـ instrumentation ممكن يتغيروا قبل الإصدار الثابت. والـ README نفسه بيذكر حدود: bindings مش مغطاة، ومفيش إلغاء تلقائي للـ scope، والـ overhead مش مقاس.\n\nتعرف بالظبط أنهي Hilt bindings بتتعمل في startup تطبيقك؟",
+    "summary_en": "Android Hilt Extension adds Perfetto trace sections around Hilt object creation (hilt.create) and injection (hilt.inject) in debug and benchmark builds, built on androidx.tracing, so a trace shows which bindings a startup creates, in what order and how long each takes. It also provides coroutine helpers: dispatcher and scope qualifiers, suspending adapters for Provider and Lazy, and a trace section that follows a coroutine. It is 1.0.0-alpha01 (minSdk 24, KSP only), so APIs may change.",
+    "url": "https://github.com/santimattius/android-hilt-extension",
+    "image": "assets/images/articles/kw537-aw753-android-hilt-extension-perfetto-tracing-for-hilt-and-coroutine-helpers.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-android-hilt-extension-perfetto-tracing-for-hilt-and-coroutine-helpers.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Hilt",
+        "explanation": "إطار dependency injection لـ Android مبني على Dagger."
+      },
+      {
+        "term": "binding",
+        "explanation": "تعريف بيقول لـ Hilt إزاي ينشئ كائن."
+      },
+      {
+        "term": "Perfetto",
+        "explanation": "أداة لتسجيل وعرض system traces."
+      },
+      {
+        "term": "androidx.tracing",
+        "explanation": "مكتبة بتكتب trace sections من كود التطبيق."
+      },
+      {
+        "term": "bytecode transform",
+        "explanation": "تعديل على الكود المترجم وقت البناء."
+      },
+      {
+        "term": "Provider",
+        "explanation": "واجهة بتنشئ كائن جديد كل ما تطلبه."
+      },
+      {
+        "term": "Lazy",
+        "explanation": "واجهة بتأجّل إنشاء الكائن لحد أول استخدام."
+      },
+      {
+        "term": "KSP",
+        "explanation": "Kotlin Symbol Processing: معالج annotations أسرع من kapt."
+      }
+    ],
+    "linkedin_body": "تطبيقك بيفتح بطيء، وعندك Hilt، وإنت مش عارف أنهي bindings بتتعمل في الـ startup وبأي ترتيب وبتاخد قد إيه. المشروع ده بيجاوبك على السؤال ده من الـ trace 🔎\n\nSantiago Mattiauda عمل Android Hilt Extension. جزء اسمه Hilt Trace بيضيف trace sections لـ Perfetto حوالين إنشاء كائنات Hilt (hilt.create) والـ injection (hilt.inject) في debug builds، ومبني على androidx.tracing. وجزء تاني فيه coroutine helpers: qualifiers لـ dispatchers و scopes، و adapters بتخلي Provider و Lazy suspending، و trace section بتمشي مع الـ coroutine.\n\nتخيّل بتسجّل trace لكولد ستارت وبتشوف في الـ timeline إن binding معين بيتعمل بدري وبياخد وقت كبير. دلوقتي تعرف تنقله أو تخليه lazy بناءً على رقم مش تخمين.\n\nالـ README بيحدد الضمانات: الـ sections بس في debug و benchmark variants، و release builds ما بتتعدّلش وبايتاتها متطابقة مع build من غير الـ plugin، ومفيش حاجة بتتسجل لو الـ tracing مقفول، والـ build ما بيفشلش بسبب الـ instrumentation. الـ requirements: minSdk 24 و compileSdk 35، مع KSP بس (من غير kapt)، وتوليفات AGP و Kotlin و Hilt اتجرّبت.\n\nخد بالك إن النسخة 1.0.0-alpha01 pre-release، فالـ APIs وسلوك الـ instrumentation ممكن يتغيروا قبل الإصدار الثابت. والـ README نفسه بيذكر حدود: bindings مش مغطاة، ومفيش إلغاء تلقائي للـ scope، والـ overhead مش مقاس.\n\nجرّب Hilt Trace في debug build واحد بس وسجّل startup. اسأل نفسك: أنهي bindings بتتعمل قبل أول شاشة وملهاش لازمة؟ وحوّل الأثقل لـ Lazy أو Provider، وأعد القياس. وانتبه إن ده alpha، فمتحطوش في pipeline حرجة.\n\nتعرف بالظبط أنهي Hilt bindings بتتعمل في startup تطبيقك؟\n\nزكاة العلم نشره.\n\n#Android #Hilt #Perfetto #Coroutines #mo3talogy"
+  },
+  {
+    "title": "Sign in with Google لألعاب Unity: plugin مفتوح المصدر بدل الـ sample bridges القديمة",
+    "date": "2026-11-19T23:21:00+02:00",
+    "source": "نشرة التكنولوجيا",
+    "category": "Android",
+    "tags": [
+      "Unity",
+      "Credential Manager",
+      "Authentication"
+    ],
+    "content": "لو بتبني لعبة Unity، تسجيل الدخول بجوجل كان لسنين بيعتمد على sample bridges قديمة بتتعب مع Gradle الحديث ومتطلبات AndroidX 🎮\n\nمدونة Android Developers أعلنت إطلاق Sign in with Google Mobile Plugin for Unity كمشروع open source على GitHub. متوافق مع Unity 6.5، وبيحل محل التنفيذ القديم بـ authentication bridge رسمي وخفيف.\n\nتخيّل لعبة محتاجة onboarding سلس عشان الـ day-one retention. بدل ما تكتب manifest edits يدوي، بتحط الـ Web Client ID و iOS Reversed Client ID من داخل الـ editor في Window > Google Sign-In Native > Settings.\n\nالمميزات المذكورة: bridges native بس لتقليل الـ overhead، وتكامل مع Credential Manager على Android (بـ Kotlin) و GIDSignIn على iOS (بـ Objective-C++) لتجربة دخول من غير password، وإعداد من الـ editor، وغير مرتبط بـ backend معين.\n\nخد بالك إن ده إعلان رسمي، فالحقيقة العملية هتظهر في التجربة على مشروعك. والـ plugin جديد، فراجع حالة الـ issues وتوافق نسخة Unity عندك قبل ما تعتمد عليه.\n\nلعبتك Unity لسه معتمدة على bridge قديم لتسجيل الدخول بجوجل؟\n\nزكاة العلم نشره.\n\n#Android #Unity #CredentialManager #GoogleSignIn #mo3talogy",
+    "summary_ar": "لو بتبني لعبة Unity، تسجيل الدخول بجوجل كان لسنين بيعتمد على sample bridges قديمة بتتعب مع Gradle الحديث ومتطلبات AndroidX 🎮\n\nمدونة Android Developers أعلنت إطلاق Sign in with Google Mobile Plugin for Unity كمشروع open source على GitHub. متوافق مع Unity 6.5، وبيحل محل التنفيذ القديم بـ authentication bridge رسمي وخفيف.\n\nتخيّل لعبة محتاجة onboarding سلس عشان الـ day-one retention. بدل ما تكتب manifest edits يدوي، بتحط الـ Web Client ID و iOS Reversed Client ID من داخل الـ editor في Window > Google Sign-In Native > Settings.\n\nخد بالك إن ده إعلان رسمي، فالحقيقة العملية هتظهر في التجربة على مشروعك. والـ plugin جديد، فراجع حالة الـ issues وتوافق نسخة Unity عندك قبل ما تعتمد عليه.\n\nلعبتك Unity لسه معتمدة على bridge قديم لتسجيل الدخول بجوجل؟",
+    "summary_en": "Google announced an open-source Sign in with Google Mobile Plugin for Unity, compatible with Unity 6.5, replacing deprecated sample bridges. It uses lightweight native-only bridges with Android's Credential Manager (Kotlin) and iOS's GIDSignIn (Objective-C++), lets you set the Web Client ID and iOS Reversed Client ID in the editor under Window > Google Sign-In Native > Settings, and stays backend-agnostic.",
+    "url": "https://developer.android.com/blog/posts/open-source-google-sign-in-unity",
+    "image": "assets/images/articles/kw537-aw753-open-source-sign-in-with-google-plugin-for-unity.svg",
+    "images": [
+      "assets/images/articles/kw537-aw753-open-source-sign-in-with-google-plugin-for-unity.svg"
+    ],
+    "explainers": [
+      {
+        "term": "Unity",
+        "explanation": "محرك ألعاب بيشغّل أكتر من نص ألعاب الموبايل."
+      },
+      {
+        "term": "Credential Manager",
+        "explanation": "API في Android بتوحّد تسجيل الدخول بـ passkeys و passwords والحسابات."
+      },
+      {
+        "term": "GIDSignIn",
+        "explanation": "مكتبة Google لتسجيل الدخول على iOS."
+      },
+      {
+        "term": "bridge",
+        "explanation": "طبقة بتوصل كود Unity بالـ API الأصلية للمنصة."
+      },
+      {
+        "term": "Web Client ID",
+        "explanation": "معرّف OAuth بتحتاجه عشان تتحقق من الـ token في السيرفر."
+      },
+      {
+        "term": "backend-agnostic",
+        "explanation": "مش مربوطة بسيرفر أو منصة معينة."
+      },
+      {
+        "term": "retention",
+        "explanation": "نسبة اللاعبين اللي بيرجعوا بعد أول يوم."
+      },
+      {
+        "term": "onboarding",
+        "explanation": "تجربة أول استخدام للمستخدم الجديد."
+      }
+    ],
+    "linkedin_body": "لو بتبني لعبة Unity، تسجيل الدخول بجوجل كان لسنين بيعتمد على sample bridges قديمة بتتعب مع Gradle الحديث ومتطلبات AndroidX 🎮\n\nمدونة Android Developers أعلنت إطلاق Sign in with Google Mobile Plugin for Unity كمشروع open source على GitHub. متوافق مع Unity 6.5، وبيحل محل التنفيذ القديم بـ authentication bridge رسمي وخفيف.\n\nتخيّل لعبة محتاجة onboarding سلس عشان الـ day-one retention. بدل ما تكتب manifest edits يدوي، بتحط الـ Web Client ID و iOS Reversed Client ID من داخل الـ editor في Window > Google Sign-In Native > Settings.\n\nالمميزات المذكورة: bridges native بس لتقليل الـ overhead، وتكامل مع Credential Manager على Android (بـ Kotlin) و GIDSignIn على iOS (بـ Objective-C++) لتجربة دخول من غير password، وإعداد من الـ editor، وغير مرتبط بـ backend معين.\n\nخد بالك إن ده إعلان رسمي، فالحقيقة العملية هتظهر في التجربة على مشروعك. والـ plugin جديد، فراجع حالة الـ issues وتوافق نسخة Unity عندك قبل ما تعتمد عليه.\n\nلو عندك لعبة Unity بتستخدم sample bridge قديم، جرّب الـ plugin على branch منفصل. اتأكد من Credential Manager على أجهزة Android مختلفة، واختبر مسار الفشل زي إلغاء المستخدم أو عدم وجود حساب.\n\nلعبتك Unity لسه معتمدة على bridge قديم لتسجيل الدخول بجوجل؟\n\nزكاة العلم نشره.\n\n#Android #Unity #CredentialManager #GoogleSignIn #mo3talogy"
+  },
+  {
     "title": "إزاي تحوّل جلسات Android Dev Summit لمرجع بتشتغل بيه؟",
     "date": "2026-11-08T21:40:15+02:00",
     "source": "نشرة التكنولوجيا",
