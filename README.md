@@ -10,4 +10,6 @@
 3. Branch: main, Folder: / (root)
 4. Save
 
-الموقع سيكون متاحا على: https://mahmoudmabrok.github.io/tech-blog
+الموقع متاح على: https://mo3ta.top/tech-blog
+
+الدومين `mo3ta.top` جاي من موقع المستخدم، ومش من المستودع ده. متعملش ملف CNAME هنا.
