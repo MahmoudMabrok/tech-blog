@@ -140,7 +140,7 @@ title: المقالات
 
 <div class="visitors">
   <span>عدد الزيارات</span>
-  <img src="https://hits.sh/mahmoudmabrok.github.io/tech-blog.svg?style=flat-square&label=%F0%9F%91%81&color=4f46e5" alt="عدد الزيارات" loading="lazy">
+  <img src="https://hits.sh/mo3ta.top/tech-blog.svg?style=flat-square&label=%F0%9F%91%81&color=4f46e5" alt="عدد الزيارات" loading="lazy">
 </div>
 
 <div id="lightbox" class="lightbox" hidden>

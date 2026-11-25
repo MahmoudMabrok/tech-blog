@@ -6,7 +6,7 @@ theme: minima
 
 lang: ar
 
-url: "https://mahmoudmabrok.github.io"
+url: "https://mo3ta.top"
 
 baseurl: "/tech-blog"
 
@@ -14,5 +14,6 @@ markdown: kramdown
 
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
 
 timezone: Africa/Cairo
